@@ -23,7 +23,10 @@ FAIL=0
 
 scan_tree() {
     # Scan working-tree files git tracks (respects .gitignore implicitly)
+    # Skip this script: it contains regex fragments/escapes of the patterns
+    # themselves (by design) and would always self-match.
     while IFS= read -r -d '' f; do
+        [[ "$f" == *hygiene-check.sh ]] && continue
         if grep -Iq . "$f" 2>/dev/null; then
             MATCHES=$(grep -inE "$PATTERNS" "$f" 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
