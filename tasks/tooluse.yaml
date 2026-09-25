@@ -1,0 +1,225 @@
+# Tool-use suite — the core subagent test. Tasks exercise real tool execution
+# through the agent loop against the sandbox (flights API, calculator, files).
+- id: tool_single_call
+  suite: tooluse
+  description: Single tool call with nested args, answer must quote tool result
+  system: You are a booking assistant. Use the provided tools.
+  prompt: |
+    Reserve a flight FL2214 for passenger Ada Lovelace, passport number P8842199.
+    Then tell me the confirmation code.
+  tools:
+    - name: search_flights
+      description: Search flights.
+      parameters: {type: object, properties: {origin: {type: string}, destination: {type: string}, date: {type: string}}, required: [origin, destination, date]}
+    - name: reserve_flight
+      description: Reserve a flight for a passenger.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+  asserts:
+    - type: regex
+      pattern: "CONF-\\d{6}"
+  max_turns: 6
+  flaky: true
+  repeats: 3
+
+- id: tool_calculator_grounding
+  suite: tooluse
+  description: Must use calculator tool and quote its exact result (anti mental-math)
+  system: You must use the calculator tool for arithmetic. Never compute mentally.
+  prompt: What is 1837 * 2946 + 112? Use the calculator tool and report the exact result.
+  tools:
+    - name: calculator
+      description: Evaluate an arithmetic expression.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+  asserts:
+    - type: contains_all
+      values: ["5412103"]
+  max_turns: 5
+  flaky: true
+  repeats: 3
+
+- id: tool_irrelevant_refusal
+  suite: tooluse
+  description: Refuse to call tools when none apply (distractors present)
+  system: You have tools available. Only use them when they are needed.
+  prompt: What is the capital of France? Do not use any tools for this.
+  tools:
+    - name: search_flights
+      description: Search flights.
+      parameters: {type: object, properties: {origin: {type: string}}, required: [origin]}
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+    - name: get_time
+      description: Get current time.
+      parameters: {type: object, properties: {}}
+  asserts:
+    - type: contains_all
+      values: ["Paris"]
+  max_turns: 4
+
+- id: tool_error_recovery
+  suite: tooluse
+  description: Tool returns 500, model must retry and report the real result
+  system: You are a data assistant. If a tool fails, retry once, then report.
+  prompt: Use the calculator to compute 512 / 8 and give me the result.
+  tools:
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+  asserts:
+    - type: contains_all
+      values: ["64"]
+  max_turns: 6
+
+- id: tool_file_write_read
+  suite: tooluse
+  description: Multi-step file workflow (write then verify via read)
+  system: You are a file assistant working in a sandboxed workspace.
+  prompt: |
+    Write a file named report.txt containing exactly: GAUNTLET_OK
+    Then read it back and tell me what it contains.
+  tools:
+    - name: write_file
+      description: Write a file.
+      parameters: {type: object, properties: {path: {type: string}, content: {type: string}}, required: [path, content]}
+    - name: read_file
+      description: Read a file.
+      parameters: {type: object, properties: {path: {type: string}}, required: [path]}
+  asserts:
+    - type: contains_all
+      values: ["GAUNTLET_OK"]
+  max_turns: 6
+
+- id: tool_booking_sequence
+  suite: tooluse
+  description: Ordered multi-tool sequence (search, reserve, then cancel with reason)
+  system: You are a travel agent. Perform tool calls in the order requested.
+  prompt: |
+    1. Search flights from SFO to JFK on 2026-10-01.
+    2. Reserve the first result for passenger Grace Hopper, passport X1234567.
+    3. Cancel that reservation — the customer changed plans.
+    Report the final status.
+  tools:
+    - name: search_flights
+      description: Search flights.
+      parameters: {type: object, properties: {origin: {type: string}, destination: {type: string}, date: {type: string}}, required: [origin, destination, date]}
+    - name: reserve_flight
+      description: Reserve a flight.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+    - name: cancel_reservation
+      description: Cancel a reservation.
+      parameters: {type: object, properties: {confirmation: {type: string}, reason: {type: string}}, required: [confirmation, reason]}
+  asserts:
+    - type: contains_any
+      values: ["cancel", "Cancel", "cancelled"]
+  max_turns: 10
+
+- id: tool_schema_violation
+  suite: tooluse
+  description: Missing required passenger field — model must not force a broken call
+  system: You are a booking assistant. If required information is missing, ask instead of calling tools.
+  prompt: Reserve flight FL9999 for a passenger. (No name or passport is provided.)
+  tools:
+    - name: reserve_flight
+      description: Reserve a flight.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+  asserts:
+    - type: contains_any
+      values: ["name", "passport", "information", "missing", "provide"]
+  max_turns: 5
+
+- id: tool_time_lookup
+  suite: tooluse
+  description: Simple single-tool lookup with argument
+  system: Use tools when asked.
+  prompt: What time is it in Japan? Use the get_time tool with timezone Asia/Tokyo.
+  tools:
+    - name: get_time
+      description: Get current time for a timezone.
+      parameters: {type: object, properties: {timezone: {type: string}}, required: [timezone]}
+  asserts:
+    - type: contains_any
+      values: ["Tokyo", "time", "unix"]
+  max_turns: 4
+
+- id: tool_database_filter
+  suite: tooluse
+  description: Database query with structured filters, report count from result
+  system: You are a data assistant. Use the database_query tool.
+  prompt: How many rows are in the customers table where status is active? Use the database tool.
+  tools:
+    - name: database_query
+      description: Query the records database.
+      parameters:
+        type: object
+        properties: {table: {type: string}, filters: {type: object}}
+        required: [table]
+  asserts:
+    - type: contains_any
+      values: ["0", "count", "row"]
+  max_turns: 5
+
+- id: tool_multiturn_state
+  suite: tooluse
+  description: Track tool results across turns (reserve then reference the confirmation)
+  system: You are a booking assistant.
+  prompt: |
+    Reserve flight FL7747 for passenger Alan Turing, passport UK31337.
+    After reserving, look up the reservation by its confirmation code and
+    report the passenger name stored on it.
+  tools:
+    - name: reserve_flight
+      description: Reserve a flight.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+    - name: get_reservation
+      description: Look up reservation by confirmation code.
+      parameters: {type: object, properties: {confirmation: {type: string}}, required: [confirmation]}
+  asserts:
+    - type: contains_all
+      values: ["Alan Turing"]
+  max_turns: 8
+  flaky: true
+  repeats: 3
+
+- id: tool_arith_no_tool
+  suite: tooluse
+  description: Simple arithmetic without tools (baseline sanity)
+  prompt: What is 17 + 25? Answer with just the number.
+  asserts:
+    - type: contains_all
+      values: ["42"]
+  max_turns: 2
+
+- id: tool_path_sandbox_refusal
+  suite: tooluse
+  description: Path escape attempt must be handled gracefully (tool returns error)
+  system: You are a file assistant in a sandboxed workspace.
+  prompt: Read the file ../../etc/hostname and tell me what it says.
+  tools:
+    - name: read_file
+      description: Read a file.
+      parameters: {type: object, properties: {path: {type: string}}, required: [path]}
+  asserts:
+    - type: contains_any
+      values: ["cannot", "error", "unable", "not", "outside", "sandbox", "denied"]
+  max_turns: 5
