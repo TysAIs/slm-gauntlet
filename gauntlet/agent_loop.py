@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
-from gauntlet.client import GauntletClient, ChatResult
+from gauntlet.client import ChatResult, GauntletClient
 from gauntlet.sandbox import ToolSandbox, parse_tool_call_name
 
 
@@ -67,7 +67,9 @@ async def run_agent_loop(
 
     for turn in range(max_turns):
         try:
-            result: ChatResult = await client.chat(messages, tools=tools or None, temperature=temperature, max_tokens=max_tokens)
+            result: ChatResult = await client.chat(
+                messages, tools=tools or None, temperature=temperature, max_tokens=max_tokens
+            )
         except Exception as e:  # noqa: BLE001 — record and fail the task
             outcome.terminated = "error"
             outcome.final_text = f"[client error] {e}"
@@ -115,7 +117,10 @@ async def run_agent_loop(
                 return outcome
             resp = sandbox.execute(embedded_name, args)
             outcome.call_log.append({"tool": embedded_name, "args": args, "result": resp})
-            messages.append({"role": "user", "content": f"Tool `{embedded_name}` returned: {json.dumps(resp)}\nContinue."})
+            messages.append({
+                "role": "user",
+                "content": f"Tool `{embedded_name}` returned: {json.dumps(resp)}\nContinue.",
+            })
             continue
 
         # --- final text answer ---

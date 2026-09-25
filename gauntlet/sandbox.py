@@ -88,7 +88,9 @@ class ToolSandbox:
         if not passenger.get("name") or not passenger.get("passport"):
             return {"error": "missing_passenger_fields", "message": "passenger needs name and passport"}
         confirmation = f"CONF-{self.rng.randint(100000, 999999)}"
-        self.state.setdefault("reservations", []).append({"flight_id": flight_id, "confirmation": confirmation, **passenger})
+        self.state.setdefault("reservations", []).append(
+            {"flight_id": flight_id, "confirmation": confirmation, **passenger}
+        )
         return {"confirmation": confirmation, "status": "reserved", "flight_id": flight_id}
 
     def _tool_get_reservation(self, confirmation: str) -> dict:

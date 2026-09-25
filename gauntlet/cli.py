@@ -11,9 +11,9 @@ from pathlib import Path
 import yaml
 
 from gauntlet.client import GauntletClient
-from gauntlet.task import Task
-from gauntlet.runner import run_suite, write_results
 from gauntlet.report import aggregate_results
+from gauntlet.runner import run_suite, write_results
+from gauntlet.task import Task
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "tasks"
 
@@ -43,7 +43,11 @@ def cmd_run(args: argparse.Namespace) -> int:
             await client.close()
 
     results = asyncio.run(go())
-    out = write_results(results, meta={"model": args.model, "endpoint": args.endpoint, "seed": args.seed}, outdir=Path("results"))
+    out = write_results(
+        results,
+        meta={"model": args.model, "endpoint": args.endpoint, "seed": args.seed},
+        outdir=Path("results"),
+    )
     print(f"[gauntlet] results -> {out}")
 
     summary = aggregate_results(results, SUITE_WEIGHTS)

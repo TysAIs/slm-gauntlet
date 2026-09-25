@@ -1,15 +1,14 @@
 """Tests for the deterministic scorer."""
 
-import pytest
 
 from gauntlet.scorer import (
-    ScoreResult,
     Scorer,
+    ScoreResult,
+    contains_all,
     exact_match,
     json_schema_check,
-    regex_check,
-    contains_all,
     predicate_check,
+    regex_check,
 )
 
 

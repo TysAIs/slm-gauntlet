@@ -3,13 +3,12 @@
 import json
 
 import httpx
-import pytest
 
-from gauntlet.agent_loop import run_agent_loop, LoopWatchdog, _extract_args
+from gauntlet.agent_loop import LoopWatchdog, _extract_args, run_agent_loop
 from gauntlet.client import GauntletClient
-from gauntlet.sandbox import ToolSandbox, tools_for
-from gauntlet.task import Task, ToolDef, Assert
 from gauntlet.runner import run_task
+from gauntlet.sandbox import ToolSandbox, tools_for
+from gauntlet.task import Assert, Task, ToolDef
 
 
 def _client_with_script(script: list[dict]) -> GauntletClient:

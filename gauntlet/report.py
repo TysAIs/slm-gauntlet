@@ -84,7 +84,8 @@ def generate_leaderboard(results_dir: Path) -> str:
     ]
     for model, s in rows:
         st = s["suites"]
-        cells = [st.get(k, {}).get("pass1", "-") for k in ("tooluse", "structured", "retrieval", "coding", "instruction")]
+        cell_keys = ("tooluse", "structured", "retrieval", "coding", "instruction")
+        cells = [st.get(k, {}).get("pass1", "-") for k in cell_keys]
         loops = s["failure_modes"].get("looped", 0) + s["failure_modes"].get("max_turns", 0)
         lines.append(
             f"| {model} | {s['subagent_capability_score']} | {s['profile']} | "

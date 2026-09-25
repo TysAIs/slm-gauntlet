@@ -37,7 +37,6 @@ def test_cli_run_writes_results_and_scores(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)  # results/ lands in tmp
     transport = httpx.MockTransport(_mock_handler)
     # patch client creation to inject transport
-    import gauntlet.cli as cli
     import gauntlet.client as client_mod
 
     orig_init = client_mod.GauntletClient.__init__
@@ -47,7 +46,10 @@ def test_cli_run_writes_results_and_scores(tmp_path, monkeypatch):
 
     monkeypatch.setattr(client_mod.GauntletClient, "__init__", patched)
 
-    rc = main(["run", "--endpoint", "http://mock/v1", "--model", "mock-model", "--suite", "tooluse", "--concurrency", "4"])
+    rc = main([
+        "run", "--endpoint", "http://mock/v1", "--model", "mock-model",
+        "--suite", "tooluse", "--concurrency", "4",
+    ])
     assert rc == 0
 
     files = list((tmp_path / "results").glob("*.json"))

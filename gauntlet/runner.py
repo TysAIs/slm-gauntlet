@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-import time
-from dataclasses import asdict
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from gauntlet.agent_loop import run_agent_loop, LoopOutcome
+from gauntlet.agent_loop import LoopOutcome, run_agent_loop
 from gauntlet.client import GauntletClient
 from gauntlet.sandbox import ToolSandbox, tools_for
 from gauntlet.scorer import Scorer
@@ -35,7 +33,7 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
                 ),
                 timeout=task.timeout,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             outcome = LoopOutcome(terminated="timeout", final_text="[timeout]")
         score = scorer.score(outcome.final_text, task.to_assert_dicts()) if outcome.final_text else None
         if score is None:
@@ -87,7 +85,7 @@ async def run_suite(client: GauntletClient, tasks: list[Task], concurrency: int 
 
 def write_results(results: list[dict], meta: dict, outdir: Path) -> Path:
     outdir.mkdir(parents=True, exist_ok=True)
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     path = outdir / f"{meta.get('model', 'model').replace('/', '_')}_{stamp}.json"
     payload = {
         "meta": {

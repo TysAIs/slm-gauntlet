@@ -11,7 +11,7 @@ from __future__ import annotations
 import random
 import uuid
 
-from gauntlet.task import Task, Assert
+from gauntlet.task import Assert, Task
 
 FILLER_SUBJECTS = [
     "the city council", "a retired cartographer", "two bakers", "the local chess club",
@@ -32,14 +32,38 @@ FILLER_EVENTS = [
 # NoLiMa-style: needle entity/relation with zero lexical overlap with the question
 NOLIMA_PAIRS = [
     # (needle sentence, question asking about it without shared content words)
-    ("The velvet compass belongs to Marisol Vane.", "Who owns the item used for wayfinding that has a soft fabric covering?"),
-    ("Renwick's flagship store opened during a leap year.", "In what type of year did the company's main shop first open its doors?"),
-    ("The violinist hides spare rosin inside a hollowed cookbook.", "Where does the string musician keep extra bow resin?"),
-    ("Professor Okonkwo commutes by unicycle when it rains.", "How does the educator travel to work in wet weather?"),
-    ("The bakery's secret ingredient is smoked sea salt.", "What special component gives the bread shop's goods their flavor?"),
-    ("Captain Reyes keeps the ship's log in violet ink.", "What color ink does the vessel's commander use for records?"),
-    ("The lighthouse generator runs on recycled cooking oil.", "What fuel powers the beacon's machinery?"),
-    ("Agnieszka paints only during thunderstorms.", "Under what weather conditions does the artist work?"),
+    (
+        "The velvet compass belongs to Marisol Vane.",
+        "Who owns the item used for wayfinding that has a soft fabric covering?",
+    ),
+    (
+        "Renwick's flagship store opened during a leap year.",
+        "In what type of year did the company's main shop first open its doors?",
+    ),
+    (
+        "The violinist hides spare rosin inside a hollowed cookbook.",
+        "Where does the string musician keep extra bow resin?",
+    ),
+    (
+        "Professor Okonkwo commutes by unicycle when it rains.",
+        "How does the educator travel to work in wet weather?",
+    ),
+    (
+        "The bakery's secret ingredient is smoked sea salt.",
+        "What special component gives the bread shop's goods their flavor?",
+    ),
+    (
+        "Captain Reyes keeps the ship's log in violet ink.",
+        "What color ink does the vessel's commander use for records?",
+    ),
+    (
+        "The lighthouse generator runs on recycled cooking oil.",
+        "What fuel powers the beacon's machinery?",
+    ),
+    (
+        "Agnieszka paints only during thunderstorms.",
+        "Under what weather conditions does the artist work?",
+    ),
 ]
 
 

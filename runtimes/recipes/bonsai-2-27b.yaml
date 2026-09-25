@@ -1,0 +1,15 @@
+# Canonical load recipe: Bonsai-2-27B-ternary (PrismML) — NON-VANILLA RUNTIME
+model: prismml/bonsai-2-27b-ptq1_0  # verify exact HF id at bring-up
+runtime: prismml-llama-cpp-fork
+weights_bytes_gb: 5.9
+context: 16384
+parallel_slots: 4
+flash_attn: true
+jinja: true
+temperature: 0.0
+notes: >
+  Ternary-weight 27B at 1.75 bpw (PTQ1_0). REQUIRES the PrismML llama.cpp fork
+  with Q1_0/Q2_0 kernel support — vanilla llama.cpp cannot load these bands.
+  Build the fork per its README, point this recipe's runner at that binary.
+  If CUDA kernels do not support the target GPU arch (sm86 or older), the
+  model runs CPU-only (slow but scoreable) or is recorded as runtime-incompatible.

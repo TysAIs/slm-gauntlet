@@ -1,0 +1,13 @@
+# Canonical load recipe: LFM2.5-2.6B (Liquid AI), GGUF quants Q4_K_M / Q8_0
+model: LiquidAI/LFM2.5-2.6B-GGUF
+architecture: lfm2
+context: 32768
+parallel_slots: 8
+kv_cache: q8_0
+flash_attn: true
+jinja: true          # native tool calling requires --jinja
+temperature: 0.0
+notes: >
+  Agentic-native model; trained for tool calling with pythonic tool-call tokens.
+  Use --jinja so the native template applies. 8 slots at 32K context fits 8GB
+  VRAM at Q4_K_M (1.67GB weights); Q8_0 (2.87GB) also fits with KV headroom.

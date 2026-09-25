@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-import yaml
 import pytest
+import yaml
 
 from gauntlet.task import Task
 

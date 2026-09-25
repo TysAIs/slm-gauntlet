@@ -1,6 +1,6 @@
 """Tests for taskgen: determinism under seed, needle placement, no-lexical-overlap."""
 
-from gauntlet.taskgen.needle_haystack import make_needle_task, make_refusal_task, NOLIMA_PAIRS
+from gauntlet.taskgen.needle_haystack import NOLIMA_PAIRS, make_needle_task, make_refusal_task
 
 
 def test_deterministic_under_seed():

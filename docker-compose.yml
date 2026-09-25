@@ -1,0 +1,26 @@
+# One-command reproduction: docker compose up --build
+# Serves a model with llama.cpp and runs the gauntlet against it.
+services:
+  llama-server:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: >
+      -m /models/model.gguf
+      --host 0.0.0.0 --port 8080
+      -c 32768 -np 8 --kv-unified -fa --jinja --temp 0.0
+    volumes:
+      - ${MODEL_DIR:-./models}:/models
+    ports:
+      - "8080:8080"
+
+  gauntlet:
+    build: .
+    depends_on:
+      - llama-server
+    environment:
+      - GAUNTLET_ENDPOINT=http://llama-server:8080/v1
+      - GAUNTLET_MODEL=${MODEL_ID:-local-model}
+    command: >
+      run --endpoint http://llama-server:8080/v1
+      --model ${MODEL_ID:-local-model} --suite all
+    volumes:
+      - ./results:/app/results

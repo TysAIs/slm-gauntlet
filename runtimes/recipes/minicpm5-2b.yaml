@@ -1,0 +1,12 @@
+# Canonical load recipe: MiniCPM5-2B (OpenBMB), GGUF quants Q4_K_M / Q8_0
+model: openbmb/MiniCPM5-2B-GGUF
+context: 32768
+parallel_slots: 8
+kv_cache: q8_0
+flash_attn: true
+jinja: true
+temperature: 0.0
+notes: >
+  Hybrid think/no-think modes. Our 1070 Ti baseline serving used Q8_0 with
+  -c 131072 -np 8 --kv-unified q8_0 (5537 MiB); the gauntlet standardizes on
+  32K context x 8 slots for comparability across models.

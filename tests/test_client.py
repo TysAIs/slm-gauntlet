@@ -5,7 +5,7 @@ import json
 import httpx
 import pytest
 
-from gauntlet.client import GauntletClient, ClientError
+from gauntlet.client import ClientError, GauntletClient
 
 
 def _resp(payload, status=200):
