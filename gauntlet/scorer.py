@@ -31,12 +31,14 @@ class ScoreResult:
     passed: bool
     checks: list[dict] = field(default_factory=list)
     failed: list[str] = field(default_factory=list)
+    score: float = 1.0  # weighted partial-credit rubric score in [0, 1]
 
     def merge(self, other: ScoreResult) -> ScoreResult:
         return ScoreResult(
             passed=self.passed and other.passed,
             checks=self.checks + other.checks,
             failed=self.failed + other.failed,
+            score=min(self.score, other.score),
         )
 
 
@@ -136,14 +138,26 @@ def predicate_check(output: Any, expr: str) -> ScoreResult:
 
 
 class Scorer:
-    """Runs a task's assertion list against model output."""
+    """Runs a task's assertion list against model output.
+
+    Scoring model (Vals-AI / Anthropic partial-credit pattern):
+      - every assert carries a weight (default 1.0)
+      - rubric score = earned weight / total weight
+      - a must_pass assert failing forces the task score to 0
+      - ScoreResult.passed remains the strict all-checks binary
+    """
 
     def score(self, output: str, asserts: list[dict]) -> ScoreResult:
         if not asserts:
             raise ValueError("task has no asserts — refusing to score trivially")
         result = ScoreResult(True)
+        earned = 0.0
+        total = 0.0
+        must_pass_failed = False
         for a in asserts:
             a = dict(a)
+            weight = float(a.pop("weight", 1.0))
+            must_pass = bool(a.pop("must_pass", False))
             kind = a.pop("type")
             fn: Callable[..., ScoreResult] = {
                 "exact_match": exact_match,
@@ -162,10 +176,20 @@ class Scorer:
                 r = fn(output, a["pattern"])
             else:
                 raise ValueError(f"unknown assert type: {kind}")
+            total += weight
+            check_ok = r.passed
+            if check_ok:
+                earned += weight
+            if must_pass and not check_ok:
+                must_pass_failed = True
             merged = result.merge(r)
             # surface failed checks in `failed` (merge only ANDs booleans)
             merged.failed = result.failed + [
                 f"{kind}: {json.dumps(c)}" for c in r.checks if not c.get("ok")
             ] + r.failed
             result = merged
+
+        result.score = earned / total if total else 0.0
+        if must_pass_failed:
+            result.score = 0.0
         return result

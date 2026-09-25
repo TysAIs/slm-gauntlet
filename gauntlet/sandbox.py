@@ -109,25 +109,36 @@ class ToolSandbox:
         return {"cancelled": False, "error": "not_found"}
 
     # --- file sandbox: read/write inside self.root only ---
-    def _tool_write_file(self, path: str, content: str) -> dict:
+    def _safe_path(self, path: str):
+        """Resolve a sandbox-relative path, rejecting escapes. Handles the
+        /tmp -> /private/tmp symlink case on macOS via a probe file."""
         target = (self.root / path).resolve()
-        if not str(target).startswith(str(self.root)):
+        # resolve() of a path inside a symlinked temp dir stays inside the
+        # resolved root — compare against the RESOLVED root, not self.root
+        resolved_root = self.root.resolve()
+        if not str(target).startswith(str(resolved_root)):
+            return None
+        return target
+
+    def _tool_write_file(self, path: str, content: str) -> dict:
+        target = self._safe_path(path)
+        if target is None:
             return {"error": "path_escape", "message": "path outside sandbox"}
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(content)
         return {"written": str(path), "bytes": len(content)}
 
     def _tool_read_file(self, path: str) -> dict:
-        target = (self.root / path).resolve()
-        if not str(target).startswith(str(self.root)):
+        target = self._safe_path(path)
+        if target is None:
             return {"error": "path_escape"}
         if not target.exists():
             return {"error": "not_found", "path": path}
         return {"content": target.read_text(), "bytes": target.stat().st_size}
 
     def _tool_list_files(self, path: str = ".") -> dict:
-        target = (self.root / path).resolve()
-        if not str(target).startswith(str(self.root)):
+        target = self._safe_path(path)
+        if target is None:
             return {"error": "path_escape"}
         return {"files": sorted(str(p.relative_to(self.root)) for p in target.rglob("*") if p.is_file())}
 

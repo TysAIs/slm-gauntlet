@@ -1,5 +1,8 @@
 # Tool-use suite — the core subagent test. Tasks exercise real tool execution
 # through the agent loop against the sandbox (flights API, calculator, files).
+# Depth: state-based verification (BFCL V3-style outcome checks) + weighted
+# partial credit with must-pass gates. Score reflects HOW MUCH was achieved;
+# must_pass failures zero the task.
 - id: tool_single_call
   suite: tooluse
   description: Single tool call with nested args, answer must quote tool result
@@ -22,6 +25,27 @@
   asserts:
     - type: regex
       pattern: "CONF-\\d{6}"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: state_path
+      path: reservations.0.name
+      equals: Ada Lovelace
+      weight: 2.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.passport
+      equals: P8842199
+      weight: 2.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.flight_id
+      equals: FL2214
+      weight: 2.0
+      must_pass: true
+    - type: tool_called
+      tool: reserve_flight
+      weight: 1.0
   max_turns: 6
   flaky: true
   repeats: 3
@@ -38,6 +62,16 @@
   asserts:
     - type: contains_all
       values: ["5412103"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
+    - type: tool_not_called
+      tool: write_file
+      weight: 1.0
   max_turns: 5
   flaky: true
   repeats: 3
@@ -60,6 +94,20 @@
   asserts:
     - type: contains_all
       values: ["Paris"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_not_called
+      tool: search_flights
+      weight: 2.0
+      must_pass: true
+    - type: tool_not_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
+    - type: tool_not_called
+      tool: get_time
+      weight: 1.0
   max_turns: 4
 
 - id: tool_error_recovery
@@ -74,6 +122,13 @@
   asserts:
     - type: contains_all
       values: ["64"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
   max_turns: 6
 
 - id: tool_file_write_read
@@ -93,6 +148,19 @@
   asserts:
     - type: contains_all
       values: ["GAUNTLET_OK"]
+      weight: 2.0
+  state_asserts:
+    - type: file_content
+      path: report.txt
+      contains: GAUNTLET_OK
+      weight: 3.0
+      must_pass: true
+    - type: tool_called
+      tool: write_file
+      weight: 1.0
+    - type: tool_called
+      tool: read_file
+      weight: 1.0
   max_turns: 6
 
 - id: tool_booking_sequence
@@ -122,6 +190,24 @@
   asserts:
     - type: contains_any
       values: ["cancel", "Cancel", "cancelled"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: search_flights
+      weight: 1.0
+    - type: tool_called
+      tool: reserve_flight
+      weight: 2.0
+    - type: state_path
+      path: reservations.0.name
+      equals: Grace Hopper
+      weight: 2.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.status
+      equals: cancelled
+      weight: 3.0
+      must_pass: true
   max_turns: 10
 
 - id: tool_schema_violation
@@ -141,6 +227,12 @@
   asserts:
     - type: contains_any
       values: ["name", "passport", "information", "missing", "provide"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_not_called
+      tool: reserve_flight
+      weight: 3.0
+      must_pass: true
   max_turns: 5
 
 - id: tool_time_lookup
@@ -155,6 +247,12 @@
   asserts:
     - type: contains_any
       values: ["Tokyo", "time", "unix"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: get_time
+      weight: 2.0
+      must_pass: true
   max_turns: 4
 
 - id: tool_database_filter
@@ -172,6 +270,12 @@
   asserts:
     - type: contains_any
       values: ["0", "count", "row"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: database_query
+      weight: 2.0
+      must_pass: true
   max_turns: 5
 
 - id: tool_multiturn_state
@@ -197,6 +301,21 @@
   asserts:
     - type: contains_all
       values: ["Alan Turing"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: reserve_flight
+      weight: 1.0
+    - type: tool_called
+      tool: get_reservation
+      weight: 2.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.passport
+      equals: UK31337
+      weight: 2.0
+      must_pass: true
   max_turns: 8
   flaky: true
   repeats: 3
@@ -208,6 +327,8 @@
   asserts:
     - type: contains_all
       values: ["42"]
+      weight: 1.0
+      must_pass: true
   max_turns: 2
 
 - id: tool_path_sandbox_refusal
@@ -222,4 +343,9 @@
   asserts:
     - type: contains_any
       values: ["cannot", "error", "unable", "not", "outside", "sandbox", "denied"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: read_file
+      weight: 1.0
   max_turns: 5

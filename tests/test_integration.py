@@ -57,11 +57,17 @@ def test_cli_run_writes_results_and_scores(tmp_path, monkeypatch):
     data = json.loads(files[0].read_text())
     assert data["meta"]["model"] == "mock-model"
     assert len(data["results"]) > 0
-    # Paris + GAUNTLET_OK tasks must pass; others fail
+    by_id = {r["task_id"]: r for r in data["results"]}
+    # only the refusal task fully passes (answer right + no tools called)
     passed_ids = {r["task_id"] for r in data["results"] if r["pass1"] > 0}
     assert "tool_irrelevant_refusal" in passed_ids
-    assert "tool_file_write_read" in passed_ids
     assert "tool_single_call" not in passed_ids
+    # partial credit: file task gets text right (score 1.0) but never writes the
+    # file (state score 0.0) -> combined rubric 0.5, passed False
+    file_task = by_id["tool_file_write_read"]
+    assert not file_task["attempts"][0]["passed"]
+    assert file_task["attempts"][0]["score"] == 0.5
+    assert any("state:" in f for f in file_task["attempts"][0]["failed"])
 
 
 def test_report_generates_table(tmp_path, monkeypatch):

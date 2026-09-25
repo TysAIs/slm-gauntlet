@@ -11,6 +11,7 @@ from gauntlet.agent_loop import LoopOutcome, run_agent_loop
 from gauntlet.client import GauntletClient
 from gauntlet.sandbox import ToolSandbox, tools_for
 from gauntlet.scorer import Scorer
+from gauntlet.state_check import evaluate_state_asserts
 from gauntlet.task import Task
 
 
@@ -36,18 +37,37 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
         except TimeoutError:
             outcome = LoopOutcome(terminated="timeout", final_text="[timeout]")
         score = scorer.score(outcome.final_text, task.to_assert_dicts()) if outcome.final_text else None
-        if score is None:
+        state = evaluate_state_asserts(sandbox, task.state_asserts) if task.state_asserts else None
+
+        # combine text rubric + state rubric (average when both present)
+        if score is not None and state is not None:
+            rubric = (score.score + state["score"]) / 2
+        elif state is not None:
+            rubric = state["score"]
+        elif score is not None:
+            rubric = score.score
+        else:
+            rubric = 0.0
+
+        if score is None and state is None:
             passed = False
             failed = [f"no final output (terminated={outcome.terminated})"]
         else:
-            passed = outcome.terminated == "completed" and score.passed
-            failed = score.failed if not passed else []
+            text_ok = score.passed if score is not None else True
+            state_ok = state["passed"] if state is not None else True
+            passed = outcome.terminated == "completed" and text_ok and state_ok
+            failed = []
+            if score is not None and not passed:
+                failed.extend(score.failed)
+            if state is not None and not state_ok:
+                failed.extend(state["failed"])
             if outcome.terminated != "completed":
                 failed.append(f"loop_terminated:{outcome.terminated}")
         attempts.append(
             {
                 "rep": rep,
                 "passed": passed,
+                "score": round(rubric, 3),
                 "failed": failed,
                 "terminated": outcome.terminated,
                 "turns": outcome.turns,

@@ -26,8 +26,30 @@ class Assert(BaseModel):
     values: list[str] | None = None
     pattern: str | None = None
     schema_: dict | None = Field(default=None, alias="schema")
+    weight: float = 1.0  # partial-credit weight (Vals-AI-style rubric)
+    must_pass: bool = False  # must-pass gate: failure forces task partial score to 0
 
     model_config = {"populate_by_name": True}
+
+
+class StateAssert(BaseModel):
+    """State/behavioral assertion evaluated against the sandbox after the run.
+
+    BFCL V3-style state-based evaluation: verify achieved outcomes, not just
+    final text. Types:
+      tool_called   — tool appears in call log           {"tool": name}
+      tool_not_called — tool absent from call log        {"tool": name}
+      state_path    — dot path into sandbox.state        {"path": "reservations.0.name", "equals": X}
+      file_content  — file in sandbox                    {"path": "report.txt", "contains": X}
+    """
+
+    type: Literal["tool_called", "tool_not_called", "state_path", "file_content"]
+    tool: str | None = None
+    path: str | None = None
+    equals: str | int | float | bool | None = None
+    contains: str | None = None
+    weight: float = 1.0
+    must_pass: bool = False
 
 
 class Task(BaseModel):
@@ -44,6 +66,7 @@ class Task(BaseModel):
     system: str = "You are a helpful assistant."
     tools: list[ToolDef] = Field(default_factory=list)
     asserts: list[Assert] = Field(min_length=1)
+    state_asserts: list[StateAssert] = Field(default_factory=list)
     max_tokens: int = 1024
     timeout: float = 300.0
     repeats: int = 1  # >1 enables pass^k
