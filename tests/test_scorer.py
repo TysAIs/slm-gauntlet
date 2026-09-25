@@ -10,6 +10,7 @@ from gauntlet.scorer import (
     predicate_check,
     regex_check,
 )
+from gauntlet.task import Assert as TaskAssert
 
 
 def test_exact_match():
@@ -55,6 +56,37 @@ def test_json_schema_extracts_from_markdown_fence():
 def test_predicate_check():
     r = predicate_check({"x": 5}, "out.get('x') == 5")
     assert r.passed
+
+
+def test_predicate_via_to_assert_dicts():
+    """Round-trip: Task Assert expr must survive to_assert_dicts -> Scorer."""
+    from gauntlet.task import Task as TaskModel
+
+    a = TaskAssert(type="predicate", expr="len(out.split()) <= 30")
+    dicts = TaskModel(
+        id="x", suite="instruction", description="d", prompt="p",
+        asserts=[a],
+    ).to_assert_dicts()
+    r = Scorer().score("one two three", dicts)
+    assert r.score == 1.0
+    r2 = Scorer().score(" ".join(["word"] * 40), dicts)
+    assert r2.score == 0.0
+
+
+def test_partial_credit_comma_normalized():
+    """Numbers formatted with commas must still match (format-agnostic scoring)."""
+    r = Scorer().score("The result is 5,411,914 exactly.", [
+        {"type": "contains_all", "values": ["5411914"], "must_pass": True},
+    ])
+    assert r.score == 1.0
+
+
+def test_regex_check_stays_raw():
+    """Regex/predicate checks see raw output (comma-sensitive IF tests)."""
+    r = Scorer().score("a, b, c", [
+        {"type": "regex", "pattern": "^((?!,).)*$"},  # must fail: commas present
+    ])
+    assert not r.passed
 
 
 def test_scorer_runs_assert_list():

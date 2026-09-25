@@ -102,6 +102,16 @@ async def test_max_turns_termination():
     sandbox.cleanup()
 
 
+async def test_empty_final_answer_is_empty_response():
+    """Model returns empty content with no tool calls -> empty_response, never completed."""
+    script = [_completion(content=""), _completion(content="   ")]
+    client = _client_with_script(script)
+    sandbox = ToolSandbox(seed=10)
+    outcome = await run_agent_loop(client, sandbox, "sys", "do something", tools=[], max_turns=4)
+    assert outcome.terminated == "empty_response"
+    sandbox.cleanup()
+
+
 def test_extract_args_python_kwargs():
     assert _extract_args("search_flights(origin='SFO', destination='JFK', date='2026-10-01')") == {
         "origin": "SFO", "destination": "JFK", "date": "2026-10-01",

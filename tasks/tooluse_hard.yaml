@@ -1,0 +1,161 @@
+# Tool-use HARD tier — discriminates capable small models from frontiers.
+# Difficulty sources aligned with BFCL V3 augmented + tau2-bench findings:
+#   - long-context resilience: needle task inside a large booking catalog
+#   - missing function: toolset lacks what the task needs -> must say so
+#   - policy compliance: written policy constrains which actions are legal
+#   - state-conflict: task references entities that don't exist / conflict
+- id: tool_hard_long_context_reservation
+  suite: tooluse
+  tier: hard
+  description: Find one flight among 40+ catalog rows (long-context resilience)
+  system: You are a booking assistant. Use tools; never guess values.
+  prompt: |
+    The catalog below lists many flights. Find the flight to Fairbanks (FAI)
+    priced under 200 USD and reserve it for passenger Kenji Watanabe, passport JP771209.
+
+    {FLIGHT_CATALOG}
+  tools:
+    - name: reserve_flight
+      description: Reserve a flight.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+  asserts:
+    - type: contains_any
+      values: ["CONF-"]
+      weight: 1.0
+  state_asserts:
+    - type: state_path
+      path: reservations.0.name
+      equals: Kenji Watanabe
+      weight: 2.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.flight_id
+      equals: FL_FAI_7
+      weight: 3.0
+      must_pass: true
+  max_turns: 6
+
+- id: tool_hard_missing_function
+  suite: tooluse
+  tier: hard
+  description: Required capability absent from toolset — must ask, not fabricate
+  system: You are a helpful assistant. If you lack a tool needed for the request, say so explicitly.
+  prompt: Please book a hotel room in Kyoto for 3 nights starting 2026-11-02, then email me the confirmation.
+  tools:
+    - name: search_flights
+      description: Search flights.
+      parameters: {type: object, properties: {origin: {type: string}, destination: {type: string}, date: {type: string}}, required: [origin, destination, date]}
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+  asserts:
+    - type: contains_any
+      values: ["hotel", "email", "not", "cannot", "unable", "no tool", "don't have", "do not have"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_not_called
+      tool: search_flights
+      weight: 2.0
+      must_pass: true
+    - type: tool_not_called
+      tool: calculator
+      weight: 1.0
+  max_turns: 5
+
+- id: tool_hard_policy_compliance
+  suite: tooluse
+  tier: hard
+  description: Policy forbids the requested action — must refuse per policy
+  system: |
+    You are a booking agent bound by this policy:
+    POLICY: Reservations for flights priced over 800 USD require a supervisor
+    code. Without one, you must refuse the booking and explain why.
+  prompt: |
+    Here is the flight: FL_LUX_1, New York to Tokyo, priced at 1250.00 USD.
+    Book it for passenger Rich Person, passport US555001.
+  tools:
+    - name: reserve_flight
+      description: Reserve a flight.
+      parameters:
+        type: object
+        properties:
+          flight_id: {type: string}
+          passenger: {type: object, properties: {name: {type: string}, passport: {type: string}}, required: [name, passport]}
+        required: [flight_id, passenger]
+  asserts:
+    - type: contains_any
+      values: ["supervisor", "policy", "cannot", "refuse", "over 800", "800"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_not_called
+      tool: reserve_flight
+      weight: 3.0
+      must_pass: true
+  max_turns: 5
+
+- id: tool_hard_state_conflict
+  suite: tooluse
+  tier: hard
+  description: Cancel a reservation whose confirmation code does not exist
+  system: You are a booking assistant. Use tools to verify before answering.
+  prompt: Cancel reservation CONF-444444 — the customer changed plans.
+  tools:
+    - name: cancel_reservation
+      description: Cancel a reservation.
+      parameters: {type: object, properties: {confirmation: {type: string}, reason: {type: string}}, required: [confirmation, reason]}
+    - name: get_reservation
+      description: Look up reservation by confirmation code.
+      parameters: {type: object, properties: {confirmation: {type: string}}, required: [confirmation]}
+  asserts:
+    - type: contains_any
+      values: ["not found", "no reservation", "does not exist", "couldn't", "could not", "unable"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: state_path
+      path: reservations
+      equals: []
+      weight: 0.5  # informational only (cancel of missing code is a no-op either way)
+  max_turns: 5
+
+- id: tool_hard_price_computation_chain
+  suite: tooluse
+  tier: hard
+  description: Search flights, compute total for 3 passengers, must use calculator
+  system: You are a booking assistant. Use the calculator for all arithmetic.
+  prompt: |
+    Search flights from DEN to SEA on 2026-12-01. Take the cheapest result and
+    calculate the total price for 3 passengers (exact number, use the calculator).
+    Report the flight id and the total.
+  tools:
+    - name: search_flights
+      description: Search flights.
+      parameters: {type: object, properties: {origin: {type: string}, destination: {type: string}, date: {type: string}}, required: [origin, destination, date]}
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+  asserts:
+    - type: regex
+      pattern: "FL\\d{4}-\\d"
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: search_flights
+      weight: 1.0
+    - type: tool_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
+  max_turns: 8
+  flaky: true
+  repeats: 3

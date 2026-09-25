@@ -50,7 +50,12 @@ def evaluate_state_asserts(sandbox: ToolSandbox, asserts: list[StateAssert]) -> 
         elif sa.type == "state_path":
             value = _resolve_path(sandbox.state, sa.path or "")
             if sa.equals is not None:
-                ok = value == sa.equals
+                # missing key == empty default when expecting an empty container
+                # (e.g. reservations == [] when nothing was ever created)
+                if value is None and sa.equals in ([], {}, "", 0):
+                    ok = True
+                else:
+                    ok = value == sa.equals
                 detail = f"{sa.path} == {sa.equals!r} (got {value!r})"
             else:
                 ok = value is not None

@@ -69,6 +69,7 @@ class GauntletClient:
         temperature: float = 0.0,
         max_tokens: int | None = None,
         extra: dict | None = None,
+        no_think: bool = False,
     ) -> ChatResult:
         body: dict = {"model": self.model, "messages": messages, "temperature": temperature}
         if tools:
@@ -76,6 +77,10 @@ class GauntletClient:
             body["tool_choice"] = "auto"
         if max_tokens:
             body["max_tokens"] = max_tokens
+        if no_think:
+            # llama.cpp per-request think-mode disable (works for templates
+            # exposing enable_thinking; ignored gracefully by others)
+            body.setdefault("chat_template_kwargs", {})["enable_thinking"] = False
         if extra:
             body.update(extra)
 

@@ -59,7 +59,8 @@ async def run_agent_loop(
     tools: list[dict],
     max_turns: int = 8,
     temperature: float = 0.0,
-    max_tokens: int = 1024,
+    max_tokens: int = 4096,
+    no_think: bool = True,
 ) -> LoopOutcome:
     outcome = LoopOutcome()
     messages: list[dict] = [{"role": "system", "content": system}, {"role": "user", "content": prompt}]
@@ -68,7 +69,7 @@ async def run_agent_loop(
     for turn in range(max_turns):
         try:
             result: ChatResult = await client.chat(
-                messages, tools=tools or None, temperature=temperature, max_tokens=max_tokens
+                messages, tools=tools or None, temperature=temperature, max_tokens=max_tokens, no_think=no_think
             )
         except Exception as e:  # noqa: BLE001 — record and fail the task
             outcome.terminated = "error"
@@ -124,6 +125,11 @@ async def run_agent_loop(
             continue
 
         # --- final text answer ---
+        if not (text and text.strip()):
+            # empty final answer with no tool calls: distinct failure mode,
+            # never a completed task (typically think-mode token exhaustion)
+            outcome.terminated = "empty_response"
+            return outcome
         if watchdog.check_text(text):
             outcome.terminated = "looped"
             outcome.final_text = text

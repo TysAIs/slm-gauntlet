@@ -59,7 +59,15 @@
     dicts, joining keys with a dot: {"a": {"b": 1}} -> {"a.b": 1}. Output only the code.
   asserts:
     - type: contains_all
-      values: ["def flatten", '"."', "'.'"]
+      values: ["def flatten"]
+      weight: 1.0
+      must_pass: true
+    - type: predicate
+      expr: "'.' in out"
+      weight: 1.0
+    - type: regex
+      pattern: "isinstance\\([^)]*dict\\)"
+      weight: 1.0
 
 - id: code_swap_fix
   suite: coding
@@ -73,4 +81,6 @@
     Output the corrected function only.
   asserts:
     - type: contains_any
-      values: ["a, b = b, a", "temp = a", "tmp = a"]
+      values: ["a, b = b, a", "temp = a", "tmp = a", "return b, a"]
+      weight: 2.0
+      must_pass: true

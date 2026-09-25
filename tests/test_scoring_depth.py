@@ -87,6 +87,16 @@ def test_state_must_pass_zeroes():
     sandbox.cleanup()
 
 
+def test_state_empty_default_when_never_created():
+    """Expecting empty container on a never-created path passes (no-op semantics)."""
+    sandbox = ToolSandbox(seed=12)  # nothing ever reserved
+    result = evaluate_state_asserts(sandbox, [
+        StateAssert(type="state_path", path="reservations", equals=[]),
+    ])
+    assert result["passed"]
+    sandbox.cleanup()
+
+
 def test_state_file_content():
     sandbox = ToolSandbox(seed=8)
     sandbox.execute("write_file", {"path": "out.txt", "content": "GAUNTLET_OK"})

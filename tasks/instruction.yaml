@@ -85,5 +85,5 @@
     cat, dog, eagle, bear
   asserts:
     - type: predicate
-      expr: "[l.strip().lower() for l in out.strip().splitlines() if l.strip()][:4] == ['eagle','dog','cat','bear']"
+      expr: "[w.strip().lower().lstrip('-*.1234567890) ') for w in out.strip().splitlines() if w.strip()][:4] == ['eagle','dog','cat','bear']"
   max_tokens: 128

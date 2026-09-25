@@ -26,6 +26,7 @@ class Assert(BaseModel):
     values: list[str] | None = None
     pattern: str | None = None
     schema_: dict | None = Field(default=None, alias="schema")
+    expr: str | None = None  # predicate: python bool expr with `out` bound
     weight: float = 1.0  # partial-credit weight (Vals-AI-style rubric)
     must_pass: bool = False  # must-pass gate: failure forces task partial score to 0
 
@@ -46,10 +47,21 @@ class StateAssert(BaseModel):
     type: Literal["tool_called", "tool_not_called", "state_path", "file_content"]
     tool: str | None = None
     path: str | None = None
-    equals: str | int | float | bool | None = None
+    equals: str | int | float | bool | list | dict | None = None
     contains: str | None = None
     weight: float = 1.0
     must_pass: bool = False
+
+
+class FailInjection(BaseModel):
+    """Chaos injection: force a sandbox tool to fail N times before succeeding.
+
+    The runner calls sandbox.fail_next(tool, times) before the loop starts.
+    This makes error-recovery tasks test actual recovery, not luck.
+    """
+
+    tool: str
+    times: int = 1
 
 
 class Task(BaseModel):
@@ -67,10 +79,13 @@ class Task(BaseModel):
     tools: list[ToolDef] = Field(default_factory=list)
     asserts: list[Assert] = Field(min_length=1)
     state_asserts: list[StateAssert] = Field(default_factory=list)
-    max_tokens: int = 1024
+    fail_injections: list[FailInjection] = Field(default_factory=list)
+    max_tokens: int = 4096
     timeout: float = 300.0
     repeats: int = 1  # >1 enables pass^k
     flaky: bool = False  # informational: repeats should be 3 when true
+    no_think: bool = True  # disable think-mode per-request (token exhaustion guard)
+    tier: str = "standard"  # difficulty tier: standard | hard
     max_turns: int = 8  # agent-loop turns (tool round-trips) allowed
     canary: str | None = None  # embedded canary GUID for generated tasks
     contamination_risk: Literal["none", "generated", "known"] = "none"
@@ -92,6 +107,8 @@ class Task(BaseModel):
                 d["pattern"] = a.pattern
             if a.schema_ is not None:
                 d["schema"] = a.schema_
+            if a.expr is not None:
+                d["expr"] = a.expr
             out.append(d)
         return out
 

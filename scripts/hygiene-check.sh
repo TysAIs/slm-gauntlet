@@ -40,8 +40,10 @@ scan_tree() {
 
 scan_history() {
     # Scan every diff blob in history for patterns (run pre-publish)
+    # Skip diffs of this script itself: it contains escaped regex fragments
+    # of the patterns (by design) and would always self-match.
     echo "Scanning full git history..."
-    HITS=$(git log --all -p | grep -inE "$PATTERNS" | head -20 || true)
+    HITS=$(git log --all -p -- . ':!scripts/hygiene-check.sh' | grep -inE "$PATTERNS" | head -20 || true)
     if [ -n "$HITS" ]; then
         echo "HISTORY HITS:"
         echo "$HITS"

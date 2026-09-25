@@ -32,7 +32,7 @@ def test_context_scales_with_target():
 
 def test_nolima_no_lexical_overlap():
     # spot-check several pairs: needle content words absent from question
-    for needle, question in NOLIMA_PAIRS:
+    for needle, question, _expected in NOLIMA_PAIRS:
         needle_words = set(w.lower().strip(".,'") for w in needle.split() if len(w) > 4)
         q_words = set(w.lower().strip(".,'?") for w in question.split())
         # allow at most 1 accidental shared word (stopword-ish)

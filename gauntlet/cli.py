@@ -32,7 +32,23 @@ def load_tasks(suites: list[str] | None = None) -> list[Task]:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
-    tasks = load_tasks(args.suite.split(",") if args.suite != "all" else None)
+    suites = args.suite.split(",") if args.suite != "all" else None
+    tasks = load_tasks(suites)
+
+    # generated (contamination-resistant) tasks for retrieval
+    from gauntlet.taskgen.needle_haystack import make_needle_task, make_refusal_task
+
+    retrieval_wanted = suites is None or "retrieval" in suites
+    if retrieval_wanted:
+        gen: list[Task] = []
+        for i, ctx in enumerate((4000, 8000, 16000, 32000)):
+            gen.append(make_needle_task(f"gen_needle_{ctx//1000}k", ctx, seed=args.seed * 100 + i))
+        gen.append(make_needle_task("gen_nolima_8k", 8000, seed=args.seed * 100 + 50, nolima=True))
+        gen.append(make_needle_task("gen_nolima_16k", 16000, seed=args.seed * 100 + 51, nolima=True))
+        gen.append(make_refusal_task("gen_refusal", seed=args.seed * 100 + 60))
+        gen.append(make_needle_task("gen_needle_multi_4k", 4000, seed=args.seed * 100 + 70))
+        tasks.extend(gen)
+
     print(f"[gauntlet] {len(tasks)} tasks -> {args.endpoint} (model={args.model})")
 
     async def go():
@@ -83,7 +99,10 @@ def main(argv: list[str] | None = None) -> int:
     run_p.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL, e.g. http://host:8080/v1")
     run_p.add_argument("--model", required=True)
     run_p.add_argument("--suite", default="all", help="comma-separated suites or 'all'")
-    run_p.add_argument("--concurrency", type=int, default=4)
+    run_p.add_argument(
+        "--concurrency", type=int, default=2,
+        help="parallel tasks; keep low (1-2) for 8GB GPU endpoints",
+    )
     run_p.add_argument("--timeout", type=float, default=600.0)
     run_p.add_argument("--seed", type=int, default=0)
     run_p.set_defaults(fn=cmd_run)

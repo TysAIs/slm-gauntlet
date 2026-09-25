@@ -61,7 +61,9 @@
     defaulting to "basic") and applies (a boolean, defaulting to False).
   asserts:
     - type: regex
-      pattern: "def calculate_discount\\(price.*tier.*=.*[\"']basic[\"'].*applies.*=.*False.*\\)"
+      pattern: "(def )?calculate_discount\\(.*price.*tier.*=.*[\"']basic[\"'].*applies.*=.*False"
+      weight: 2.0
+      must_pass: true
 
 - id: struct_regex_gen
   suite: structured

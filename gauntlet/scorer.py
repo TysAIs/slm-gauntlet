@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -47,15 +46,33 @@ def _strip_code_fence(text: str) -> str:
     fence = re.search(r"```(?:json)?\s*\n(.*?)```", text, re.DOTALL)
     if fence:
         return fence.group(1).strip()
-    # fall back: first {...} or [...] block
+    # fall back: first {...} or [...] block — whichever opener comes FIRST
+    # (trying { before [ made "[{...}]" extract only the inner {...} and
+    # broke array-schema checks)
+    candidates = []
     for opener, closer in (("{", "}"), ("[", "]")):
         start = text.find(opener)
         if start != -1:
-            depth = 0
-            for i in range(start, len(text)):
-                if text[i] == opener:
+            candidates.append((start, opener, closer))
+    if candidates:
+        start, opener, closer = min(candidates)
+        depth = 0
+        in_str = False
+        escape = False
+        for i in range(start, len(text)):
+            ch = text[i]
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"' and not in_str:
+                in_str = True
+            elif ch == '"' and in_str:
+                in_str = False
+            elif not in_str:
+                if ch == opener:
                     depth += 1
-                elif text[i] == closer:
+                elif ch == closer:
                     depth -= 1
                     if depth == 0:
                         return text[start : i + 1]
@@ -154,28 +171,40 @@ class Scorer:
         earned = 0.0
         total = 0.0
         must_pass_failed = False
+        # number-format-agnostic matching: contains/exact checks compare against
+        # comma-stripped text (models format numbers inconsistently: 5,411,914)
+        norm_output = output.replace(",", "")
         for a in asserts:
             a = dict(a)
             weight = float(a.pop("weight", 1.0))
             must_pass = bool(a.pop("must_pass", False))
             kind = a.pop("type")
-            fn: Callable[..., ScoreResult] = {
+            known = {
                 "exact_match": exact_match,
                 "contains_all": contains_all,
                 "contains_any": contains_any,
                 "regex": regex_check,
                 "json_schema": json_schema_check,
-            }[kind]
-            if kind == "json_schema":
-                r = fn(output, a["schema"])
-            elif kind in ("contains_all", "contains_any"):
-                r = fn(output, a["values"])
-            elif kind == "exact_match":
-                r = fn(output, a["value"])
-            elif kind == "regex":
-                r = fn(output, a["pattern"])
+            }
+            if kind == "predicate":
+                # predicates evaluate against the RAW output text — no JSON
+                # extraction (code/loose text tasks would mis-parse)
+                r = predicate_check(output, a["expr"])
             else:
-                raise ValueError(f"unknown assert type: {kind}")
+                if kind not in known:
+                    raise ValueError(f"unknown assert type: {kind}")
+                fn = known[kind]
+                if kind == "json_schema":
+                    r = fn(output, a["schema"])
+                elif kind in ("contains_all", "contains_any"):
+                    vals = [v.replace(",", "") for v in a["values"]]
+                    r = fn(norm_output, vals)
+                elif kind == "exact_match":
+                    r = fn(norm_output, a["value"].replace(",", ""))
+                elif kind == "regex":
+                    r = fn(output, a["pattern"])
+                else:
+                    raise ValueError(f"unknown assert type: {kind}")
             total += weight
             check_ok = r.passed
             if check_ok:

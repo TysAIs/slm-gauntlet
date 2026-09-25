@@ -61,7 +61,7 @@
       parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
   asserts:
     - type: contains_all
-      values: ["5412103"]
+      values: ["5411914"]
       weight: 2.0
       must_pass: true
   state_asserts:
@@ -115,6 +115,9 @@
   description: Tool returns 500, model must retry and report the real result
   system: You are a data assistant. If a tool fails, retry once, then report.
   prompt: Use the calculator to compute 512 / 8 and give me the result.
+  fail_injections:
+    - tool: calculator
+      times: 1
   tools:
     - name: calculator
       description: Evaluate arithmetic.

@@ -31,38 +31,46 @@ FILLER_EVENTS = [
 
 # NoLiMa-style: needle entity/relation with zero lexical overlap with the question
 NOLIMA_PAIRS = [
-    # (needle sentence, question asking about it without shared content words)
+    # (needle sentence, question, expected answer substring)
     (
         "The velvet compass belongs to Marisol Vane.",
         "Who owns the item used for wayfinding that has a soft fabric covering?",
+        'Marisol Vane',
     ),
     (
         "Renwick's flagship store opened during a leap year.",
         "In what type of year did the company's main shop first open its doors?",
+        'leap year',
     ),
     (
         "The violinist hides spare rosin inside a hollowed cookbook.",
         "Where does the string musician keep extra bow resin?",
+        'cookbook',
     ),
     (
         "Professor Okonkwo commutes by unicycle when it rains.",
         "How does the educator travel to work in wet weather?",
+        'unicycle',
     ),
     (
         "The bakery's secret ingredient is smoked sea salt.",
         "What special component gives the bread shop's goods their flavor?",
+        'smoked sea salt',
     ),
     (
         "Captain Reyes keeps the ship's log in violet ink.",
         "What color ink does the vessel's commander use for records?",
+        'violet',
     ),
     (
         "The lighthouse generator runs on recycled cooking oil.",
         "What fuel powers the beacon's machinery?",
+        'cooking oil',
     ),
     (
         "Agnieszka paints only during thunderstorms.",
         "Under what weather conditions does the artist work?",
+        'thunderstorm',
     ),
 ]
 
@@ -86,11 +94,12 @@ def make_needle_task(
     canary = f"gauntlet-canary-{uuid.UUID(int=rng.getrandbits(128))}"
 
     if nolima:
-        needle, question = rng.choice(NOLIMA_PAIRS)
+        needle, question, expected = rng.choice(NOLIMA_PAIRS)
     else:
         code = f"ZEBRA-{rng.randint(10000, 99999)}"
         needle = f"The secret access code for the vault is {code}."
         question = "What is the secret access code for the vault?"
+        expected = code
 
     # ~1.3 tokens per word average -> words needed
     words_needed = int(context_tokens_target / 1.3)
@@ -108,14 +117,7 @@ def make_needle_task(
     context = "\n\n".join(paragraphs)
     prompt = f"{context}\n\nQuestion: {question}\nAnswer with only the answer itself."
 
-    asserts = (
-        [Assert(type="contains_any", values=[n for n, q in NOLIMA_PAIRS if n == needle][0].split()[4].rstrip("."))]
-        if nolima
-        else None
-    )
-    if not nolima:
-        code = needle.split()[-1].rstrip(".")
-        asserts = [Assert(type="contains_all", values=[code])]
+    asserts = [Assert(type="contains_all", values=[expected])]
 
     return Task(
         id=task_id,

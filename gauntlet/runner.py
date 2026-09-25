@@ -13,6 +13,7 @@ from gauntlet.sandbox import ToolSandbox, tools_for
 from gauntlet.scorer import Scorer
 from gauntlet.state_check import evaluate_state_asserts
 from gauntlet.task import Task
+from gauntlet.taskgen.enrich import enrich_task
 
 
 async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
@@ -21,18 +22,22 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
     attempts = []
     for rep in range(task.repeats):
         sandbox = ToolSandbox(seed=seed + rep)
+        for inj in task.fail_injections:
+            sandbox.fail_next(inj.tool, inj.times)
+        enriched = enrich_task(task, seed=seed * 1000 + rep) if "{" in task.prompt else task
         try:
             outcome: LoopOutcome = await asyncio.wait_for(
                 run_agent_loop(
                     client,
                     sandbox,
-                    system=task.system,
-                    prompt=task.prompt,
-                    tools=tools_for([t.name for t in task.tools]),
-                    max_turns=task.max_turns,
-                    max_tokens=task.max_tokens,
+                    system=enriched.system,
+                    prompt=enriched.prompt,
+                    tools=tools_for([t.name for t in enriched.tools]),
+                    max_turns=enriched.max_turns,
+                    max_tokens=enriched.max_tokens,
+                    no_think=enriched.no_think,
                 ),
-                timeout=task.timeout,
+                timeout=enriched.timeout,
             )
         except TimeoutError:
             outcome = LoopOutcome(terminated="timeout", final_text="[timeout]")
