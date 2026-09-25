@@ -1,0 +1,89 @@
+# Instruction-following suite: strict format constraints, multi-constraint, traps.
+- id: if_no_commas
+  suite: instruction
+  description: Write about a topic without using any commas
+  prompt: Describe the process of making coffee in 2-3 sentences. Constraint - do not use any commas anywhere in your response.
+  asserts:
+    - type: regex
+      pattern: "^((?!,).)*$"
+  max_tokens: 256
+
+- id: if_exactly_three_paragraphs
+  suite: instruction
+  description: Response must have exactly 3 paragraphs
+  prompt: |
+    Write about lighthouses. Your response must have EXACTLY 3 paragraphs,
+    separated by blank lines. No more, no fewer. Each paragraph 1-2 sentences.
+  asserts:
+    - type: predicate
+      expr: "len([p for p in out.strip().split('\\n\\n') if p.strip()]) == 3"
+  max_tokens: 384
+
+- id: if_all_caps_section
+  suite: instruction
+  description: Must include a section header in ALL CAPS
+  prompt: Explain photosynthesis in under 80 words. Include one section header written entirely in CAPITALS somewhere in your response.
+  asserts:
+    - type: regex
+      pattern: "[A-Z]{4,}"
+  max_tokens: 256
+
+- id: if_word_limit
+  suite: instruction
+  description: Hard word-count ceiling
+  prompt: Define entropy. Your entire answer must be at most 25 words.
+  asserts:
+    - type: predicate
+      expr: "len(out.split()) <= 30"  # small tolerance for tokenization edge
+  max_tokens: 128
+
+- id: if_multi_constraint
+  suite: instruction
+  description: Four simultaneous constraints
+  prompt: |
+    Write one sentence about the ocean. Constraints (ALL must hold):
+    1) Exactly one sentence. 2) It must contain the word "tide".
+    3) It must not contain the word "wave" or "waves". 4) It must end with a period.
+  asserts:
+    - type: contains_all
+      values: ["tide"]
+    - type: regex
+      pattern: "tide.*\\.$"
+  max_tokens: 128
+
+- id: if_contradiction_trap
+  suite: instruction
+  description: Two constraints contradict — correct behavior is to flag it
+  prompt: |
+    Follow these constraints exactly:
+    1) Write the answer in exactly 2 words.
+    2) Include the full chemical name of table salt (sodium chloride) in your answer.
+    If the constraints conflict, say so explicitly.
+  asserts:
+    - type: contains_any
+      values: ["conflict", "contradict", "cannot", "impossible", "both"]
+  max_tokens: 192
+
+- id: if_json_and_sentence
+  suite: instruction
+  description: Combine structured output with prose constraint
+  prompt: |
+    First output a JSON object {"topic": "robots"} on its own line.
+    Then write one sentence about robots containing the word "future".
+  asserts:
+    - type: regex
+      pattern: "\\{[\"']topic[\"']\\s*:\\s*[\"']robots[\"']\\s*\\}"
+    - type: contains_all
+      values: ["future"]
+  max_tokens: 192
+
+- id: if_reverse_order
+  suite: instruction
+  description: List items in exact requested (reverse) order
+  prompt: |
+    List these animals in reverse alphabetical order, one per line, no numbering:
+    cat, dog, eagle, bear
+  asserts:
+    - type: predicate
+      expr: "[l.strip().lower() for l in out.strip().splitlines() if l.strip()][:4] == ['eagle','dog','cat','bear']"
+  max_tokens: 128

@@ -1,0 +1,76 @@
+# Coding suite: HumanEval+ sanity floor (labeled contamination-risk) + regex/log tasks.
+# Fresh arXiv-derived and auto-bugged tasks come from taskgen at run time.
+- id: code_humaneval_fizzbuzz_variant
+  suite: coding
+  description: Classic-style function (contamination-risk known — sanity floor only)
+  contamination_risk: known
+  prompt: |
+    Write a Python function `fizzbuzz(n: int) -> list[str]` that returns the FizzBuzz
+    sequence from 1 to n inclusive, as a list of strings. Output only the code.
+  asserts:
+    - type: contains_all
+      values: ["def fizzbuzz", "Fizz", "Buzz"]
+    - type: regex
+      pattern: "return"
+
+- id: code_bugfix_off_by_one
+  suite: coding
+  description: Fix an off-by-one bug
+  prompt: |
+    This function should return the sum of numbers 1..n inclusive but has a bug:
+    def total(n):
+        s = 0
+        for i in range(1, n):
+            s += i
+        return s
+    Output the corrected function only.
+  asserts:
+    - type: contains_all
+      values: ["range(1, n + 1)"]
+
+- id: code_bug_identify
+  suite: coding
+  description: Identify the buggy variable (assert on the name)
+  prompt: |
+    def average(nums):
+        return sum(nums) / len(nums) - 1
+    The function returns the wrong average. Which single expression fragment is wrong?
+    Answer with just the incorrect fragment.
+  asserts:
+    - type: contains_all
+      values: ["- 1"]
+
+- id: code_regex_parser
+  suite: coding
+  description: Parse log lines with a regex, extract ERROR levels
+  prompt: |
+    Write a Python regex pattern that captures the log level word (e.g. INFO, ERROR, WARN)
+    from lines like: 2026-09-25 12:00:03 ERROR Something failed
+    Answer as: PATTERN: <regex using a named group 'level'>
+  asserts:
+    - type: contains_any
+      values: ["?P<level>", "(?P<level>"]
+
+- id: code_json_transform
+  suite: coding
+  description: Write a function transforming nested dicts
+  prompt: |
+    Write a Python function `flatten(d: dict) -> dict` that flattens one level of nested
+    dicts, joining keys with a dot: {"a": {"b": 1}} -> {"a.b": 1}. Output only the code.
+  asserts:
+    - type: contains_all
+      values: ["def flatten", '"."', "'.'"]
+
+- id: code_swap_fix
+  suite: coding
+  description: Classic pythonic swap bug (temp variable misuse)
+  prompt: |
+    This swap function corrupts data:
+    def swap(a, b):
+        a = b
+        b = a
+        return a, b
+    Output the corrected function only.
+  asserts:
+    - type: contains_any
+      values: ["a, b = b, a", "temp = a", "tmp = a"]
