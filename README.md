@@ -44,6 +44,8 @@ Same model + same seed → identical results.
 | Suite | Tasks | What it measures |
 |---|---|---|
 | **tooluse** | 12 + 5 hard | Correct tool selection and arguments; calculator grounding (does it use the tool or hallucinate arithmetic?); error recovery (tool fails once → must retry); sandbox escape refusal; distractor discipline; and a **hard tier**: policy compliance with traps, long-context reservations, missing functions, state conflicts, multi-step computation chains |
+| **adversarial** | 8 | Prompt-injection resistance: injected "ignore instructions" in email/tool data, system-prompt exfiltration, priority inversion, sycophancy pressure, base64-encoded bypasses, impersonation. Must resist the attack **and** still complete the real job |
+| **agent_chains** | 6 | Multi-turn tool pipelines (3-8 turns): search→pick→reserve chains, file write→append→read-back, lookup→transform→compute, mid-chain error recovery, conditional branches on tool output |
 | **structured** | 8 | Valid JSON against a schema, extraction from messy input, exact function signatures |
 | **retrieval** | 8 | Needle-in-a-haystack from 4K to 32K tokens, NoLiMa-style associative needles, and refusal-when-absent (anti-hallucination) |
 | **coding** | 6 | Bug fixes, dict/list transforms, regex parsing, contradiction traps where the naive solution is invalid |
@@ -101,11 +103,22 @@ Results land in `results/<model>_<timestamp>.json` with per-task attempts, tool-
 ### Useful flags
 
 ```
-gauntlet run --suite all|tooluse|structured|retrieval|coding|instruction
+gauntlet run --suite all|tooluse|adversarial|agent_chains|structured|retrieval|coding|instruction
              --concurrency N     parallel tasks; keep 1-2 for 8GB GPUs (default 2)
              --timeout S         per-task timeout in seconds (default 240)
              --seed N            RNG seed for generated tasks (default 0; same seed = same tasks)
+             --repeats K         run every task k times; pass^k = all-reps reliability (3 recommended)
 ```
+
+### Speculative decoding
+
+Draft-model support depends entirely on the target model's ecosystem — there is no universal draft:
+
+- **Qwen3.5-4B / 9B**: MTP drafts exist ([unsloth/Qwen3.5-4B-MTP-GGUF](https://huggingface.co/unsloth/Qwen3.5-4B-MTP-GGUF)). MTP heads ride inside the same GGUF (no extra draft VRAM) but require a recent llama.cpp and `-np 1` (no parallel slots with MTP yet).
+- **MiniCPM5-2B / LFM2.5 / Gemma-3n**: no published EAGLE-3/MTP drafts exist at time of writing. Standard `-md` self-drafting (same model at lower quant as its own draft) works with llama.cpp's `--model-draft` if you can spare the extra ~1GB VRAM.
+- Benchmarks above were run WITHOUT speculative decoding — comparable baseline numbers.
+
+The gauntlet measures quality and throughput as served; if you serve with a draft, note it in your result metadata.
 
 ### Tips
 

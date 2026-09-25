@@ -17,7 +17,15 @@ from gauntlet.task import Task
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "tasks"
 
-SUITE_WEIGHTS = {"tooluse": 0.40, "structured": 0.20, "retrieval": 0.20, "coding": 0.10, "instruction": 0.10}
+SUITE_WEIGHTS = {
+    "tooluse": 0.30,
+    "structured": 0.15,
+    "retrieval": 0.15,
+    "coding": 0.10,
+    "instruction": 0.10,
+    "adversarial": 0.10,
+    "agent_chains": 0.10,
+}
 
 
 def load_tasks(suites: list[str] | None = None) -> list[Task]:
@@ -34,6 +42,10 @@ def load_tasks(suites: list[str] | None = None) -> list[Task]:
 def cmd_run(args: argparse.Namespace) -> int:
     suites = args.suite.split(",") if args.suite != "all" else None
     tasks = load_tasks(suites)
+    if args.repeats > 1:
+        # pass^k reliability mode: every task runs k times, pass^k = all-reps rate
+        for t in tasks:
+            t.repeats = args.repeats
 
     # generated (contamination-resistant) tasks for retrieval
     from gauntlet.taskgen.needle_haystack import make_needle_task, make_refusal_task
@@ -91,6 +103,19 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pagoda(args: argparse.Namespace) -> int:
+    import asyncio
+
+    from gauntlet.pagoda_cli import run as pagoda_run
+
+    data = asyncio.run(pagoda_run(args.endpoint, args.model, args.max_tokens, args.out))
+    out = args.out or f"results/pagoda_{args.model.replace('/', '_')}.json"
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    Path(out).write_text(json.dumps({"model": args.model, "score": data.as_dict(), "output": ""}, indent=1))
+    print(f"[gauntlet] pagoda results -> {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="gauntlet")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -105,6 +130,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     run_p.add_argument("--timeout", type=float, default=600.0)
     run_p.add_argument("--seed", type=int, default=0)
+    run_p.add_argument(
+        "--repeats", type=int, default=1,
+        help="run every task k times; pass^k = all-reps reliability (tau-bench style). 3 recommended",
+    )
+    # add pagoda subcommand
+    pag_p = sub.add_parser("pagoda", help="run the Pagoda creative-build benchmark")
+    pag_p.add_argument("--endpoint", required=True)
+    pag_p.add_argument("--model", required=True)
+    pag_p.add_argument("--max-tokens", type=int, default=1500)
+    pag_p.add_argument("--out", default=None)
+    pag_p.set_defaults(fn=cmd_pagoda)
     run_p.set_defaults(fn=cmd_run)
 
     perf_p = sub.add_parser("perf", help="throughput benchmark (TTFT/tok-s at c=1/4/8)")

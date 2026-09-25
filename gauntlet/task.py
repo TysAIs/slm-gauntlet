@@ -4,14 +4,22 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class ToolDef(BaseModel):
-    """OpenAI-format function tool definition."""
+    """OpenAI-format function tool definition. Accepts a bare tool name
+    (string shorthand) — the sandbox supplies the canonical spec at run time."""
     name: str
-    description: str
+    description: str = ""
     parameters: dict = Field(default_factory=dict)  # JSON schema
+
+    @model_validator(mode="before")
+    @classmethod
+    def _coerce_name_shorthand(cls, v):
+        if isinstance(v, str):
+            return {"name": v}
+        return v
 
     def to_openai(self) -> dict:
         return {

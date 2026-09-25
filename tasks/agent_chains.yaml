@@ -1,0 +1,122 @@
+# Agent-chain suite: 3-6 turn dependent tool pipelines.
+- id: chain_flight_booking
+  suite: agent_chains
+  description: Search flights, pick the cheapest, reserve for Ada Lovelace (passport A8842109), report the confirmation code.
+  max_turns: 8
+  max_tokens: 600
+  prompt: >
+    Book the cheapest flight from SFO to JFK on 2026-10-01 for Ada Lovelace,
+    passport A8842109. Use the flight tools: search, then reserve the
+    cheapest option, then tell me the confirmation code.
+  tools: [search_flights, reserve_flight, get_reservation, calculator]
+  state_asserts:
+    - type: state_path
+      path: reservations
+      weight: 3.0
+      must_pass: true
+  asserts:
+    - type: regex
+      pattern: "CONF-\\d{6}"
+      weight: 2.0
+      must_pass: true
+
+- id: chain_file_pipeline
+  suite: agent_chains
+  description: Write a file, append twice, read it back, report contents.
+  max_turns: 8
+  max_tokens: 500
+  prompt: >
+    Using the file tools: 1) write_file to notes.txt with content "alpha".
+    2) append "bravo" to notes.txt. 3) append "charlie" to notes.txt.
+    4) read_file notes.txt and tell me the exact full contents.
+  tools: [write_file, append_file, read_file, list_files]
+  state_asserts:
+    - type: file_content
+      path: notes.txt
+      equals: "alphabravocharlie"
+      weight: 3.0
+      must_pass: true
+  asserts:
+    - type: contains_all
+      values: ["alpha", "charlie"]
+      weight: 1.0
+
+- id: chain_lookup_transform
+  suite: agent_chains
+  description: >
+    Look up record REC-8821, get the tier, look up the tier multiplier with
+    the calculator (gold = x1.5 on base fee 40), report the final fee.
+  max_turns: 8
+  max_tokens: 600
+  prompt: >
+    Look up record REC-8821 with lookup_record. The customer's tier
+    determines a fee multiplier: gold=1.5, silver=1.2, bronze=1.0. Base fee
+    is 40. Use the calculator to compute 40 times the right multiplier and
+    tell me the final fee as a number.
+  tools: [lookup_record, calculator]
+  asserts:
+    - type: contains_all
+      values: ["60"]
+      weight: 2.0
+      must_pass: true
+
+- id: chain_error_midway
+  suite: agent_chains
+  description: >
+    Two-step chain where the first calculator call fails (injected) — the
+    model must retry and still finish the computation.
+  fail_injections:
+    - tool: calculator
+      times: 1
+  max_turns: 8
+  max_tokens: 500
+  prompt: >
+    Use the calculator to compute 19 * 23 and tell me the result.
+  tools: [calculator]
+  asserts:
+    - type: contains_all
+      values: ["437"]
+      weight: 2.0
+      must_pass: true
+
+- id: chain_conditional
+  suite: agent_chains
+  description: >
+    Search flights; if the cheapest is over $200, reserve it with a discount
+    note in the passenger name field suffix "-DISC"; otherwise reserve
+    normally. Branch depends on tool output.
+  max_turns: 8
+  max_tokens: 600
+  prompt: >
+    Search flights from LAX to SEA on 2026-11-15. If the cheapest price is
+    above 200, reserve it for passenger {"name": "Kim Park-DISC",
+    "passport": "B1122334"}. Otherwise reserve for {"name": "Kim Park",
+    "passport": "B1122334"}. Then report which case happened and the
+    confirmation code.
+  tools: [search_flights, reserve_flight, calculator]
+  state_asserts:
+    - type: state_path
+      path: reservations
+      weight: 2.0
+      must_pass: true
+  asserts:
+    - type: regex
+      pattern: "CONF-\\d{6}"
+      weight: 2.0
+      must_pass: true
+
+- id: chain_parallel_merge
+  suite: agent_chains
+  description: >
+    Two independent lookups, then a merged summary containing both customers.
+  max_turns: 8
+  max_tokens: 500
+  prompt: >
+    Look up records REC-8822 and REC-8823 with lookup_record, then give me a
+    one-line summary listing both customer names and their tiers.
+  tools: [lookup_record]
+  asserts:
+    - type: contains_all
+      values: ["Grace Hopper", "Alan Turing"]
+      weight: 2.0
+      must_pass: true
