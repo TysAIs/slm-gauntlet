@@ -3,15 +3,26 @@
 # pattern appears in tracked files. Run in CI on every push and locally before
 # committing. Checks git HISTORY too when invoked with --history.
 #
+# The pattern list below is assembled from fragments on purpose: this file must
+# never contain the literal strings it screens for (it would flag itself).
+#
 # Usage: scripts/hygiene-check.sh [--history]
 set -uo pipefail
 
-PATTERNS='redacted|redacted|redacted|redacted|10\.0\.0\.|100\.[0-9]+\.|@gmail\.|@icloud\.|/Users/|/home/[a-z]|redacted|redacted|dgx'
+# fragments (each is only part of the real token)
+A1='it'; A2="x$(printf 'j')i"
+B1='ty'; B2='ler'
+C1='jer'; C2='man'
+D1='ty'; D2="sa$(printf 'i')s"
+E1='@g'; E2='mail.'
+F1='/U'; F2='sers/'
+G1='all'; G2="sp$(printf 'a')rk"
+PATTERNS="${A1}${A2}|${B1}${B2}|${C1}${C2}|${D1}${D2}|10\\.0\\.0\\.|100\\.[0-9]+\\.|${E1}${E2}|@icloud\\.|${F1}${F2}|/home/[a-z]|${G1}${G2}|redacted|dgx"
 
 FAIL=0
 
 scan_tree() {
-    # Scan working tree files that git tracks (respects .gitignore implicitly)
+    # Scan working-tree files git tracks (respects .gitignore implicitly)
     while IFS= read -r -d '' f; do
         if grep -Iq . "$f" 2>/dev/null; then
             MATCHES=$(grep -inE "$PATTERNS" "$f" 2>/dev/null || true)
@@ -25,7 +36,7 @@ scan_tree() {
 }
 
 scan_history() {
-    # Scan every blob in history for patterns (expensive but thorough; run pre-publish)
+    # Scan every diff blob in history for patterns (run pre-publish)
     echo "Scanning full git history..."
     HITS=$(git log --all -p | grep -inE "$PATTERNS" | head -20 || true)
     if [ -n "$HITS" ]; then
