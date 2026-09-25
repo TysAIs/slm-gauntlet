@@ -161,5 +161,10 @@ class Scorer:
                 r = fn(output, a["pattern"])
             else:
                 raise ValueError(f"unknown assert type: {kind}")
-            result = result.merge(r)
+            merged = result.merge(r)
+            # surface failed checks in `failed` (merge only ANDs booleans)
+            merged.failed = result.failed + [
+                f"{kind}: {json.dumps(c)}" for c in r.checks if not c.get("ok")
+            ] + r.failed
+            result = merged
         return result
