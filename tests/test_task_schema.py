@@ -9,7 +9,7 @@ from gauntlet.task import Task
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "tasks"
 
-EXPECTED_SUITES = {"tooluse"}
+EXPECTED_SUITES = {"tooluse", "structured", "retrieval", "coding", "instruction"}
 
 
 def task_files():

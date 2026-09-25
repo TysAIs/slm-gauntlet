@@ -1,0 +1,116 @@
+# Structured-output suite: strict schema compliance, repair, extraction.
+# All scoring deterministic via json_schema/regex asserts.
+- id: struct_nested_json
+  suite: structured
+  description: Nested JSON object with arrays and enums
+  prompt: |
+    Output ONLY valid JSON (no other text) describing this order:
+    customer "J. Doe", items: 2x widget ($9.99 each), 1x gadget ($24.50),
+    shipping "express", paid with "credit_card".
+    Schema: {"customer": string, "items": [{"name": string, "qty": integer, "price": number}], "shipping": "standard"|"express", "payment": "credit_card"|"paypal"}
+  asserts:
+    - type: json_schema
+      schema:
+        type: object
+        properties:
+          customer: {type: string}
+          items:
+            type: array
+            items:
+              type: object
+              properties: {name: {type: string}, qty: {type: integer}, price: {type: number}}
+              required: [name, qty, price]
+          shipping: {type: string, enum: [standard, express]}
+          payment: {type: string, enum: [credit_card, paypal]}
+        required: [customer, items, shipping, payment]
+  max_tokens: 512
+
+- id: struct_json_repair
+  suite: structured
+  description: Fix malformed JSON preserving values
+  prompt: |
+    This JSON is malformed. Fix it and output ONLY the corrected JSON, keeping all values:
+    {"name": "widget", "count": 3, "tags": ["a", "b",] "price": 4.5
+  asserts:
+    - type: json_schema
+      schema:
+        type: object
+        properties:
+          name: {type: string}
+          count: {type: integer}
+          tags: {type: array, items: {type: string}}
+          price: {type: number}
+        required: [name, count, tags, price]
+
+- id: struct_csv_extract
+  suite: structured
+  description: Extract tabular data from prose into CSV
+  prompt: |
+    Convert to CSV with header "name,score". Output only the CSV.
+    Alice scored 91, Bob scored 85, and Carol got 78 on the test.
+  asserts:
+    - type: contains_all
+      values: ["name,score", "Alice,91", "Bob,85", "Carol,78"]
+
+- id: struct_signature_extract
+  suite: structured
+  description: Extract function signature from docstring prose
+  prompt: |
+    What is the exact function signature described? Answer with only the signature line.
+    A function named calculate_discount that takes price (a float), tier (a string,
+    defaulting to "basic") and applies (a boolean, defaulting to False).
+  asserts:
+    - type: regex
+      pattern: "def calculate_discount\\(price.*tier.*=.*[\"']basic[\"'].*applies.*=.*False.*\\)"
+
+- id: struct_regex_gen
+  suite: structured
+  description: Write a regex matching US phone numbers; must match all provided cases
+  prompt: |
+    Write a single Python regex (the pattern only, no explanation) that matches
+    these formats: 555-123-4567, (555) 123-4567, 5551234567.
+    Format your answer as: PATTERN: <regex>
+  asserts:
+    - type: regex
+      pattern: "PATTERN:.*"
+  max_tokens: 256
+
+- id: struct_json_array_sort
+  suite: structured
+  description: Transform data to sorted JSON array of objects
+  prompt: |
+    Output ONLY a JSON array of objects with keys "city" and "population",
+    sorted by population descending, from this data:
+    Paris has 2.1 million people. Berlin has 3.6 million. Rome has 2.8 million.
+    Use numbers (millions) for population.
+  asserts:
+    - type: json_schema
+      schema:
+        type: array
+        items:
+          type: object
+          properties: {city: {type: string}, population: {type: number}}
+          required: [city, population]
+
+- id: struct_yaml_shape
+  suite: structured
+  description: Convert JSON to a specific YAML-like key layout
+  prompt: |
+    Reformat this data as indented "key: value" lines (2-space indent, nested items
+    indented under parents), outputting nothing else:
+    {"server": {"host": "0.0.0.0", "port": 8080}, "debug": true}
+  asserts:
+    - type: contains_all
+      values: ["server:", "host:", "port: 8080", "debug: true"]
+
+- id: struct_strict_json_only
+  suite: structured
+  description: JSON with no prose wrapper at all (instruction discipline)
+  prompt: Output a JSON object with exactly one key "ok" set to true. Output nothing except the JSON.
+  asserts:
+    - type: json_schema
+      schema:
+        type: object
+        properties: {ok: {type: boolean}}
+        required: [ok]
+  max_tokens: 64
