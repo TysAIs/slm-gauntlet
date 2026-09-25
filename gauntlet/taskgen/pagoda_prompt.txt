@@ -1,0 +1,21 @@
+The mountain village of Kiyomizu-jō hires you to design its centerpiece shrine.
+Write a complete build description of a Japanese pagoda temple complex, in
+order, as the visitor experiences it. You are not writing code — you are
+describing the build itself, precisely and visually.
+
+Required, in this order:
+1. The stone foundation and base platform of the complex.
+2. A stone stairway or path ascending through the grounds.
+3. A vermillion torii gate marking the entrance to the inner shrine.
+4. The main pagoda: at least three stacked tiers, each narrower than the one
+   below, with flared roof eaves on every tier.
+5. The curvature of the roofs — how the eaves sweep and lift at the corners.
+6. Lighting: stone lanterns along the path and glowing lanterns hung at the
+   topmost tier.
+7. The garden: sakura trees, raked gravel, a reflection pond.
+8. The backdrop: the mountain face behind the shrine and the water feature
+   beside it.
+9. An atmospheric closing line: mist, dusk bells, or incense smoke.
+
+Write it as flowing prose, one paragraph per numbered element, in order.
+Do not number the paragraphs. Begin directly with the foundation.

@@ -35,7 +35,9 @@ async def _timed_generation(client: GauntletClient, prompt: str, max_tokens: int
     wall = time.perf_counter() - start
     ttft = r.ttft or wall
     decode_time = max(wall - ttft, 1e-6)
-    tokens = r.usage.completion_tokens or len((r.content or "").split())
+    # usage.completion_tokens can be 0 on stream without usage chunks: count words is wrong;
+    # fall back to estimating ~1.3 tokens/word
+    tokens = r.usage.completion_tokens or max(int(len((r.content or "").split()) * 1.3), 1)
     return {
         "ttft_s": round(ttft, 4),
         "wall_s": round(wall, 4),
@@ -84,6 +86,9 @@ async def fetch_server_metrics(base_url: str) -> dict:
 
 
 async def run_perf_suite(endpoint: str, model: str, max_tokens: int = 256) -> dict:
+    """max_tokens must be high enough that the model cannot finish the prompt
+    early (a short answer makes tok/s meaningless). 256 floor enforced."""
+    max_tokens = max(int(max_tokens), 256)
     client = GauntletClient(base_url=endpoint, model=model)
     short_prompt = "Count from 1 to 50, then say DONE."
     try:

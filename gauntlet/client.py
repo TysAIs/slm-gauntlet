@@ -119,11 +119,14 @@ class GauntletClient:
         messages: list[dict],
         temperature: float = 0.0,
         max_tokens: int | None = None,
+        no_think: bool = True,
     ) -> ChatResult:
         """Streaming completion; records TTFT and concatenates content."""
         body: dict = {"model": self.model, "messages": messages, "temperature": temperature, "stream": True}
         if max_tokens:
             body["max_tokens"] = max_tokens
+        if no_think:
+            body.setdefault("chat_template_kwargs", {})["enable_thinking"] = False
 
         start = time.perf_counter()
         resp = await self._post_with_retry(body, stream=True)
