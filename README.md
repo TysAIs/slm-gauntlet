@@ -9,7 +9,11 @@ Static benchmarks (MMLU-style) are saturated and contamination-ridden, and they 
 ## Design principles
 
 1. **Real agent loop, real tools.** Tasks run through a multi-turn loop where tool calls actually execute against a sandboxed environment (mock flights API, file workspace, calculator, records DB). Tool results feed back. No one-shot completion scoring.
-2. **Deterministic scoring.** Every scored assert is exact-match, substring, regex, JSON-schema, or a predicate. No LLM judge in scored paths. Same model + seed → same result.
+2. **Deterministic, layered scoring.** Three layers, all mechanical:
+   - **Text rubric** — weighted partial credit per check (Vals-AI / Anthropic pattern). A task that half-scores shows 0.5, not FAIL. `must_pass` gates zero the task when a critical requirement fails.
+   - **State verification** — BFCL V3-style outcome checks against the sandbox *after* the run: was the reservation actually created with the right passenger? Was the file actually written? Was the distractor tool actually *not* called? "Did the model achieve the right outcome," not "did it say the right thing."
+   - **Perfect / partial split** — binary all-checks-pass and weighted rubric score reported side by side.
+   No LLM judge anywhere in scored paths. Same model + seed → same result.
 3. **Contamination-resistant.** Retrieval tasks (needle-in-haystack) are **generated at run time** from seeded combinatorial space with canary GUIDs embedded — models cannot have memorized them. Includes **NoLiMa-style** needles with zero lexical overlap between question and answer. Classic benchmarks (if any) are labeled `contamination_risk: known` and are sanity floors only.
 4. **pass^k, not just pass@1.** Flaky-prone tasks repeat 3×; the headline reports both pass@1 (any-rep rate) and pass^3 (all-reps rate) — τ-bench-style reliability.
 5. **Loop watchdog.** A no-progress detector terminates repeated identical tool calls / near-identical outputs and records the task as `looped` — a scored failure and a reported failure mode.
