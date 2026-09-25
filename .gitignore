@@ -1,0 +1,28 @@
+# --- secrets / env ---
+.env
+*.env
+!.env.example
+
+# --- models / results (never in git) ---
+*.gguf
+*.safetensors
+models/
+results/
+!results/.gitkeep
+!results/_published/
+
+# --- python ---
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# --- editor/OS ---
+.DS_Store
+.idea/
+.vscode/
