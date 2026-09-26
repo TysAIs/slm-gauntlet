@@ -14,6 +14,12 @@ A1='it'; A2="x$(printf 'j')i"
 B1='ty'; B2='ler'
 C1='jer'; C2='man'
 D1='ty'; D2="sa$(printf 'i')s"
+# Whitelisted (public, Tyler-approved 2026-09-26): the GitHub org name in repo URLs.
+# Strip it before scanning so repo links don't trip the handle pattern.
+sanitize() {
+    # remove public repo URL org references before pattern matching
+    sed -E 's#github\.com/TysAIs/#GITHUB-ORG/#g; s#TysAIs/slm-gauntlet#ORG/slm-gauntlet#g'
+}
 E1='@g'; E2='mail.'
 F1='/U'; F2='sers/'
 G1='all'; G2="sp$(printf 'a')rk"
@@ -28,7 +34,7 @@ scan_tree() {
     while IFS= read -r -d '' f; do
         [[ "$f" == *hygiene-check.sh ]] && continue
         if grep -Iq . "$f" 2>/dev/null; then
-            MATCHES=$(grep -inE "$PATTERNS" "$f" 2>/dev/null || true)
+            MATCHES=$(grep -inE "$PATTERNS" <(sanitize < "$f") 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
                 echo "HIT: $f"
                 echo "$MATCHES" | head -5
@@ -43,7 +49,7 @@ scan_history() {
     # Skip diffs of this script itself: it contains escaped regex fragments
     # of the patterns (by design) and would always self-match.
     echo "Scanning full git history..."
-    HITS=$(git log --all -p -- . ':!scripts/hygiene-check.sh' | grep -inE "$PATTERNS" | head -20 || true)
+    HITS=$(git log --all -p -- . ':!scripts/hygiene-check.sh' | sanitize | grep -inE "$PATTERNS" | head -20 || true)
     if [ -n "$HITS" ]; then
         echo "HISTORY HITS:"
         echo "$HITS"
