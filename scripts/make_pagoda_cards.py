@@ -5,12 +5,16 @@ Same template every time: pagoda SVG motif, score, tier list, full model text.
 Usage: python scripts/make_pagoda_cards.py results/cards/manifest.json
 """
 from __future__ import annotations
-import html, json, sys
+
+import html
+import json
+import sys
 from pathlib import Path
 
 PAG_CSS = """
 * { margin:0; padding:0; box-sizing:border-box; }
-html,body { width:1080px; height:1080px; overflow:hidden; margin:0; background:#0d1117; font-family:'Georgia','Times New Roman',serif; }
+html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
+  background:#0d1117; font-family:'Georgia','Times New Roman',serif; }
 .card { width:1080px; height:1080px; background:linear-gradient(160deg,#1a1f2b,#10141d);
   border:1px solid #30363d; border-radius:22px; padding:40px 44px; color:#e6edf3;
   position:relative; overflow:hidden; display:flex; flex-direction:column; }
@@ -21,8 +25,10 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0; background:#
 .model-name { font-size:34px; font-weight:800; font-family:'SF Pro Display','Segoe UI',sans-serif; margin-top:6px; }
 .model-quant { font-size:16px; color:#8b949e; font-family:'SF Pro Display','Segoe UI',sans-serif; margin-top:4px; }
 .pct { text-align:right; }
-.pct .v { font-size:64px; font-weight:900; color:#7bd88f; line-height:1; font-family:'SF Pro Display','Segoe UI',sans-serif; }
-.pct .k { font-size:12px; color:#8b949e; letter-spacing:2px; font-family:'SF Pro Display','Segoe UI',sans-serif; margin-top:4px; }
+.pct .v { font-size:64px; font-weight:900; color:#7bd88f; line-height:1;
+  font-family:'SF Pro Display','Segoe UI',sans-serif; }
+.pct .k { font-size:12px; color:#8b949e; letter-spacing:2px;
+  font-family:'SF Pro Display','Segoe UI',sans-serif; margin-top:4px; }
 .tiers { margin:18px 0; font-family:'SF Pro Display','Segoe UI',sans-serif; }
 .tier-chip { display:inline-block; background:#0d1117; border:1px solid #30363d; border-radius:20px;
   padding:6px 16px; margin:0 8px 8px 0; font-size:14px; color:#c9d1d9; }
@@ -53,7 +59,7 @@ def render(name: str, quant: str, pct: float, tiers: int, text: str, ts: str) ->
         f'<div class=hrow><div><div class=pag-title>🏯 Pagoda</div>'
         f'<div class=model-name>{html.escape(name)}</div>'
         f'<div class=model-quant>{html.escape(quant)}</div></div>'
-        f'{SVG.replace("width=\"88\"", "width=\"88\"")}'
+        f'{SVG}'
         f'<div class=pct><div class=v>{pct:.0f}%</div><div class=k>ELEMENT COVERAGE</div></div></div>'
         f'<div class=tiers>{chips}</div>'
         f'<div class=text>{paras}</div>'
@@ -63,7 +69,8 @@ def render(name: str, quant: str, pct: float, tiers: int, text: str, ts: str) ->
 
 def main() -> None:
     manifest = {m["model"]: m for m in json.load(open(sys.argv[1]))}
-    outdir = Path("results/cards"); outdir.mkdir(parents=True, exist_ok=True)
+    outdir = Path("results/cards")
+    outdir.mkdir(parents=True, exist_ok=True)
     import glob
     for f in sorted(glob.glob("results/pagoda_*.json")):
         d = json.load(open(f))
