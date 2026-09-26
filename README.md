@@ -18,14 +18,14 @@ A benchmark for **small language models** (sub-12B, 8GB VRAM class) that measure
 | 10 | LFM2.5-2.6B | Q4_K_M | 71.3% | 76% | 50% | 83% | 75% | 50% | 100% | 62% | 34→58 |
 | 11 | Gemma-3n-E4B | Q4_K_M | 57.6% | 29%⚠ | 62% | 17% | 100% | 75% | 83% | 62% | 13→13 |
 
-**61 tasks** across 7 suites (weights: tooluse 30%, structured/retrieval 15%, coding/instruction/adversarial/chains 10%). Full data: [`results/_published/`](results/_published/LEADERBOARD.md). Verdict: **MiniCPM5-2B Q4_K_M is the best 8GB daily-driver subagent**; Bonsai-2 1-bit is the accuracy specialist (perfect tooluse/adversarial/chains, but 3 tok/s).
+**61 tasks** across 7 suites (weights: tooluse 30%, structured/retrieval 15%, coding/instruction/adversarial/chains 10%). Full data: [`results/_published/`](results/_published/LEADERBOARD.md). Verdict: **MiniCPM5-2B Q4_K_M is the best 8GB daily-driver subagent**; Bonsai-2 1-bit is the accuracy specialist (perfect tooluse/adversarial/chains, but 10.4 tok/s retested).
 
 ⚠ Gemma emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency. MiMo/Ornith/Bonsai retrieval capped by the 8K-context ceiling their VRAM footprint forces on an 8GB card.
 
 
 \* Bonsai-2 PQ2_0 weights fill the card completely: 8K context is the hard ceiling and there is zero concurrency headroom. Gemma ⚠: emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency.
 
-**Takeaway:** MiniCPM5-2B Q4_K_M is the best daily-driver subagent for an 8GB card. Bonsai-2 1-bit is the best *tool-calling specialist* if you can live with 3 tok/s.
+**Takeaway:** MiniCPM5-2B Q4_K_M is the best daily-driver subagent for an 8GB card. Bonsai-2 1-bit is the best *tool-calling specialist* if you can live with 10.4 tok/s retested.
 
 ---
 

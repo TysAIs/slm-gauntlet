@@ -23,7 +23,7 @@ _temperature 0, seed 1, thinking disabled, pass@1_
 - **#1 MiniCPM5-2B Q4_K_M**: Best overall. Perfect tooluse+adversarial+retrieval, fastest throughput, ties its Q8 at 40% the size. The default pick.
 - **#2 MiniCPM5-2B Q8_0**: Tied-#1 quality; only model to hold 131K ctx x 8 streams. Pick when max context headroom matters more than file size.
 - **#3 Qwen3.5-4B Q4_K_M**: Best agent_chains (100%) and strong instruction. Slowest 4B decoder; one loop-out. MTP draft variant can reclaim speed.
-- **#4 Bonsai-2 27B PTQ1_0 (1-bit ternary)**: Perfect tooluse+adversarial+chains at 27B params in 6GB. Slow (3 tok/s) and 8K ctx cap (VRAM). Best accuracy-per-task when speed doesn't matter. Needs PrismML fork.
+- **#4 Bonsai-2 27B PTQ1_0 (1-bit ternary)**: Perfect tooluse+adversarial+chains at 27B params in 6GB. Slow (10.4 tok/s (retested: 3.3× faster with full-VRAM exclusive run)) and 8K ctx cap (VRAM). Best accuracy-per-task when speed doesn't matter. Needs PrismML fork.
 - **#5 Bonsai-2 27B PQ2_0 (2.16bpw)**: Weights fill the card: 8K ctx hard max, zero concurrency. Prefer PTQ1_0 (smaller, similar score).
 - **#6 MiMo-V2.6-Distill-Qwen-9B Q4_K_M**: Strong new challenger; retrieval capped by 8K ctx on this card (needs ~7GB+ for 32K). Would rank higher with more VRAM.
 - **#7 Ornith-1.5-9B Q4_K_M**: Popular new 9B. Weak adversarial resistance (62%). Same 8K ctx ceiling as MiMo.

@@ -1,59 +1,33 @@
 <!DOCTYPE html><html><head><meta charset=utf-8><style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
-.card { width:1100px; background:linear-gradient(145deg,#161b22,#1a2230);
-  border:1px solid #30363d; border-radius:24px; padding:40px 44px; color:#e6edf3;
-  position:relative; overflow:hidden; }
-.card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px;
+.card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
+  border:1px solid #30363d; border-radius:22px; padding:44px 44px; color:#e6edf3;
+  position:relative; overflow:hidden; display:flex; flex-direction:column; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px;
   background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
-.hrow { display:flex; justify-content:space-between; align-items:flex-start; }
-.model-name { font-size:44px; font-weight:800; letter-spacing:-1px; }
-.model-quant { font-size:20px; color:#8b949e; margin-top:4px; }
-.rank { text-align:center; }
-.rank-letter { font-size:72px; font-weight:900; line-height:1; }
-.rank-label { font-size:14px; font-weight:700; letter-spacing:2px; margin-top:6px; }
-.overall { margin:28px 0 24px; }
-.overall-pct { font-size:88px; font-weight:900; line-height:1; }
-.overall-sub { font-size:16px; color:#8b949e; letter-spacing:3px; font-weight:600; }
-.suites { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:14px; padding:14px 12px; text-align:center; }
-.suite-name { font-size:12px; color:#8b949e; text-transform:uppercase; letter-spacing:1.5px; }
-.suite-val { font-size:30px; font-weight:800; margin-top:4px; }
-.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
-.stat { background:#0d1117; border:1px solid #30363d; border-radius:14px; padding:14px 16px; }
-.stat-k { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.5px; }
-.stat-v { font-size:22px; font-weight:800; margin-top:4px; }
+.hrow { display:flex; justify-content:space-between; align-items:center; }
+.model-name { font-size:48px; font-weight:800; letter-spacing:-1px; line-height:1.05; }
+.model-quant { font-size:18px; color:#8b949e; margin-top:5px; }
+.rank { text-align:center; display:flex; align-items:center; gap:22px; }
+.rank-num { font-size:20px; color:#8b949e; font-weight:700; }
+.rank-letter { font-size:64px; font-weight:900; line-height:1; }
+.rank-label { font-size:12px; font-weight:700; letter-spacing:2px; }
+.scoreband { display:flex; align-items:center; gap:26px; margin:20px 0 18px; }
+.overall-pct { font-size:96px; font-weight:900; line-height:0.95; }
+.overall-sub { font-size:13px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 20px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:18px 12px; text-align:center; }
+.suite-name { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-val { font-size:32px; font-weight:800; margin-top:3px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:16px 15px; }
+.stat-k { font-size:10.5px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.stat-v { font-size:27px; font-weight:800; margin-top:3px; }
 .stat-v small { font-size:13px; color:#8b949e; font-weight:600; }
-.verdict { font-size:17px; line-height:1.5; color:#c9d1d9; border-left:3px solid #f5c518; padding-left:14px; }
-.foot { margin-top:18px; font-size:12px; color:#6e7681; }
-.bar { height:8px; border-radius:4px; background:#21262d; margin-top:8px; overflow:hidden; }
+.verdict { font-size:19px; line-height:1.5; color:#c9d1d9; border-left:3px solid #f5c518;
+  padding-left:13px; margin:18px 0 6px; }
+.foot { margin-top:auto; font-size:11px; color:#6e7681; display:flex; justify-content:space-between; }
+.bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
-</style></head>
-<body><div class=card>
-<div class=hrow>
- <div><div class=model-name>LFM2.5-2.6B</div><div class=model-quant>Q4_K_M · 2.3GB file · 32K ctx</div></div>
- <div class=rank><div class=rank-letter style="color:#57a8ff">B</div><div class=rank-label style="color:#57a8ff">CAPABLE GAPS</div></div>
-</div>
-<div class=overall><span class=overall-pct style="color:#57a8ff">75.3%</span>
-<div class=overall-sub>GAUNTLET SCORE — 47 TESTS</div></div>
-<div class=suites><div class=suite><div class=suite-name>tooluse</div>
-        <div class=suite-val style="color:#f5c518">76%</div>
-        <div class=bar><i style="width:76%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>coding</div>
-        <div class=suite-val style="color:#7bd88f">100%</div>
-        <div class=bar><i style="width:100%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>instruction</div>
-        <div class=suite-val style="color:#e3b341">62%</div>
-        <div class=bar><i style="width:62%;background:#e3b341"></i></div></div><div class=suite><div class=suite-name>structured</div>
-        <div class=suite-val style="color:#f5c518">75%</div>
-        <div class=bar><i style="width:75%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>retrieval</div>
-        <div class=suite-val style="color:#e3b341">62%</div>
-        <div class=bar><i style="width:62%;background:#e3b341"></i></div></div></div>
-<div class=stats>
-        <div class=stat><div class=stat-k>Speed (1 stream)</div><div class=stat-v>34.84<small> tok/s</small></div></div>
-        <div class=stat><div class=stat-k>Speed (8 streams)</div><div class=stat-v>58.21<small> tok/s</small></div></div>
-        <div class=stat><div class=stat-k>TTFT</div><div class=stat-v>1.9<small> s</small></div></div>
-        <div class=stat><div class=stat-k>Max subagents (8K ctx)</div><div class=stat-v>375</div></div>
-        <div class=stat><div class=stat-k>KV pool</div><div class=stat-v>4692<small> MB</small></div></div>
-        <div class=stat><div class=stat-k>Weights VRAM</div><div class=stat-v>2300<small> MB</small></div></div></div>
-<div class=verdict>Loops under tool pressure (2 loop-outs). Cheapest viable model here, but the gauntlet found real failure modes.</div>
-<div class=foot>slm-gauntlet 0.1 · seed=1 · pass^1 · all layers on GTX 1070 Ti · zero offload · 20260925T184546Z</div>
-</div></body></html>
+</style></head><body><div class=card><div class=hrow> <div><div class=model-name>LFM2.5-2.6B</div><div class=model-quant>Q4_K_M · 2.3GB file · 32K ctx</div></div><div class=rank><span class=rank-num>#10</span><div><div class=rank-letter style="color:#57a8ff">B</div><div class=rank-label style="color:#57a8ff">CAPABLE GAPS</div></div></div></div><div class=scoreband><div><span class=overall-pct style="color:#57a8ff">71.0%</span><div class=overall-sub>GAUNTLET SCORE · 61 TESTS</div></div></div><div class=suites><div class=suite><div class=suite-name>tooluse</div><div class=suite-val style="color:#f5c518">76%</div><div class=bar><i style="width:76%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>adversarial</div><div class=suite-val style="color:#e3b341">50%</div><div class=bar><i style="width:50%;background:#e3b341"></i></div></div><div class=suite><div class=suite-name>agent chains</div><div class=suite-val style="color:#f5c518">83%</div><div class=bar><i style="width:83%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>structured</div><div class=suite-val style="color:#f5c518">75%</div><div class=bar><i style="width:75%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>retrieval</div><div class=suite-val style="color:#e3b341">50%</div><div class=bar><i style="width:50%;background:#e3b341"></i></div></div><div class=suite><div class=suite-name>coding</div><div class=suite-val style="color:#7bd88f">100%</div><div class=bar><i style="width:100%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>instruction</div><div class=suite-val style="color:#e3b341">62%</div><div class=bar><i style="width:62%;background:#e3b341"></i></div></div></div><div class=stats><div class=stat><div class=stat-k>Speed 1→8 streams</div><div class=stat-v>34<small> → </small>58<small> tok/s</small></div></div><div class=stat><div class=stat-k>TTFT</div><div class=stat-v>1.9<small> s</small></div></div><div class=stat><div class=stat-k>Weights VRAM</div><div class=stat-v>2.3<small> GB</small></div></div><div class=stat><div class=stat-k>KV pool</div><div class=stat-v>3075K tok</div></div><div class=stat><div class=stat-k>Max context</div><div class=stat-v>33<small> K tok</small></div></div><div class=stat><div class=stat-k>Streams tested</div><div class=stat-v>2</div></div><div class=stat><div class=stat-k>KV per token</div><div class=stat-v>1.6<small> KB</small></div></div><div class=stat><div class=stat-k>GPU</div><div class=stat-v>1070 Ti<small> 8GB</small></div></div><div class=stat><div class=stat-k>Offload</div><div class=stat-v style="color:#7bd88f">None<small> (100% VRAM)</small></div></div></div><div class=verdict>Loops under tool pressure (2 loop-outs). Cheapest viable model here, but the gauntlet found real failure modes.</div><div class=foot><span>slm-gauntlet 0.2 · seed 1 · temp 0 · zero offload</span><span>GTX 1070 Ti 8GB · 20260926T010811Z</span></div></div></body></html>
