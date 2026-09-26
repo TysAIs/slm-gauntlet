@@ -1,5 +1,7 @@
 
-import shutil, subprocess, platform, re
+import platform
+import shutil
+import subprocess
 
 def detect_device():
     """Return (name, vram_total_mb, kind). kind in {nvidia, amd, apple, cpu}."""
