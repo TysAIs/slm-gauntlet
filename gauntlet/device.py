@@ -3,6 +3,7 @@ import platform
 import shutil
 import subprocess
 
+
 def detect_device():
     """Return (name, vram_total_mb, kind). kind in {nvidia, amd, apple, cpu}."""
     # NVIDIA
@@ -10,9 +11,12 @@ def detect_device():
         try:
             r = subprocess.run(["nvidia-smi","--query-gpu=name,memory.total","--format=csv,noheader,nounits"],
                                capture_output=True, text=True, timeout=10)
-            name, mb = r.stdout.strip().splitlines()[0].split(", ")
+            line = r.stdout.strip().splitlines()[0]
+            name, mb = line.split(", ")
             return name.strip(), int(float(mb)), "nvidia"
-        except Exception: pass
+        except Exception:
+
+            pass
     # Apple Silicon (unified memory = total RAM usable as VRAM)
     if platform.system() == "Darwin" and platform.machine() == "arm64":
         try:
@@ -21,7 +25,9 @@ def detect_device():
             r = subprocess.run(["sysctl","-n","hw.memsize"], capture_output=True, text=True, timeout=5)
             total_mb = int(r.stdout.strip()) // (1024*1024)
             return f"Apple {chip.split('Apple ')[-1]}", total_mb, "apple"
-        except Exception: pass
+        except Exception:
+
+            pass
     # AMD ROCm
     if shutil.which("rocm-smi"):
         try:
@@ -32,7 +38,9 @@ def detect_device():
                 if "Card series" in ln or "vram" in ln.lower():
                     pass
             return "AMD GPU", 0, "amd"
-        except Exception: pass
+        except Exception:
+
+            pass
     return "CPU", 0, "cpu"
 
 if __name__ == "__main__":
