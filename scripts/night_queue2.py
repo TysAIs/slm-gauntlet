@@ -6,8 +6,11 @@ import subprocess
 import sys
 import time
 
-EP = "http://CT_HOST:18081/v1"
-CT = ["ssh", "-o", "ConnectTimeout=15", "pve", "pct", "exec", "100", "--"]
+import os as _os
+_SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "pve-lab")
+CT_HOST = _os.environ.get("GAUNTLET_CT_HOST", "localhost")
+EP = f"http://{CT_HOST}:18081/v1"
+CT = ["ssh", "-o", "ConnectTimeout=15", _SSH_ALIAS, "pct", "exec", "100", "--"]
 MODELS = {
   "lfm2.5-2.6b-q8_0":      ("lfm2.5-2.6b/LFM2.5-2.6B-Q8_0.gguf", "32768", "2", "LLAMA"),
   "gemma-e4b-q4_K_M":      ("gemma-e4b/gemma-3n-E4B-it-Q4_K_M.gguf", "16384", "1", "LLAMA"),
