@@ -16,7 +16,7 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 1,
-  "verdict": "Accuracy king of v0.3.1 by a hair. PaT arch punches above its size; stacked-constraint instruction following is its one gap.",
+  "verdict": "Accuracy king by a hair. PaT arch punches above its size; stacked-constraint instruction following is the one gap.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia"
@@ -60,7 +60,7 @@
   "n": 65,
   "ts": "20260926T1",
   "rank": 3,
-  "verdict": "Reasoning specialist: perfect adversarial, agent chains and structured. 3 tok/s keeps it out of daily-driver duty.",
+  "verdict": "Reasoning specialist: perfect adversarial, chains and structured. 3 tok/s keeps it off daily-driver duty.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia"
