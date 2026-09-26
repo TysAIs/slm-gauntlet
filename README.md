@@ -4,16 +4,24 @@ A benchmark for **small language models** (sub-12B, 8GB VRAM class) that measure
 
 **Current leaderboard (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload):**
 
-| Rank | Model | Score | Tool use | Coding | Instruction | Structured | Retrieval | Speed (c1→c8) |
-|---|---|---|---|---|---|---|---|---|
-| 🥇 | MiniCPM5-2B Q4_K_M | **91.7%** | 100% | 83% | 75% | 100% | 100% | 32→62 tok/s |
-| 🥈 | MiniCPM5-2B Q8_0 | 89.3% | 88% | 83% | 88% | 88% | 100% | 33→62 tok/s |
-| 🥉 | Qwen3.5-4B Q4_K_M | 88.0% | 94% | 83% | 88% | 88% | 88% | 16→27 tok/s |
-| 4 | Bonsai-2 27B PTQ1_0 (1-bit) | 81.7% | **100%** | 83% | 88% | 100% | 38% | 3→3 tok/s |
-| 5 | Bonsai-2 27B PQ2_0 | 82.5%* | **100%** | 100% | 88% | 100% | 25% | 5→6 tok/s |
-| 6 | LFM2.5-2.6B Q8_0 | 77.8% | 76% | 100% | 62% | 75% | 75% | 26→44 tok/s |
-| 7 | LFM2.5-2.6B Q4_K_M | 75.3% | 76% | 100% | 62% | 75% | 62% | 27→58 tok/s |
-| 8 | Gemma-3n-E4B Q4_K_M | 70.0% | 29%⚠ | 83% | 62% | 100% | 75% | 13→13 tok/s |
+| Rank | Model | Quant | Score | Tool | Adversarial | Chains | Struct | Retrieval | Coding | Instr | tok/s c1→c8 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 🥇 | MiniCPM5-2B | Q4_K_M | **94.2%** | 100% | 100% | 83% | 100% | 100% | 83% | 75% | 32→62 |
+| 🥈 | MiniCPM5-2B | Q8_0 | 94.0% | 98% | 88% | 83% | 100% | 100% | 100% | 75% | 26→51 |
+| 🥉 | Qwen3.5-4B | Q4_K_M | 89.1% | 94% | 75% | 100% | 88% | 88% | 83% | 88% | 16→27 |
+| 4 | Bonsai-2 27B | PTQ1_0 1-bit | 87.7% | 100% | 100% | 100% | 100% | 38% | 83% | 88% | 3.2→3.4 |
+| 5 | Bonsai-2 27B | PQ2_0 | 84.4% | 100% | — | — | 100% | 25% | 100% | 88% | 4.6→5.7 |
+| 6 | MiMo-V2.6-Distill-9B | Q4_K_M | 81.7% | 88% | 88% | 100% | 100% | 38% | 83% | 75% | 13→13 |
+| 7 | Ornith-1.5-9B | Q4_K_M | 80.9% | 94% | 62% | 100% | 100% | 38% | 83% | 75% | 10→10 |
+| 8 | Sharp-Spark-X2.5-4B | Q4_K_XL | 73.8% | 65% | 75% | 50% | 100% | 62% | 100% | 75% | 17→17 |
+| 9 | LFM2.5-2.6B | Q8_0 | 73.8% | 76% | 38% | 83% | 75% | 75% | 100% | 62% | 26→44 |
+| 10 | LFM2.5-2.6B | Q4_K_M | 71.3% | 76% | 50% | 83% | 75% | 50% | 100% | 62% | 34→58 |
+| 11 | Gemma-3n-E4B | Q4_K_M | 57.6% | 29%⚠ | 62% | 17% | 100% | 75% | 83% | 62% | 13→13 |
+
+**61 tasks** across 7 suites (weights: tooluse 30%, structured/retrieval 15%, coding/instruction/adversarial/chains 10%). Full data: [`results/_published/`](results/_published/LEADERBOARD.md). Verdict: **MiniCPM5-2B Q4_K_M is the best 8GB daily-driver subagent**; Bonsai-2 1-bit is the accuracy specialist (perfect tooluse/adversarial/chains, but 3 tok/s).
+
+⚠ Gemma emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency. MiMo/Ornith/Bonsai retrieval capped by the 8K-context ceiling their VRAM footprint forces on an 8GB card.
+
 
 \* Bonsai-2 PQ2_0 weights fill the card completely: 8K context is the hard ceiling and there is zero concurrency headroom. Gemma ⚠: emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency.
 
