@@ -103,13 +103,6 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_pagoda_code(args: argparse.Namespace) -> int:
-    from gauntlet.pagoda_code_cli import main as pc_main
-
-    sys.argv = ["pagoda-code", "--endpoint", args.endpoint, "--model", args.model]
-    return pc_main()
-
-
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="gauntlet")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -129,11 +122,6 @@ def main(argv: list[str] | None = None) -> int:
         help="run every task k times; pass^k = all-reps reliability (tau-bench style). 3 recommended",
     )
     run_p.set_defaults(fn=cmd_run)
-
-    pc_p = sub.add_parser("pagoda-code", help="voxel pagoda build test (execution-graded, needs local Chromium)")
-    pc_p.add_argument("--endpoint", required=True)
-    pc_p.add_argument("--model", required=True)
-    pc_p.set_defaults(fn=cmd_pagoda_code)
 
     perf_p = sub.add_parser("perf", help="throughput benchmark (TTFT/tok-s at c=1/4/8)")
     perf_p.add_argument("--endpoint", required=True)

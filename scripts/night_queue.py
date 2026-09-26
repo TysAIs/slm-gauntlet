@@ -2,7 +2,6 @@
 """Night queue driver: run every model through the newest gauntlet end-to-end.
 
 Runs LOCALLY (Mac). For each model: swap CT server via ssh, wait for endpoint,
-run gauntlet (all suites incl. hard), voxel pagoda (pagoda-code), perf.
 Bonsai uses the PrismML fork binary.
 """
 import os as _os
@@ -83,18 +82,6 @@ def main():
                 f"--model {name} --suite all --concurrency 2 --timeout 240 --seed 1 "
                 f"> /tmp/gauntlet_{name}.log 2>&1; echo RC=$?"], timeout=580)
         log.write(f"=== {name} gauntlet rc={r.stdout.strip()[-6:]} {time.strftime('%H:%M:%S')} ===\n")
-        # prose pagoda
-        sh(["bash", "-c",
-            f".venv/bin/python -m gauntlet.pagoda_code_cli --endpoint {ENDPOINT} "
-            f"--model {name} --max-tokens 1400 "
-            f"--out results/pagoda_code_{name}.json"], timeout=580)
-        # voxel pagoda
-        import os
-        env = {**os.environ, "PLAYWRIGHT_BROWSERS_PATH": os.path.expanduser("~/Library/Caches/ms-playwright")}
-        sh([".venv/bin/python", "-m", "gauntlet.pagoda_code_cli",
-            "--endpoint", ENDPOINT, "--model", name,
-            "--out", f"results/pagoda_code_{name}.json"],
-           timeout=590, env=env)
         log.write(f"=== {name} COMPLETE {time.strftime('%H:%M:%S')} ===\n")
     # restore production
     sh(CT + ["pkill", "-f", f"port {PORT}"])

@@ -2,32 +2,31 @@
 
 A benchmark for **small language models** (sub-12B, 8GB VRAM class) that measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
 
-**Current leaderboard — v0.3 gauntlet (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload, 71 tasks):**
+**Current leaderboard — v0.3.1 gauntlet (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload, 71 tasks):**
 
-| Rank | Model | Quant | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Voxel |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | Gemma 4 · E4B | Q4_K_M | **85.1%** | 95% | 88% | 83% | 80% | 100% | 100% | 50% | 14% |
-| 🥈 | MiniCPM-V 5 · 2B | Q8_0 | **84.8%** | 93% | 88% | 83% | 80% | 100% | 100% | 50% | 29% |
-| 🥉 | Ternary Bonsai-2 · 27B | PTQ1_0 | **83.3%** | 95% | 100% | 100% | 80% | 38% | 83% | 88% | — |
-| 4 | MiniCPM-V 5 · 2B | Q4_K_M | **82.7%** | 95% | 88% | 83% | 80% | 100% | 83% | 50% | 29% |
-| 5 | MiMo V2.6 · 9B | Q4_K_M | **73.9%** | 79% | 88% | 100% | 80% | 38% | 83% | 50% | — |
-| 6 | Ornith 1.5 · 9B | Q4_K_M | **72.8%** | 89% | 62% | 100% | 80% | 38% | 83% | 57% | — |
-| 7 | Gemma 4 · 12B | UD-Q2_K_XL | **69.8%** | 74% | 88% | 67% | 70% | 50% | 83% | 57% | 57% |
-| 8 | LFM 2.5 · 2.6B | Q8_0 | **68.5%** | 74% | 38% | 83% | 60% | 75% | 100% | 50% | — |
-| 9 | LFM 2.5 · 2.6B | Q4_K_M | **66.7%** | 74% | 50% | 83% | 60% | 50% | 100% | 50% | 43% |
-| 10 | Qwen 3.5 · 4B | Q4_K_M | **65.4%** | 68% | 62% | 67% | 60% | 50% | 100% | 50% | 86% |
-| 11 | Gemma 4 · 12B | IQ3_XXS | **65.1%** | 74% | 62% | 67% | 60% | 50% | 100% | 43% | — |
-| 12 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **63.6%** | 68% | 50% | 67% | 60% | 50% | 100% | 50% | 43% |
-| 13 | Gemma 3n · E4B | Q4_K_M | **56.3%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | — |
+| Rank | Model | Quant | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 🥇 | Gemma 4 · E4B | Q4_K_M | **87.9%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% |
+| 🥈 | MiniCPM-V 5 · 2B | Q8_0 | **87.7%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% |
+| 🥉 | Ternary Bonsai-2 · 27B | PTQ1_0 | **86.2%** | 95% | 100% | 100% | 100% | 38% | 83% | 88% |
+| 4 | MiniCPM-V 5 · 2B | Q4_K_M | **85.6%** | 95% | 88% | 83% | 100% | 100% | 83% | 50% |
+| 5 | Ornith 1.5 · 9B | Q4_K_M | **75.7%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% |
+| 6 | MiMo V2.6 · 9B | Q4_K_M | **75.3%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% |
+| 7 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% |
+| 8 | LFM 2.5 · 2.6B | Q8_0 | **69.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% |
+| 9 | LFM 2.5 · 2.6B | Q4_K_M | **69.6%** | 74% | 50% | 83% | 80% | 50% | 100% | 50% |
+| 10 | Qwen 3.5 · 4B | Q4_K_M | **68.2%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% |
+| 11 | Gemma 4 · 12B | IQ3_XXS | **68.0%** | 74% | 62% | 67% | 80% | 50% | 100% | 43% |
+| 12 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.4%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% |
+| 13 | Gemma 3n · E4B | Q4_K_M | **56.3%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% |
 
 Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · trading cards in [`results/cards/`](results/cards/).
 
 **v0.3 takeaways:**
-- **Gemma 4 E4B (Q4_K_M)** is the new accuracy king (85.1%) — the PaT arch punches way above its size.
-- **MiniCPM5-2B Q8_0** is the best speed/accuracy *balance* (84.8% at 26 tok/s) — still the daily-driver pick.
-- **Bonsai-2 1-bit (27B)** is the reasoning specialist (perfect adversarial + agent chains) at 3 tok/s.
-- The **voxel pagoda** is the great separator: Qwen 3.5-4B is the only model that built a real multi-floor 3D scene (86%); most models score in the teens-20s. 12B Gemma-4 manages 57% only as UD-Q2_K_XL.
-- v0.3's hard suites (instruction-hard, structured-hard, tooluse-hard) cut top scores ~10 points vs v0.2 — that's the discrimination working.
+- **Gemma 4 E4B (Q4_K_M)** edges the win (87.9%) — the PaT arch punches above its size, but only by 0.2pp over MiniCPM Q8.
+- **MiniCPM5-2B Q8_0** is statistically tied at #2 (87.7%) at DOUBLE the speed (26 vs 14 tok/s) — the practical daily-driver pick.
+- **Bonsai-2 1-bit (27B)** is the reasoning specialist (perfect adversarial + chains + structured, 86.2%) at 3 tok/s.
+- v0.3.1 grader audit: fixed 2 broken structured-hard predicates; the top-2 models' near-identical scores (70/71 same outcomes) verified genuine via per-run output logs.
 
 ---
 
@@ -71,8 +70,7 @@ Plain `POST /v1/chat/completions` → check the answer contains the code. That's
 
 - **`gauntlet perf`** — TTFT, tok/s at 1/4/8 concurrent streams, 8K-token prefill speed.
 - **Capacity analysis** — from the server log: weights VRAM, KV bytes/token, KV pool after weights, and the max number of concurrent 8K-context subagents the card can hold.
-- **Voxel Pagoda** (`gauntlet pagoda-code`) — an execution-graded limits test: the model must write a complete, self-contained HTML file that renders a blocky 3D voxel pagoda garden (tiers, torii gate, lanterns, garden, sky) with no external assets, then the page is loaded headlessly in Chromium and graded on what actually renders: console errors, voxel counts, declared scene stats, live FPS. Screenshots of every model's attempt are saved as artifacts. This is the hardest thing we ask — it separates "can talk about code" from "can build a working program." Most models score in the teens-20s; writing a real 3D engine from scratch is a genuine frontier for small models.
-- **Model cards** — trading-card style PNG per model: rank badge, suite percentages, speed curve, KV pool, max subagents, voxel pagoda score, and a plain-English verdict.
+- **Model cards** — trading-card style PNG per model: rank badge, suite percentages, speed curve, KV pool, max subagents, and a plain-English verdict.
 
 ---
 
@@ -97,9 +95,6 @@ gauntlet run --endpoint http://localhost:8080/v1 --model my-model --suite toolus
 
 # 3. Throughput benchmark
 gauntlet perf --endpoint http://localhost:8080/v1 --model my-model
-
-# 3b. Voxel pagoda limits test (needs local Chromium/playwright)
-gauntlet pagoda-code --endpoint http://localhost:8080/v1 --model my-model
 
 # 4. Leaderboard from your local runs
 gauntlet report

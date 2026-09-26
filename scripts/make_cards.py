@@ -43,11 +43,6 @@ def cap_latest(model: str) -> dict | None:
     return json.load(open(f)) if Path(f).exists() else None
 
 
-def voxel_latest(model: str) -> dict | None:
-    f = f"results/pagoda_code_{model}.json"
-    return json.load(open(f)) if Path(f).exists() else None
-
-
 def suite_color(pct: float) -> str:
     if pct >= 90:
         return "#7bd88f"
@@ -78,16 +73,16 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 .overall-pct { font-size:96px; font-weight:900; line-height:0.95; }
 .overall-sub { font-size:13px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
 .suites { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 20px; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:18px 12px; text-align:center; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:22px 12px; text-align:center; }
 .suite-name { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.suite-val { font-size:32px; font-weight:800; margin-top:3px; }
+.suite-val { font-size:36px; font-weight:800; margin-top:5px; }
 .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
-.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:16px 15px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:20px 15px; }
 .stat-k { font-size:10.5px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
 .stat-v { font-size:27px; font-weight:800; margin-top:3px; }
 .stat-v small { font-size:13px; color:#8b949e; font-weight:600; }
-.verdict { font-size:19px; line-height:1.5; color:#c9d1d9; border-left:3px solid #f5c518;
-  padding-left:13px; margin:18px 0 6px; }
+.verdict { font-size:20px; line-height:1.55; color:#c9d1d9; border-left:3px solid #f5c518;
+  padding-left:14px; margin:22px 0 10px; }
 .foot { margin-top:auto; font-size:11px; color:#6e7681; display:flex; justify-content:space-between; }
 .bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
@@ -145,15 +140,6 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'<div class=stat><div class=stat-k>Offload</div>'
             f'<div class=stat-v style="color:#7bd88f">None<small> (100% VRAM)</small></div></div>'
         )
-    vox_tile = ""
-    vox = voxel_latest(m["model"])
-    if vox:
-        vpct = vox.get("pct", 0)
-        vox_tile = (
-            f'<div class=suite><div class=suite-name>Pagoda voxel</div>'
-            f'<div class=suite-val style="color:{suite_color(vpct)}">{vpct:.0f}%</div>'
-            f'<div class=bar><i style="width:{vpct:.0f}%;background:{suite_color(vpct)}"></i></div></div>'
-        )
     verdict = m.get("verdict", "")
     n = m.get("n", 61)
     rank_num = m.get("rank", "")
@@ -171,12 +157,12 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'</div>'
         f'<div class=scoreband>'
         f'<div><span class=overall-pct style="color:{color}">{m["overall_pct"]:.1f}%</span>'
-        f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS</div></div>'
+        f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS · 7 SUITES</div></div>'
         f'</div>'
-        f'<div class=suites>{suite_html}{vox_tile}</div>'
+        f'<div class=suites>{suite_html}</div>'
         f'<div class=stats>{stats_html}</div>'
         f'<div class=verdict>{verdict}</div>'
-        f'<div class=foot><span>slm-gauntlet v0.3 · seed 1 · temp 0 · zero offload</span>'
+        f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · zero offload · 71 tasks</span>'
         f'<span>GTX 1070 Ti 8GB · {m.get("ts","")}</span></div>'
         f'</div></body></html>'
     )

@@ -148,10 +148,11 @@ def json_schema_check(output: str, schema: dict) -> ScoreResult:
 def predicate_check(output: Any, expr: str) -> ScoreResult:
     """Evaluate a boolean expression with `out` bound. For trusted task YAML only.
     `out` goes in GLOBALS so comprehension scopes (separate frames) can see it."""
+    import json as _json
     safe_builtins = {
         "len": len, "abs": abs, "sum": sum, "round": round,
         "any": any, "all": all, "min": min, "max": max, "int": int, "float": float,
-        "str": str,
+        "str": str, "json": _json,
     }
     try:
         ok = bool(eval(expr, {"__builtins__": safe_builtins, "out": output}))

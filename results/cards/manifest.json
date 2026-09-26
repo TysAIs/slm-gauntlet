@@ -8,16 +8,15 @@
    "agent_chains": 0.8333333333333334,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.8,
+   "structured": 1.0,
    "tooluse": 0.9473684210526315,
    "retrieval": 1.0
   },
-  "overall_pct": 85.1,
+  "overall_pct": 87.9,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 14.285714285714286,
   "rank": 1,
-  "verdict": "Accuracy king of v0.3. Slower than MiniCPM but the best all-round brain; PaT arch runs well under 8GB."
+  "verdict": "Accuracy king of v0.3.1 by a hair. PaT arch punches above its size; stacked-constraint instruction following is its one gap."
  },
  {
   "model": "minicpm5-2b-q8_0",
@@ -28,16 +27,15 @@
    "agent_chains": 0.8333333333333334,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.8,
+   "structured": 1.0,
    "tooluse": 0.9298245614035089,
    "retrieval": 1.0
   },
-  "overall_pct": 84.8,
+  "overall_pct": 87.7,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 28.571428571428573,
   "rank": 2,
-  "verdict": "Best speed/accuracy balance. Daily-driver material; only soft spot is the voxel build suite."
+  "verdict": "Statistically tied with #1 (0.2pp) at DOUBLE the speed. The practical daily-driver pick."
  },
  {
   "model": "bonsai2-ptq1_0",
@@ -49,14 +47,14 @@
    "agent_chains": 1.0,
    "coding": 0.8333333333333334,
    "instruction": 0.875,
-   "structured": 0.8,
+   "structured": 1.0,
    "retrieval": 0.375
   },
-  "overall_pct": 83.3,
+  "overall_pct": 86.2,
   "n": 65,
   "ts": "20260926T1",
   "rank": 3,
-  "verdict": "Reasoning specialist: perfect adversarial+chains, near-perfect tooluse. 3 tok/s keeps it out of daily-driver duty."
+  "verdict": "Reasoning specialist: perfect adversarial, agent chains and structured. 3 tok/s keeps it out of daily-driver duty."
  },
  {
   "model": "minicpm5-2b-q4_K_M",
@@ -67,35 +65,15 @@
    "agent_chains": 0.8333333333333334,
    "coding": 0.8333333333333334,
    "instruction": 0.5,
-   "structured": 0.8,
+   "structured": 1.0,
    "tooluse": 0.9473684210526315,
    "retrieval": 1.0
   },
-  "overall_pct": 82.7,
+  "overall_pct": 85.6,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 28.571428571428573,
   "rank": 4,
-  "verdict": "Nearly matches Q8 at higher speed. The value pick if every tok/s counts."
- },
- {
-  "model": "mimo-9b-q4_K_M",
-  "display_name": "MiMo V2.6 \u00b7 9B",
-  "sub": "Q4_K_M \u00b7 Xiaomi distill",
-  "suites": {
-   "adversarial": 0.875,
-   "agent_chains": 1.0,
-   "coding": 0.8333333333333334,
-   "instruction": 0.5,
-   "structured": 0.8,
-   "tooluse": 0.7894736842105263,
-   "retrieval": 0.375
-  },
-  "overall_pct": 73.9,
-  "n": 71,
-  "ts": "20260926T1",
-  "rank": 5,
-  "verdict": "Strong reasoner, decent speed; context capped at 8K on this card."
+  "verdict": "Value pick: 85.6% at the fastest useful speed (32 tok/s)."
  },
  {
   "model": "ornith-9b-q4_K_M",
@@ -106,15 +84,34 @@
    "agent_chains": 1.0,
    "coding": 0.8333333333333334,
    "instruction": 0.5714285714285714,
-   "structured": 0.8,
+   "structured": 1.0,
    "tooluse": 0.8947368421052632,
    "retrieval": 0.375
   },
-  "overall_pct": 72.8,
+  "overall_pct": 75.7,
+  "n": 71,
+  "ts": "20260926T1",
+  "rank": 5,
+  "verdict": "Solid mid-pack brain at 10 tok/s single-stream."
+ },
+ {
+  "model": "mimo-9b-q4_K_M",
+  "display_name": "MiMo V2.6 \u00b7 9B",
+  "sub": "Q4_K_M \u00b7 Xiaomi distill",
+  "suites": {
+   "adversarial": 0.875,
+   "agent_chains": 1.0,
+   "coding": 0.8333333333333334,
+   "instruction": 0.5,
+   "structured": 0.9,
+   "tooluse": 0.7894736842105263,
+   "retrieval": 0.375
+  },
+  "overall_pct": 75.3,
   "n": 71,
   "ts": "20260926T1",
   "rank": 6,
-  "verdict": "Solid mid-pack brain; 10 tok/s single-stream."
+  "verdict": "Strong reasoner; context capped at 8K by its VRAM footprint on this card."
  },
  {
   "model": "gemma4-12b-ud-q2_K_XL",
@@ -125,16 +122,15 @@
    "agent_chains": 0.6666666666666666,
    "coding": 0.8333333333333334,
    "instruction": 0.5714285714285714,
-   "structured": 0.7,
+   "structured": 0.9,
    "tooluse": 0.7368421052631579,
    "retrieval": 0.5
   },
-  "overall_pct": 69.8,
+  "overall_pct": 72.6,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 57.142857142857146,
   "rank": 7,
-  "verdict": "The 12B fits! Q2 quant costs accuracy but voxel building is the best of any model here."
+  "verdict": "The 12B fits in 8GB. Q2 quant costs accuracy vs the E4B \u2014 prefer E4B unless you need the bigger model."
  },
  {
   "model": "lfm2.5-2.6b-q8_0",
@@ -145,15 +141,15 @@
    "agent_chains": 0.8333333333333334,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.6,
+   "structured": 0.7,
    "tooluse": 0.7368421052631579,
    "retrieval": 0.75
   },
-  "overall_pct": 68.5,
+  "overall_pct": 69.9,
   "n": 71,
   "ts": "20260926T1",
   "rank": 8,
-  "verdict": "Fast and efficient; mid-pack accuracy."
+  "verdict": "Fast and efficient; accuracy trails the leaders."
  },
  {
   "model": "lfm2.5-2.6b-q4_K_M",
@@ -164,16 +160,15 @@
    "agent_chains": 0.8333333333333334,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.6,
+   "structured": 0.8,
    "tooluse": 0.7368421052631579,
    "retrieval": 0.5
   },
-  "overall_pct": 66.7,
+  "overall_pct": 69.6,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 42.857142857142854,
   "rank": 9,
-  "verdict": "Fastest useful model tested; accuracy trails the leaders."
+  "verdict": "Fastest useful model tested; accuracy trails."
  },
  {
   "model": "qwen3.5-4b-q4_K_M",
@@ -184,16 +179,15 @@
    "agent_chains": 0.6666666666666666,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.6,
+   "structured": 0.8,
    "tooluse": 0.6842105263157895,
    "retrieval": 0.5
   },
-  "overall_pct": 65.4,
+  "overall_pct": 68.2,
   "n": 71,
   "ts": "20260926T0",
-  "pagoda_code_pct": 85.71428571428571,
   "rank": 10,
-  "verdict": "THE VOXEL CHAMPION \u2014 86% on the code pagoda. Accuracy mid-pack."
+  "verdict": "Mid-pack accuracy; aced coding while staying fast."
  },
  {
   "model": "gemma4-12b-iq3_XXS",
@@ -204,15 +198,15 @@
    "agent_chains": 0.6666666666666666,
    "coding": 1.0,
    "instruction": 0.42857142857142855,
-   "structured": 0.6,
+   "structured": 0.8,
    "tooluse": 0.7368421052631579,
    "retrieval": 0.5
   },
-  "overall_pct": 65.1,
+  "overall_pct": 68.0,
   "n": 71,
   "ts": "20260926T1",
   "rank": 11,
-  "verdict": "12B squeezed to IQ3: runs but accuracy drops below 4B leaders."
+  "verdict": "12B squeezed to IQ3: runs, but below the 4B leaders. UD-Q2 is the better 12B quant."
  },
  {
   "model": "sharp-spark-4b-q4_K_XL",
@@ -223,16 +217,15 @@
    "agent_chains": 0.6666666666666666,
    "coding": 1.0,
    "instruction": 0.5,
-   "structured": 0.6,
+   "structured": 0.8,
    "tooluse": 0.6842105263157895,
    "retrieval": 0.5
   },
-  "overall_pct": 63.6,
+  "overall_pct": 66.4,
   "n": 71,
   "ts": "20260926T1",
-  "pagoda_code_pct": 42.857142857142854,
   "rank": 12,
-  "verdict": "Mid-pack across the board; nothing stands out."
+  "verdict": "Mid-pack across the board."
  },
  {
   "model": "gemma-e4b-q4_K_M",
@@ -251,6 +244,6 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 13,
-  "verdict": "Last place on v0.3 \u2014 the older 3n arch can't keep up."
+  "verdict": "Last place \u2014 the older 3n arch can't keep up with the v0.3 hard suites."
  }
 ]

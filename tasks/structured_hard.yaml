@@ -33,9 +33,9 @@
         required: [fleet]
         additionalProperties: false
     - type: predicate
-      expr: "len({v['id'] for v in out_dict['fleet']}) == 3"
+      expr: "(lambda d: len({v['id'] for v in d.get('fleet', [])}) == 3)(json.loads(out))"
     - type: predicate
-      expr: "any(v['type']=='bike' for v in out_dict['fleet'])"
+      expr: "(lambda d: any(v['type']=='bike' for v in d.get('fleet', [])))(json.loads(out))"
   max_tokens: 512
 
 - id: hst_types_strict
@@ -56,5 +56,5 @@
         required: [count, unit, is_prime]
         additionalProperties: false
     - type: predicate
-      expr: "out_dict['count'] == 14 and out_dict['is_prime'] is False"
+      expr: "(lambda d: d.get('count') == 14 and d.get('is_prime') is False)(json.loads(out))"
   max_tokens: 128
