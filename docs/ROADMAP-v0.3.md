@@ -28,6 +28,15 @@
 - Report prompt-level AND instruction-level accuracy; log every failure verbatim.
 - Free-gen vs constrained structured delta reported separately.
 
+## DSpark drafter A/B (TESTED 2026-09-26 — negative result)
+openbmb MiniCPM5-2B-DSpark drafter on the Q4_K_M target, llama.cpp draft-dspark,
+-ngl 99 -ngld 99, fa on, GTX 1070 Ti:
+- single-stream: baseline 79.1 tok/s vs 64.8 (n-max 7) / 77-87 (n-max 4) — wash
+- 4-way concurrent: 55.2 tok/s/stream baseline vs 46.0 with drafter = **-17% aggregate**
+- draft acceptance ~0.40. Root cause: the drafter (2.6B BF16) is BIGGER than the 2B target.
+Speculative decoding needs target >> drafter (8B+). Verdict: skip for 2B; keep for future
+bigger targets on this card. Full data: results/dspark_ab_test.json
+
 ## Gemma 4 candidates (VERIFIED on HF, live API)
 | candidate | file | size | note |
 |---|---|---|---|
