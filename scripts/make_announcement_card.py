@@ -67,7 +67,7 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 .cell-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
 .cell-v { font-size:25px; font-weight:700; margin-top:5px; line-height:1.35; }
 .cell-v small { display:block; font-size:16px; color:#8b949e; font-weight:600; margin-top:4px; line-height:1.4; }
-.foot { margin-top:auto; font-size:15px; color:#6e7681; display:flex;
+.foot { margin-top:auto; font-size:18px; color:#8b949e; display:flex;
   justify-content:space-between; gap:24px; }
 .foot span { white-space:nowrap; }
 """

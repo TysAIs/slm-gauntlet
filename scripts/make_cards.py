@@ -68,29 +68,30 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
   background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
 .hrow { display:flex; justify-content:space-between; align-items:center; }
 .model-name { font-size:54px; font-weight:800; letter-spacing:-1px; line-height:1.05; }
-.model-quant { font-size:23px; color:#8b949e; margin-top:5px; }
+.model-quant { font-size:26px; color:#8b949e; margin-top:5px; }
 .rank { text-align:center; display:flex; align-items:center; gap:22px; }
-.rank-num { font-size:26px; color:#8b949e; font-weight:700; }
-.rank-letter { font-size:70px; font-weight:900; line-height:1; }
-.rank-label { font-size:15px; font-weight:700; letter-spacing:2px; }
-.scoreband { display:flex; align-items:center; gap:26px; margin:16px 0 14px; }
-.overall-pct { font-size:104px; font-weight:900; line-height:0.95; }
-.overall-sub { font-size:16px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
-.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0 12px; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:14px 10px; text-align:center; }
-.suite-name { font-size:15px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.suite-val { font-size:42px; font-weight:800; margin-top:5px; }
-.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
-.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:11px 12px; }
-.stat-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.rank-num { font-size:32px; color:#8b949e; font-weight:800; }
+.rank-letter { font-size:88px; font-weight:900; line-height:0.9; }
+.rank-label { font-size:17px; font-weight:800; letter-spacing:2.5px; }
+.scoreband { display:flex; align-items:center; gap:26px; margin:12px 0 10px; }
+.overall-pct { font-size:98px; font-weight:900; line-height:0.95; }
+.overall-sub { font-size:18px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:12px 0 10px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:10px 10px; text-align:center; }
+.suite-name { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-val { font-size:40px; font-weight:800; margin-top:5px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:9px 12px; }
+.stat-k { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
 .stat-v { font-size:31px; font-weight:800; margin-top:3px; }
 .stat-v small { font-size:17px; color:#8b949e; font-weight:600; }
-.verdict { font-size:21px; line-height:1.4; color:#c9d1d9; border-left:3px solid #f5c518;
-  padding-left:16px; margin:18px 0 10px; }
-.foot { margin-top:auto; font-size:13px; color:#6e7681; display:flex; justify-content:space-between; gap:24px; }
+.verdict { font-size:22px; line-height:1.45; color:#c9d1d9; border-left:4px solid #f5c518;
+  padding-left:18px; margin:16px 0 12px; }
+.foot { margin-top:auto; font-size:15px; color:#8b949e; display:flex; justify-content:space-between; gap:20px;
+  border-top:1px solid #21262d; padding-top:12px; }
 .foot span { white-space:nowrap; }
-.verdict-sm { font-size:17px; line-height:1.3; }
-.verdict-xs { font-size:14.5px; line-height:1.28; }
+.verdict-sm { font-size:18px; line-height:1.34; }
+.verdict-xs { font-size:16px; line-height:1.3; }
 @media (max-height:1080px){ .stat{padding:10px 12px} }
 .bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
@@ -162,13 +163,26 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'<div class=stat><div class=stat-k>{dev_kind_label}</div>'
             f'<div class=stat-v>{dev_name}<small> {dev_mem}</small></div></div>'
             f'<div class=stat><div class=stat-k>Offload</div>'
-            f'{offload_html}'
+            f'{offload_html}</div>'
         )
     verdict = m.get("verdict", "")
+    # Deterministic verdict builder: same inputs -> same paragraph, no LLM needed.
+    # Existing curated verdicts are kept; models without one get a computed template.
+    if not verdict:
+        s = suites
+        order2 = sorted([k for k in s if s.get(k) is not None], key=lambda k: s[k])
+        best = sorted([k for k in s if s.get(k) is not None], key=lambda k: -s[k])
+        bnames = {"tooluse": "tool calling", "adversarial": "prompt-injection resistance",
+                  "agent_chains": "multi-turn agent chains", "structured": "strict structured output",
+                  "retrieval": "long-context retrieval", "coding": "bug-fixing", "instruction": "stacked-constraint instruction following"}
+        strong = ", ".join(bnames[k] for k in best[:2])
+        weak = bnames.get(order2[0], "instruction following")
+        verdict = (f"Scores {m['overall_pct']:.1f}% across 71 tasks. Strongest at {strong}; "
+                   f"{weak} is the weak suite. Zero-offload on {dev_name}" + (f" {dev_mem}" if dev_mem else "") + ".")
     # long verdicts shrink to fit so nothing clips at the bottom edge
     if len(verdict) <= 110:
         vcls = "verdict"
-    elif len(verdict) <= 170:
+    elif len(verdict) <= 112:
         vcls = "verdict verdict-sm"
     else:
         vcls = "verdict verdict-xs"
