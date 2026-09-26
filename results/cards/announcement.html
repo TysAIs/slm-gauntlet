@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
+  background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
+.card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
+  border:1px solid #30363d; border-radius:22px; padding:48px 52px; color:#e6edf3;
+  position:relative; overflow:hidden; display:flex; flex-direction:column; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
+.kicker { font-size:15px; color:#8b949e; letter-spacing:4px; font-weight:700; text-transform:uppercase; }
+.title { font-size:84px; font-weight:900; letter-spacing:-2px; line-height:1.0; margin-top:8px; }
+.title .accent { color:#f5c518; }
+.tagline { font-size:23px; color:#c9d1d9; line-height:1.45; margin-top:18px; }
+.tagline b { color:#e6edf3; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:30px; }
+.suite:last-child { grid-column:span 1; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:18px 10px; text-align:center; }
+.suite-name { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-n { font-size:26px; font-weight:800; margin-top:4px; color:#e6edf3; }
+.suite-n small { font-size:12px; color:#8b949e; font-weight:600; }
+.section { font-size:13px; color:#8b949e; letter-spacing:3px; font-weight:700;
+  text-transform:uppercase; margin-top:34px; }
+.podium { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.row { display:flex; align-items:center; background:#0d1117; border:1px solid #30363d;
+  border-radius:12px; padding:14px 20px; gap:18px; }
+.medal { font-size:30px; width:44px; text-align:center; }
+.p-name { font-size:22px; font-weight:800; flex:1; }
+.p-name small { display:block; font-size:13px; color:#8b949e; font-weight:600; margin-top:2px; }
+.p-pct { font-size:34px; font-weight:900; margin-left:auto; }
+.p-bar { width:180px; }
+.bar { height:7px; border-radius:4px; background:#21262d; overflow:hidden; }
+.bar>i { display:block; height:100%; border-radius:4px; }
+.how { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; }
+.how .cell { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:16px 18px; }
+.cell-k { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.cell-v { font-size:19px; font-weight:700; margin-top:5px; line-height:1.35; }
+.cell-v small { display:block; font-size:13px; color:#8b949e; font-weight:600; margin-top:4px; line-height:1.4; }
+.foot { margin-top:auto; font-size:12px; color:#6e7681; display:flex;
+  justify-content:space-between; gap:24px; }
+.foot span { white-space:nowrap; }
+</style></head><body><div class=card><div class=kicker>Open-source benchmark · MIT · 13 models tested</div><div class=title>SLM <span class=accent>Gauntlet</span></div><div class=tagline>Can small models actually <b>do work as subagents</b> — call tools, recover from errors, follow instructions, retrieve from long context — not just answer trivia? <b>71 tasks · 7 suites · zero LLM judging.</b></div><div class=suites><div class=suite><div class=suite-name>Tool use</div><div class=suite-n>19<small> tasks</small></div></div><div class=suite><div class=suite-name>Adversarial</div><div class=suite-n>8<small> tasks</small></div></div><div class=suite><div class=suite-name>Agent chains</div><div class=suite-n>6<small> tasks</small></div></div><div class=suite><div class=suite-name>Structured</div><div class=suite-n>10<small> tasks</small></div></div><div class=suite><div class=suite-name>Retrieval</div><div class=suite-n>8<small> tasks</small></div></div><div class=suite><div class=suite-name>Coding</div><div class=suite-n>6<small> tasks</small></div></div><div class=suite><div class=suite-name>Instruction</div><div class=suite-n>14<small> tasks</small></div></div></div><div class=section>Top finishers of 13 · pass@1 · seed 1 · temp 0 · sep 2026</div><div class=podium><div class=row><div class=medal>🥇</div><div class=p-name>Gemma 4 · E4B<small>Q4_K_M · zero offload</small></div><div class=p-bar><div class=bar><i style="width:88%;background:#f5c518"></i></div></div><div class=p-pct style="color:#f5c518">87.9%</div></div><div class=row><div class=medal>🥈</div><div class=p-name>MiniCPM-V 5 · 2B<small>Q8_0 · zero offload</small></div><div class=p-bar><div class=bar><i style="width:88%;background:#f5c518"></i></div></div><div class=p-pct style="color:#f5c518">87.7%</div></div><div class=row><div class=medal>🥉</div><div class=p-name>Ternary Bonsai-2 · 27B<small>PTQ1_0 · zero offload</small></div><div class=p-bar><div class=bar><i style="width:86%;background:#f5c518"></i></div></div><div class=p-pct style="color:#f5c518">86.2%</div></div></div><div class=section>How it ran</div><div class=how><div class=cell><div class=cell-k>Grading</div><div class=cell-v>Deterministic<small>state checks, schemas, predicates — no LLM judge anywhere</small></div></div><div class=cell><div class=cell-k>This run on</div><div class=cell-v>Apple M4<small>Unified memory · 16GB · any device works, cards auto-detect yours</small></div></div><div class=cell><div class=cell-k>Reproducible</div><div class=cell-v>One command<small>same seed → identical results · cards generated from your run</small></div></div></div><div class=foot><span>Run it yourself → github.com/TysAIs/slm-gauntlet</span><span>results on Apple M4 16GB · v0.3.1</span></div></div></body></html>
