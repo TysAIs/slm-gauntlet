@@ -3,7 +3,7 @@
 
 Square card, dense layout: rank badge, percentage scores per suite, capacity
 stats (weights VRAM in GB, KV pool in context tokens, max concurrent subagents),
-tok/s, Pagoda %, verdict. Self-contained HTML; screenshot at 1080x1080.
+tok/s and verdict. Self-contained HTML; screenshot at 1080x1080.
 """
 from __future__ import annotations
 
