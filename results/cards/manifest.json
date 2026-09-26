@@ -16,7 +16,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 1,
-  "verdict": "Accuracy king of v0.3.1 by a hair. PaT arch punches above its size; stacked-constraint instruction following is its one gap."
+  "verdict": "Accuracy king of v0.3.1 by a hair. PaT arch punches above its size; stacked-constraint instruction following is its one gap.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "minicpm5-2b-q8_0",
@@ -35,7 +38,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 2,
-  "verdict": "Statistically tied with #1 (0.2pp) at DOUBLE the speed. The practical daily-driver pick."
+  "verdict": "Statistically tied with #1 (0.2pp) at DOUBLE the speed. The practical daily-driver pick.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "bonsai2-ptq1_0",
@@ -54,7 +60,10 @@
   "n": 65,
   "ts": "20260926T1",
   "rank": 3,
-  "verdict": "Reasoning specialist: perfect adversarial, agent chains and structured. 3 tok/s keeps it out of daily-driver duty."
+  "verdict": "Reasoning specialist: perfect adversarial, agent chains and structured. 3 tok/s keeps it out of daily-driver duty.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "minicpm5-2b-q4_K_M",
@@ -73,7 +82,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 4,
-  "verdict": "Value pick: 85.6% at the fastest useful speed (32 tok/s)."
+  "verdict": "Value pick: 85.6% at the fastest useful speed (32 tok/s).",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "ornith-9b-q4_K_M",
@@ -92,7 +104,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 5,
-  "verdict": "Solid mid-pack brain at 10 tok/s single-stream."
+  "verdict": "Solid mid-pack brain at 10 tok/s single-stream.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "mimo-9b-q4_K_M",
@@ -111,7 +126,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 6,
-  "verdict": "Strong reasoner; context capped at 8K by its VRAM footprint on this card."
+  "verdict": "Strong reasoner; context capped at 8K by its VRAM footprint on this card.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "gemma4-12b-ud-q2_K_XL",
@@ -130,7 +148,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 7,
-  "verdict": "The 12B fits in 8GB. Q2 quant costs accuracy vs the E4B \u2014 prefer E4B unless you need the bigger model."
+  "verdict": "The 12B fits in 8GB. Q2 quant costs accuracy vs the E4B \u2014 prefer E4B unless you need the bigger model.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "lfm2.5-2.6b-q8_0",
@@ -149,7 +170,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 8,
-  "verdict": "Fast and efficient; accuracy trails the leaders."
+  "verdict": "Fast and efficient; accuracy trails the leaders.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "lfm2.5-2.6b-q4_K_M",
@@ -168,7 +192,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 9,
-  "verdict": "Fastest useful model tested; accuracy trails."
+  "verdict": "Fastest useful model tested; accuracy trails.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "qwen3.5-4b-q4_K_M",
@@ -187,7 +214,10 @@
   "n": 71,
   "ts": "20260926T0",
   "rank": 10,
-  "verdict": "Mid-pack accuracy; aced coding while staying fast."
+  "verdict": "Mid-pack accuracy; aced coding while staying fast.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "gemma4-12b-iq3_XXS",
@@ -206,7 +236,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 11,
-  "verdict": "12B squeezed to IQ3: runs, but below the 4B leaders. UD-Q2 is the better 12B quant."
+  "verdict": "12B squeezed to IQ3: runs, but below the 4B leaders. UD-Q2 is the better 12B quant.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "sharp-spark-4b-q4_K_XL",
@@ -225,7 +258,10 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 12,
-  "verdict": "Mid-pack across the board."
+  "verdict": "Mid-pack across the board.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  },
  {
   "model": "gemma-e4b-q4_K_M",
@@ -244,6 +280,9 @@
   "n": 71,
   "ts": "20260926T1",
   "rank": 13,
-  "verdict": "Last place \u2014 the older 3n arch can't keep up with the v0.3 hard suites."
+  "verdict": "Last place \u2014 the older 3n arch can't keep up with the v0.3 hard suites.",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia"
  }
 ]
