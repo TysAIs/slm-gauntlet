@@ -1,7 +1,7 @@
 # slm-gauntlet v0.3 Roadmap (research-backed)
 
 ## Source research
-- SparkBench (github.com/Weschera/spark-bench, GitHub) — v6.8.0 "Uncapped": 76 scenarios / 12 domains,
+- SparkBench (github.com/Weschera/spark-bench (Weschera)) — v6.8.0 Uncapped: 76 scenarios / 12 domains,
   expert agentic tier with deterministic tool-failure injection + retry gates, TrueScore =
   0.55*Quality + 0.25*Calibration + 0.15*Reliability + 0.05*Efficiency/Responsiveness.
   KEY CORRECTION: their "pagoda" is a single-file Three.js VOXEL CODE-GEN benchmark (graded by
