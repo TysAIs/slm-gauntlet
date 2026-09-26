@@ -146,9 +146,15 @@ def json_schema_check(output: str, schema: dict) -> ScoreResult:
 
 
 def predicate_check(output: Any, expr: str) -> ScoreResult:
-    """Evaluate a boolean expression with `out` bound. For trusted task YAML only."""
+    """Evaluate a boolean expression with `out` bound. For trusted task YAML only.
+    `out` goes in GLOBALS so comprehension scopes (separate frames) can see it."""
+    safe_builtins = {
+        "len": len, "abs": abs, "sum": sum, "round": round,
+        "any": any, "all": all, "min": min, "max": max, "int": int, "float": float,
+        "str": str,
+    }
     try:
-        ok = bool(eval(expr, {"__builtins__": {"len": len, "abs": abs, "sum": sum, "round": round}}, {"out": output}))
+        ok = bool(eval(expr, {"__builtins__": safe_builtins, "out": output}))
     except Exception as e:  # noqa: BLE001 — task authors get the error message
         return ScoreResult(False, failed=[f"predicate error: {e}"])
     return ScoreResult(ok, checks=[{"check": "predicate", "ok": ok, "expr": expr}])
