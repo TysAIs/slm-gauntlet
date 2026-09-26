@@ -1,6 +1,6 @@
 # SLM Gauntlet
 
-A benchmark for **small language models** (sub-12B, 8GB VRAM class) that measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
+A benchmark for **small language models** (sub-12B class) that runs on whatever device you have — NVIDIA, AMD, or Apple Silicon. The card generator auto-detects your GPU and its memory, so every model card shows **your** hardware, not ours. that measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
 
 **Current leaderboard — v0.3.1 gauntlet (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload, 71 tasks):**
 
@@ -73,6 +73,17 @@ Plain `POST /v1/chat/completions` → check the answer contains the code. That's
 - **Model cards** — trading-card style PNG per model: rank badge, suite percentages, speed curve, KV pool, max subagents, and a plain-English verdict.
 
 ---
+
+## Run on your hardware
+
+The benchmark is **device-agnostic**. `gauntlet.device.detect_device()` auto-detects your hardware:
+
+- **NVIDIA** — via `nvidia-smi` (GPU name + total VRAM)
+- **Apple Silicon** — unified memory via `sysctl` (M-series chip + total memory)
+- **AMD** — via `rocm-smi`
+- **CPU** — fallback
+
+The card generator stamps whatever device it ran on into the model card — GPU name, total memory, and whether weights fit fully on-device or needed RAM offload. No manual config. Your cards show your hardware.
 
 ## Quickstart
 

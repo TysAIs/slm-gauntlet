@@ -10,7 +10,11 @@ from __future__ import annotations
 import glob
 import json
 import sys
+import sys as _sys
 from pathlib import Path
+
+_sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from gauntlet.device import detect_device
 
 RANKS = [
     (0.95, "S", "#f5c518", "DAILY DRIVER"),
@@ -83,7 +87,8 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 .stat-v small { font-size:13px; color:#8b949e; font-weight:600; }
 .verdict { font-size:20px; line-height:1.55; color:#c9d1d9; border-left:3px solid #f5c518;
   padding-left:14px; margin:22px 0 10px; }
-.foot { margin-top:auto; font-size:11px; color:#6e7681; display:flex; justify-content:space-between; }
+.foot { margin-top:auto; font-size:10.5px; color:#6e7681; display:flex; justify-content:space-between; gap:24px; }
+.foot span { white-space:nowrap; }
 .bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
 """
@@ -104,6 +109,22 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'<div class=suite-val style="color:{suite_color(pct)}">{pct:.0f}%</div>'
             f'<div class=bar><i style="width:{pct:.0f}%;background:{suite_color(pct)}"></i></div></div>'
         )
+    # device auto-detection (manifest override wins: m["device_name"] / m["device_vram_mb"])
+    dev_name = m.get("device_name")
+    dev_vram = m.get("device_vram_mb")
+    dev_kind = m.get("device_kind")
+    if not dev_name:
+        _n, _mb, _k = detect_device()
+        dev_name, dev_vram, dev_kind = _n, _mb, _k
+    dev_kind_label = {"nvidia": "GPU", "amd": "GPU", "apple": "Unified memory", "cpu": "Device"}.get(dev_kind, "Device")
+    if dev_vram:
+        dev_mem = f"{dev_vram/1000:.0f}GB" if dev_vram >= 100000 else f"{dev_vram/1024:.0f}GB"
+    else:
+        dev_mem = ""
+    # offload: derive from capacity data when present (weights fit => zero offload on that device)
+    offload_html = '<div class=stat-v style="color:#7bd88f">None<small> (100% VRAM)</small></div>'
+    if cap and cap.get("weights_mb") and dev_vram and cap["weights_mb"] * 1000 > dev_vram * 1024 * 1024:
+        offload_html = '<div class=stat-v style="color:#e3b341">Partial<small> (RAM offload)</small></div>'
     stats_html = ""
     if perf:
         c1 = perf["concurrency"][0]["aggregate_tok_s"]
@@ -135,10 +156,10 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'<div class=stat-v>{cap.get("tested_slots") or 0}</div></div>'
             f'<div class=stat><div class=stat-k>KV per token</div>'
             f'<div class=stat-v>{(cap.get("kv_bytes_per_token") or 0)/1000:.1f}<small> KB</small></div></div>'
-            f'<div class=stat><div class=stat-k>GPU</div>'
-            f'<div class=stat-v>1070 Ti<small> 8GB</small></div></div>'
+            f'<div class=stat><div class=stat-k>{dev_kind_label}</div>'
+            f'<div class=stat-v>{dev_name}<small> {dev_mem}</small></div></div>'
             f'<div class=stat><div class=stat-k>Offload</div>'
-            f'<div class=stat-v style="color:#7bd88f">None<small> (100% VRAM)</small></div></div>'
+            f'{offload_html}'
         )
     verdict = m.get("verdict", "")
     n = m.get("n", 61)
@@ -162,8 +183,8 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'<div class=suites>{suite_html}</div>'
         f'<div class=stats>{stats_html}</div>'
         f'<div class=verdict>{verdict}</div>'
-        f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · zero offload · 71 tasks</span>'
-        f'<span>GTX 1070 Ti 8GB · {m.get("ts","")}</span></div>'
+        f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · 71 tasks</span>'
+        f'<span>{dev_name}{(" " + dev_mem) if dev_mem else ""} · {str(m.get("ts",""))[:8]}</span></div>'
         f'</div></body></html>'
     )
 
