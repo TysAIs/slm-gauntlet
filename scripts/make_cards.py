@@ -176,7 +176,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'<div class=suites>{suite_html}{vox_tile}</div>'
         f'<div class=stats>{stats_html}</div>'
         f'<div class=verdict>{verdict}</div>'
-        f'<div class=foot><span>slm-gauntlet 0.2 · seed 1 · temp 0 · zero offload</span>'
+        f'<div class=foot><span>slm-gauntlet v0.3 · seed 1 · temp 0 · zero offload</span>'
         f'<span>GTX 1070 Ti 8GB · {m.get("ts","")}</span></div>'
         f'</div></body></html>'
     )
