@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """Night queue v2: swap server (direct-exec pattern), gauntlet, perf, pagoda per model."""
-import json
-import os
+import os as _os
 import subprocess
 import sys
 import time
 
-import os as _os
 _SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "pve-lab")
 CT_HOST = _os.environ.get("GAUNTLET_CT_HOST", "localhost")
 EP = f"http://{CT_HOST}:18081/v1"
@@ -50,7 +48,8 @@ def run(model):
     log(f"=== {model} start ===")
     rel, ctx, np_, bin_ = MODELS[model]
     if not swap(model, rel, ctx, np_, bin_):
-        log(f"=== {model} SERVER FAILED ==="); return False
+        log(f"=== {model} SERVER FAILED ===")
+        return False
     r = sh(["bash", "-c",
             f".venv/bin/python -m gauntlet.cli run --endpoint {EP} --model {model} "
             f"--suite all --concurrency 2 --timeout 240 --seed 1"], timeout=580)
