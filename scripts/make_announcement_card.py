@@ -35,39 +35,39 @@ CSS = """
 html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
   background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
 .card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
-  border:1px solid #30363d; border-radius:22px; padding:48px 52px; color:#e6edf3;
+  border:1px solid #30363d; border-radius:22px; padding:40px 46px; color:#e6edf3;
   position:relative; overflow:hidden; display:flex; flex-direction:column; }
 .card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px;
   background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
-.kicker { font-size:15px; color:#8b949e; letter-spacing:4px; font-weight:700; text-transform:uppercase; }
-.title { font-size:84px; font-weight:900; letter-spacing:-2px; line-height:1.0; margin-top:8px; }
+.kicker { font-size:18px; color:#8b949e; letter-spacing:4px; font-weight:700; text-transform:uppercase; }
+.title { font-size:92px; font-weight:900; letter-spacing:-2px; line-height:1.0; margin-top:6px; }
 .title .accent { color:#f5c518; }
-.tagline { font-size:23px; color:#c9d1d9; line-height:1.45; margin-top:18px; }
+.tagline { font-size:26px; color:#c9d1d9; line-height:1.38; margin-top:12px; }
 .tagline b { color:#e6edf3; }
-.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:30px; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:20px; }
 .suite:last-child { grid-column:span 1; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:18px 10px; text-align:center; }
-.suite-name { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.suite-n { font-size:26px; font-weight:800; margin-top:4px; color:#e6edf3; }
-.suite-n small { font-size:12px; color:#8b949e; font-weight:600; }
-.section { font-size:13px; color:#8b949e; letter-spacing:3px; font-weight:700;
-  text-transform:uppercase; margin-top:34px; }
-.podium { display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:13px 8px; text-align:center; }
+.suite-name { font-size:15px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-n { font-size:32px; font-weight:800; margin-top:4px; color:#e6edf3; }
+.suite-n small { font-size:15px; color:#8b949e; font-weight:600; }
+.section { font-size:15px; color:#8b949e; letter-spacing:3px; font-weight:700;
+  text-transform:uppercase; margin-top:24px; }
+.podium { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
 .row { display:flex; align-items:center; background:#0d1117; border:1px solid #30363d;
-  border-radius:12px; padding:14px 20px; gap:18px; }
-.medal { font-size:30px; width:44px; text-align:center; }
-.p-name { font-size:22px; font-weight:800; flex:1; }
-.p-name small { display:block; font-size:13px; color:#8b949e; font-weight:600; margin-top:2px; }
-.p-pct { font-size:34px; font-weight:900; margin-left:auto; }
+  border-radius:12px; padding:14px 20px; gap:16px; }
+.medal { font-size:38px; width:44px; text-align:center; }
+.p-name { font-size:28px; font-weight:800; flex:1; }
+.p-name small { display:block; font-size:17px; color:#8b949e; font-weight:600; margin-top:2px; }
+.p-pct { font-size:42px; font-weight:900; margin-left:auto; }
 .p-bar { width:180px; }
-.bar { height:7px; border-radius:4px; background:#21262d; overflow:hidden; }
+.bar { height:9px; border-radius:4px; background:#21262d; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
-.how { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px; }
-.how .cell { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:16px 18px; }
-.cell-k { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.cell-v { font-size:19px; font-weight:700; margin-top:5px; line-height:1.35; }
-.cell-v small { display:block; font-size:13px; color:#8b949e; font-weight:600; margin-top:4px; line-height:1.4; }
-.foot { margin-top:auto; font-size:12px; color:#6e7681; display:flex;
+.how { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:10px; }
+.how .cell { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:12px 14px; }
+.cell-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.cell-v { font-size:25px; font-weight:700; margin-top:5px; line-height:1.35; }
+.cell-v small { display:block; font-size:16px; color:#8b949e; font-weight:600; margin-top:4px; line-height:1.4; }
+.foot { margin-top:auto; font-size:15px; color:#6e7681; display:flex;
   justify-content:space-between; gap:24px; }
 .foot span { white-space:nowrap; }
 """
@@ -143,10 +143,15 @@ def main() -> None:
     manifest = json.load(open(sys.argv[1])) if len(sys.argv) > 1 else []
     outdir = Path("results/cards")
     outdir.mkdir(parents=True, exist_ok=True)
-    dev = detect_device()
+    # RUN device: manifest pin wins (results were measured there); auto-detect only as fallback
+    if manifest and manifest[0].get("device_name"):
+        e = manifest[0]
+        dev = (e["device_name"], e.get("device_vram_mb"), e.get("device_kind", ""))
+    else:
+        dev = detect_device()
     p = outdir / "announcement.html"
     p.write_text(render(manifest, dev))
-    print("wrote", p)
+    print("wrote", p, "device:", dev[0])
 
 
 if __name__ == "__main__":

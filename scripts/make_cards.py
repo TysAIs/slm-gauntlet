@@ -62,33 +62,36 @@ CARD_CSS = """
 html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
   background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
 .card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
-  border:1px solid #30363d; border-radius:22px; padding:44px 44px; color:#e6edf3;
+  border:1px solid #30363d; border-radius:22px; padding:40px 44px; color:#e6edf3;
   position:relative; overflow:hidden; display:flex; flex-direction:column; }
 .card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px;
   background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
 .hrow { display:flex; justify-content:space-between; align-items:center; }
-.model-name { font-size:48px; font-weight:800; letter-spacing:-1px; line-height:1.05; }
-.model-quant { font-size:18px; color:#8b949e; margin-top:5px; }
+.model-name { font-size:54px; font-weight:800; letter-spacing:-1px; line-height:1.05; }
+.model-quant { font-size:23px; color:#8b949e; margin-top:5px; }
 .rank { text-align:center; display:flex; align-items:center; gap:22px; }
-.rank-num { font-size:20px; color:#8b949e; font-weight:700; }
-.rank-letter { font-size:64px; font-weight:900; line-height:1; }
-.rank-label { font-size:12px; font-weight:700; letter-spacing:2px; }
-.scoreband { display:flex; align-items:center; gap:26px; margin:20px 0 18px; }
-.overall-pct { font-size:96px; font-weight:900; line-height:0.95; }
-.overall-sub { font-size:13px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
-.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0 20px; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:22px 12px; text-align:center; }
-.suite-name { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.suite-val { font-size:36px; font-weight:800; margin-top:5px; }
-.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:24px; }
-.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:20px 15px; }
-.stat-k { font-size:10.5px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
-.stat-v { font-size:27px; font-weight:800; margin-top:3px; }
-.stat-v small { font-size:13px; color:#8b949e; font-weight:600; }
-.verdict { font-size:20px; line-height:1.55; color:#c9d1d9; border-left:3px solid #f5c518;
-  padding-left:14px; margin:22px 0 10px; }
-.foot { margin-top:auto; font-size:10.5px; color:#6e7681; display:flex; justify-content:space-between; gap:24px; }
+.rank-num { font-size:26px; color:#8b949e; font-weight:700; }
+.rank-letter { font-size:70px; font-weight:900; line-height:1; }
+.rank-label { font-size:15px; font-weight:700; letter-spacing:2px; }
+.scoreband { display:flex; align-items:center; gap:26px; margin:16px 0 14px; }
+.overall-pct { font-size:104px; font-weight:900; line-height:0.95; }
+.overall-sub { font-size:16px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0 12px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:14px 10px; text-align:center; }
+.suite-name { font-size:15px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-val { font-size:42px; font-weight:800; margin-top:5px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:12px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:11px 12px; }
+.stat-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.stat-v { font-size:31px; font-weight:800; margin-top:3px; }
+.stat-v small { font-size:17px; color:#8b949e; font-weight:600; }
+.verdict { font-size:21px; line-height:1.4; color:#c9d1d9; border-left:3px solid #f5c518;
+  padding-left:16px; margin:18px 0 10px; }
+.foot { margin-top:auto; font-size:13px; color:#6e7681; display:flex; justify-content:space-between; gap:24px; }
 .foot span { white-space:nowrap; }
+.verdict-sm { font-size:17px; line-height:1.3; }
+.verdict-xs { font-size:14.5px; line-height:1.28; }
+@media (max-height:1080px){ .stat{padding:10px 12px} }
 .bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
 .bar>i { display:block; height:100%; border-radius:4px; }
 """
@@ -162,6 +165,13 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'{offload_html}'
         )
     verdict = m.get("verdict", "")
+    # long verdicts shrink to fit so nothing clips at the bottom edge
+    if len(verdict) <= 110:
+        vcls = "verdict"
+    elif len(verdict) <= 170:
+        vcls = "verdict verdict-sm"
+    else:
+        vcls = "verdict verdict-xs"
     n = m.get("n", 61)
     rank_num = m.get("rank", "")
     rank_html = (
@@ -182,7 +192,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'</div>'
         f'<div class=suites>{suite_html}</div>'
         f'<div class=stats>{stats_html}</div>'
-        f'<div class=verdict>{verdict}</div>'
+        f'<div class={vcls}>{verdict}</div>'
         f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · 71 tasks</span>'
         f'<span>{dev_name}{(" " + dev_mem) if dev_mem else ""} · {str(m.get("ts",""))[:8]}</span></div>'
         f'</div></body></html>'
