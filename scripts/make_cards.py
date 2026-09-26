@@ -48,6 +48,11 @@ def pagoda_latest(model: str) -> dict | None:
     return json.load(open(f)) if Path(f).exists() else None
 
 
+def voxel_latest(model: str) -> dict | None:
+    f = f"results/pagoda_code_{model}.json"
+    return json.load(open(f)) if Path(f).exists() else None
+
+
 def suite_color(pct: float) -> str:
     if pct >= 90:
         return "#7bd88f"
@@ -148,9 +153,18 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
     pag_tile = ""
     if pag:
         pag_tile = (
-            f'<div class=suite><div class=suite-name>Pagoda build</div>'
+            f'<div class=suite><div class=suite-name>Pagoda prose</div>'
             f'<div class=suite-val style="color:#7bd88f">{pag["pct"]:.0f}%</div>'
             f'<div class=bar><i style="width:{pag["pct"]:.0f}%;background:#7bd88f"></i></div></div>'
+        )
+    vox_tile = ""
+    vox = voxel_latest(m["model"])
+    if vox:
+        vpct = vox.get("pct", 0)
+        vox_tile = (
+            f'<div class=suite><div class=suite-name>Pagoda voxel</div>'
+            f'<div class=suite-val style="color:{suite_color(vpct)}">{vpct:.0f}%</div>'
+            f'<div class=bar><i style="width:{vpct:.0f}%;background:{suite_color(vpct)}"></i></div></div>'
         )
     verdict = m.get("verdict", "")
     n = m.get("n", 61)
@@ -171,7 +185,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
         f'<div><span class=overall-pct style="color:{color}">{m["overall_pct"]:.1f}%</span>'
         f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS</div></div>'
         f'</div>'
-        f'<div class=suites>{suite_html}{pag_tile}</div>'
+        f'<div class=suites>{suite_html}{pag_tile}{vox_tile}</div>'
         f'<div class=stats>{stats_html}</div>'
         f'<div class=verdict>{verdict}</div>'
         f'<div class=foot><span>slm-gauntlet 0.2 · seed 1 · temp 0 · zero offload</span>'

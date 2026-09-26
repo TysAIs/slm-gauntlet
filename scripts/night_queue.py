@@ -41,6 +41,10 @@ def swap_server(name, rel_path, ctx, np_, binary):
     path = f"/mnt/data/models/{rel_path}"
     server = ("/opt/prism-llama.cpp/build-cuda/bin/llama-server" if binary == "PRISM"
               else "/opt/llama.cpp/build/bin/llama-server")
+    # kill old server FIRST, as its own ssh exec (script file must not contain the
+    # kill pattern or it kills itself; separate exec avoids that)
+    sh(CT + ["bash", "-c", f"pkill -f 'llama-server.*port {PORT}' 2>/dev/null; true"])
+    time.sleep(3)
     script = (f"setsid nohup {server} -m {path} --alias {name} --host 0.0.0.0 "
               f"--port {PORT} --jinja -ngl 99 -t 6 -tb 6 -c {ctx} -np {np_} "
               f"--kv-unified -ctk q8_0 -ctv q8_0 -fa on --reasoning-budget 0 "
@@ -55,7 +59,7 @@ def swap_server(name, rel_path, ctx, np_, binary):
         time.sleep(2)
         r = subprocess.run(["curl", "-s", "--max-time", "3", f"{ENDPOINT}/models"],
                            capture_output=True)
-        if b"data" in r.stdout:
+        if name.encode() in r.stdout:  # RIGHT model must answer, not a stale one
             return True
     return False
 

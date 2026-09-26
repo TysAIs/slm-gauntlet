@@ -2,30 +2,32 @@
 
 A benchmark for **small language models** (sub-12B, 8GB VRAM class) that measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
 
-**Current leaderboard (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload):**
+**Current leaderboard — v0.3 gauntlet (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload, 71 tasks):**
 
-| Rank | Model | Quant | Score | Tool | Adversarial | Chains | Struct | Retrieval | Coding | Instr | tok/s c1→c8 |
+| Rank | Model | Quant | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Voxel |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | MiniCPM5-2B | Q4_K_M | **94.2%** | 100% | 100% | 83% | 100% | 100% | 83% | 75% | 32→62 |
-| 🥈 | MiniCPM5-2B | Q8_0 | 94.0% | 98% | 88% | 83% | 100% | 100% | 100% | 75% | 26→51 |
-| 🥉 | Qwen3.5-4B | Q4_K_M | 89.1% | 94% | 75% | 100% | 88% | 88% | 83% | 88% | 16→27 |
-| 4 | Bonsai-2 27B | PTQ1_0 1-bit | 87.7% | 100% | 100% | 100% | 100% | 38% | 83% | 88% | 3.2→3.4 |
-| 5 | Bonsai-2 27B | PQ2_0 | 84.4% | 100% | — | — | 100% | 25% | 100% | 88% | 4.6→5.7 |
-| 6 | MiMo-V2.6-Distill-9B | Q4_K_M | 81.7% | 88% | 88% | 100% | 100% | 38% | 83% | 75% | 13→13 |
-| 7 | Ornith-1.5-9B | Q4_K_M | 80.9% | 94% | 62% | 100% | 100% | 38% | 83% | 75% | 10→10 |
-| 8 | Sharp-Spark-X2.5-4B | Q4_K_XL | 73.8% | 65% | 75% | 50% | 100% | 62% | 100% | 75% | 17→17 |
-| 9 | LFM2.5-2.6B | Q8_0 | 73.8% | 76% | 38% | 83% | 75% | 75% | 100% | 62% | 26→44 |
-| 10 | LFM2.5-2.6B | Q4_K_M | 71.3% | 76% | 50% | 83% | 75% | 50% | 100% | 62% | 34→58 |
-| 11 | Gemma-3n-E4B | Q4_K_M | 57.6% | 29%⚠ | 62% | 17% | 100% | 75% | 83% | 62% | 13→13 |
+| 🥇 | Gemma 4 · E4B | Q4_K_M | **85.1%** | 95% | 88% | 83% | 80% | 100% | 100% | 50% | 14% |
+| 🥈 | MiniCPM-V 5 · 2B | Q8_0 | **84.8%** | 93% | 88% | 83% | 80% | 100% | 100% | 50% | 29% |
+| 🥉 | Ternary Bonsai-2 · 27B | PTQ1_0 | **83.3%** | 95% | 100% | 100% | 80% | 38% | 83% | 88% | — |
+| 4 | MiniCPM-V 5 · 2B | Q4_K_M | **82.7%** | 95% | 88% | 83% | 80% | 100% | 83% | 50% | 29% |
+| 5 | MiMo V2.6 · 9B | Q4_K_M | **73.9%** | 79% | 88% | 100% | 80% | 38% | 83% | 50% | — |
+| 6 | Ornith 1.5 · 9B | Q4_K_M | **72.8%** | 89% | 62% | 100% | 80% | 38% | 83% | 57% | — |
+| 7 | Gemma 4 · 12B | UD-Q2_K_XL | **69.8%** | 74% | 88% | 67% | 70% | 50% | 83% | 57% | 57% |
+| 8 | LFM 2.5 · 2.6B | Q8_0 | **68.5%** | 74% | 38% | 83% | 60% | 75% | 100% | 50% | — |
+| 9 | LFM 2.5 · 2.6B | Q4_K_M | **66.7%** | 74% | 50% | 83% | 60% | 50% | 100% | 50% | 43% |
+| 10 | Qwen 3.5 · 4B | Q4_K_M | **65.4%** | 68% | 62% | 67% | 60% | 50% | 100% | 50% | 86% |
+| 11 | Gemma 4 · 12B | IQ3_XXS | **65.1%** | 74% | 62% | 67% | 60% | 50% | 100% | 43% | — |
+| 12 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **63.6%** | 68% | 50% | 67% | 60% | 50% | 100% | 50% | 43% |
+| 13 | Gemma 3n · E4B | Q4_K_M | **56.3%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | — |
 
-**61 tasks** across 7 suites (weights: tooluse 30%, structured/retrieval 15%, coding/instruction/adversarial/chains 10%). Full data: [`results/_published/`](results/_published/LEADERBOARD.md). Verdict: **MiniCPM5-2B Q4_K_M is the best 8GB daily-driver subagent**; Bonsai-2 1-bit is the accuracy specialist (perfect tooluse/adversarial/chains, but 10.4 tok/s retested).
+Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · trading cards in [`results/cards/`](results/cards/).
 
-⚠ Gemma emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency. MiMo/Ornith/Bonsai retrieval capped by the 8K-context ceiling their VRAM footprint forces on an 8GB card.
-
-
-\* Bonsai-2 PQ2_0 weights fill the card completely: 8K context is the hard ceiling and there is zero concurrency headroom. Gemma ⚠: emits code blocks instead of native tool calls in its GGUF chat template — a template limitation, not a model deficiency.
-
-**Takeaway:** MiniCPM5-2B Q4_K_M is the best daily-driver subagent for an 8GB card. Bonsai-2 1-bit is the best *tool-calling specialist* if you can live with 10.4 tok/s retested.
+**v0.3 takeaways:**
+- **Gemma 4 E4B (Q4_K_M)** is the new accuracy king (85.1%) — the PaT arch punches way above its size.
+- **MiniCPM5-2B Q8_0** is the best speed/accuracy *balance* (84.8% at 26 tok/s) — still the daily-driver pick.
+- **Bonsai-2 1-bit (27B)** is the reasoning specialist (perfect adversarial + agent chains) at 3 tok/s.
+- The **voxel pagoda** is the great separator: Qwen 3.5-4B is the only model that built a real multi-floor 3D scene (86%); most models score in the teens-20s. 12B Gemma-4 manages 57% only as UD-Q2_K_XL.
+- v0.3's hard suites (instruction-hard, structured-hard, tooluse-hard) cut top scores ~10 points vs v0.2 — that's the discrimination working.
 
 ---
 

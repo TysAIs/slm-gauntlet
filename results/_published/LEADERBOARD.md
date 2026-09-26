@@ -1,39 +1,52 @@
-# Verified Leaderboard — 8GB VRAM class
+# SLM Gauntlet v0.3 — Leaderboard
 
-_slm-gauntlet 0.2 (61 tasks: tooluse 17, adversarial 8, agent_chains 6, structured 8, retrieval 8, coding 6, instruction 8)_
-_8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp_
-_temperature 0, seed 1, thinking disabled, pass@1_
+All runs on a single GTX 1070 Ti (8 GB), zero offload, `-ngl 99`, seed 1, temp 0.
+Gauntlet v0.3 = 71 tasks / 7 suites (adds instruction-hard, structured-hard, tooluse-hard).
+Bonsai-2: 65 merged tasks across the 7 suites (ran before the hard-suite expansion).
+Pagoda voxel = headlessly-graded 3D voxel garden build (execution-graded, Chromium).
 
-| # | Model | Quant | Score | Tool | Adversarial | Chains | Struct | Retrieval | Coding | Instr | tok/s c1→c8 | Pagoda |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | MiniCPM5-2B | Q4_K_M | **94.2%** | 100% | 100% | 83% | 100% | 100% | 83% | 75% | 32→62 | 100% |
-| 2 | MiniCPM5-2B | Q8_0 | **94.0%** | 98% | 88% | 83% | 100% | 100% | 100% | 75% | 26→51 | 100% |
-| 3 | Qwen3.5-4B | Q4_K_M | **89.1%** | 94% | 75% | 100% | 88% | 88% | 83% | 88% | 16→27 | 100% |
-| 4 | Bonsai-2 27B | PTQ1_0 (1-bit ternary) | **87.7%** | 100% | 100% | 100% | 100% | 38% | 83% | 88% | 3.2→3.4 | 100% |
-| 5 | Bonsai-2 27B | PQ2_0 (2.16bpw) | **84.4%** | 100% | —% | —% | 100% | 25% | 100% | 88% | 4.6→5.7 | —% |
-| 6 | MiMo-V2.6-Distill-Qwen-9B | Q4_K_M | **81.7%** | 88% | 88% | 100% | 100% | 38% | 83% | 75% | 13→13 | 100% |
-| 7 | Ornith-1.5-9B | Q4_K_M | **80.9%** | 94% | 62% | 100% | 100% | 38% | 83% | 75% | 10→10 | 100% |
-| 8 | Sharp-Spark-X2.5-4B | Q4_K_XL | **73.8%** | 65% | 75% | 50% | 100% | 62% | 100% | 75% | 17→17 | 100% |
-| 9 | LFM2.5-2.6B | Q8_0 | **73.8%** | 76% | 38% | 83% | 75% | 75% | 100% | 62% | 26→44 | 100% |
-| 10 | LFM2.5-2.6B | Q4_K_M | **71.3%** | 76% | 50% | 83% | 75% | 50% | 100% | 62% | 34→58 | 100% |
-| 11 | Gemma-3n-E4B | Q4_K_M | **57.6%** | 29% | 62% | 17% | 100% | 75% | 83% | 62% | 13→13 | 100% |
+| # | Model | Quant | Gauntlet % | Tests | tok/s (1 stream) | Voxel Pagoda |
+|---|-------|-------|-----------:|------:|-----------------:|-------------:|
+| 1 | Gemma 4 · E4B | Q4_K_M | **85.1%** | 71 | 13.8 | 14% |
+| 2 | MiniCPM-V 5 · 2B | Q8_0 | **84.8%** | 71 | 26.3 | 29% |
+| 3 | Ternary Bonsai-2 · 27B | PTQ1_0 | **83.3%** | 65 | — | — |
+| 4 | MiniCPM-V 5 · 2B | Q4_K_M | **82.7%** | 71 | 31.7 | 29% |
+| 5 | MiMo V2.6 · 9B | Q4_K_M | **73.9%** | 71 | 13.0 | — |
+| 6 | Ornith 1.5 · 9B | Q4_K_M | **72.8%** | 71 | 10.2 | — |
+| 7 | Gemma 4 · 12B | UD-Q2_K_XL | **69.8%** | 71 | 7.0 | 57% |
+| 8 | LFM 2.5 · 2.6B | Q8_0 | **68.5%** | 71 | 25.9 | — |
+| 9 | LFM 2.5 · 2.6B | Q4_K_M | **66.7%** | 71 | 34.5 | 43% |
+| 10 | Qwen 3.5 · 4B | Q4_K_M | **65.4%** | 71 | 15.6 | 86% |
+| 11 | Gemma 4 · 12B | IQ3_XXS | **65.1%** | 71 | 6.5 | — |
+| 12 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **63.6%** | 71 | 16.7 | 43% |
+| 13 | Gemma 3n · E4B | Q4_K_M | **56.3%** | 71 | 13.1 | — |
+
+## Voxel Pagoda ranking (limits test)
+
+Writing a working 3D voxel engine from scratch is the hardest thing we ask.
+
+| Model | Voxel % | Voxels | Floors |
+|-------|--------:|-------:|-------:|
+| Qwen 3.5 · 4B (Q4_K_M) | 86% | 320 | 4 |
+| Gemma 4 · 12B (UD-Q2_K_XL) | 57% | 111,872 | 0 |
+| LFM 2.5 · 2.6B (Q4_K_M) | 43% | 0 | 0 |
+| Sharp-Spark X2.5 · 4B (Q4_K_XL) | 43% | 0 | 0 |
+| MiniCPM-V 5 · 2B (Q8_0) | 29% | 0 | 0 |
+| MiniCPM-V 5 · 2B (Q4_K_M) | 29% | 0 | 0 |
+| Gemma 4 · E4B (Q4_K_M) | 14% | 0 | 0 |
 
 ## Verdicts
 
-- **#1 MiniCPM5-2B Q4_K_M**: Best overall. Perfect tooluse+adversarial+retrieval, fastest throughput, ties its Q8 at 40% the size. The default pick.
-- **#2 MiniCPM5-2B Q8_0**: Tied-#1 quality; only model to hold 131K ctx x 8 streams. Pick when max context headroom matters more than file size.
-- **#3 Qwen3.5-4B Q4_K_M**: Best agent_chains (100%) and strong instruction. Slowest 4B decoder; one loop-out. MTP draft variant can reclaim speed.
-- **#4 Bonsai-2 27B PTQ1_0 (1-bit ternary)**: Perfect tooluse+adversarial+chains at 27B params in 6GB. Slow (10.4 tok/s (retested: 3.3× faster with full-VRAM exclusive run)) and 8K ctx cap (VRAM). Best accuracy-per-task when speed doesn't matter. Needs PrismML fork.
-- **#5 Bonsai-2 27B PQ2_0 (2.16bpw)**: Weights fill the card: 8K ctx hard max, zero concurrency. Prefer PTQ1_0 (smaller, similar score).
-- **#6 MiMo-V2.6-Distill-Qwen-9B Q4_K_M**: Strong new challenger; retrieval capped by 8K ctx on this card (needs ~7GB+ for 32K). Would rank higher with more VRAM.
-- **#7 Ornith-1.5-9B Q4_K_M**: Popular new 9B. Weak adversarial resistance (62%). Same 8K ctx ceiling as MiMo.
-- **#8 Sharp-Spark-X2.5-4B Q4_K_XL**: Great coder (100%) but weak tool-caller (65%) and chains (50%).
-- **#9 LFM2.5-2.6B Q8_0**: Fast but injection-vulnerable (38% adversarial) and loops under tool pressure.
-- **#10 LFM2.5-2.6B Q4_K_M**: Fastest TTFT. Same adversarial weakness.
-- **#11 Gemma-3n-E4B Q4_K_M**: No native tool_calls in GGUF template (emits code blocks) - template limitation tanks tooluse/chains.
-
-## Model cards
-
-See `results/_published/cards/` for trading-card PNGs per model.
-
-*All runs: temperature 0, seed 1, thinking disabled, all layers on-GPU, zero offload, llama.cpp. Hardware: GTX 1070 Ti 8GB.*
+- **#1 Gemma 4 · E4B (Q4_K_M)** — Accuracy king of v0.3. Slower than MiniCPM but the best all-round brain; PaT arch runs well under 8GB.
+- **#2 MiniCPM-V 5 · 2B (Q8_0)** — Best speed/accuracy balance. Daily-driver material; only soft spot is the voxel build suite.
+- **#3 Ternary Bonsai-2 · 27B (PTQ1_0)** — Reasoning specialist: perfect adversarial+chains, near-perfect tooluse. 3 tok/s keeps it out of daily-driver duty.
+- **#4 MiniCPM-V 5 · 2B (Q4_K_M)** — Nearly matches Q8 at higher speed. The value pick if every tok/s counts.
+- **#5 MiMo V2.6 · 9B (Q4_K_M)** — Strong reasoner, decent speed; context capped at 8K on this card.
+- **#6 Ornith 1.5 · 9B (Q4_K_M)** — Solid mid-pack brain; 10 tok/s single-stream.
+- **#7 Gemma 4 · 12B (UD-Q2_K_XL)** — The 12B fits! Q2 quant costs accuracy but voxel building is the best of any model here.
+- **#8 LFM 2.5 · 2.6B (Q8_0)** — Fast and efficient; mid-pack accuracy.
+- **#9 LFM 2.5 · 2.6B (Q4_K_M)** — Fastest useful model tested; accuracy trails the leaders.
+- **#10 Qwen 3.5 · 4B (Q4_K_M)** — THE VOXEL CHAMPION — 86% on the code pagoda. Accuracy mid-pack.
+- **#11 Gemma 4 · 12B (IQ3_XXS)** — 12B squeezed to IQ3: runs but accuracy drops below 4B leaders.
+- **#12 Sharp-Spark X2.5 · 4B (Q4_K_XL)** — Mid-pack across the board; nothing stands out.
+- **#13 Gemma 3n · E4B (Q4_K_M)** — Last place on v0.3 — the older 3n arch can't keep up.
