@@ -90,7 +90,9 @@ def grade_runtime(html_path: str, shot_path: str) -> dict:
         errors: list[str] = []
         out: dict = {"loads": False, "console_errors": 1, "voxel": {}}
         async with async_playwright() as pw:
-            browser = await pw.chromium.launch(args=["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
+            browser = await pw.chromium.launch(
+                args=["--use-gl=angle", "--use-angle=swiftshader",
+                      "--enable-unsafe-swiftshader"])
             page = await browser.new_page(viewport={"width": 1280, "height": 800})
             page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
             page.on("pageerror", lambda e: errors.append(str(e)))
