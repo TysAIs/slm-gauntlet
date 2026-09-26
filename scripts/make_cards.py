@@ -60,7 +60,8 @@ def suite_color(pct: float) -> str:
 
 CARD_CSS = """
 * { margin:0; padding:0; box-sizing:border-box; }
-html,body { width:1080px; height:1080px; overflow:hidden; margin:0; background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
+html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
+  background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
 .card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
   border:1px solid #30363d; border-radius:22px; padding:44px 44px; color:#e6edf3;
   position:relative; overflow:hidden; display:flex; flex-direction:column; }
