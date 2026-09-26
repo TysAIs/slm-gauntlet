@@ -1,0 +1,60 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
+.card { width:1100px; background:linear-gradient(145deg,#161b22,#1a2230);
+  border:1px solid #30363d; border-radius:24px; padding:40px 44px; color:#e6edf3;
+  position:relative; overflow:hidden; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px;
+  background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
+.hrow { display:flex; justify-content:space-between; align-items:flex-start; }
+.model-name { font-size:44px; font-weight:800; letter-spacing:-1px; }
+.model-quant { font-size:20px; color:#8b949e; margin-top:4px; }
+.rank { text-align:center; }
+.rank-letter { font-size:72px; font-weight:900; line-height:1; }
+.rank-label { font-size:14px; font-weight:700; letter-spacing:2px; margin-top:6px; }
+.overall { margin:28px 0 24px; }
+.overall-pct { font-size:88px; font-weight:900; line-height:1; }
+.overall-sub { font-size:16px; color:#8b949e; letter-spacing:3px; font-weight:600; }
+.suites { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:14px; padding:14px 12px; text-align:center; }
+.suite-name { font-size:12px; color:#8b949e; text-transform:uppercase; letter-spacing:1.5px; }
+.suite-val { font-size:30px; font-weight:800; margin-top:4px; }
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:14px; padding:14px 16px; }
+.stat-k { font-size:11px; color:#8b949e; text-transform:uppercase; letter-spacing:1.5px; }
+.stat-v { font-size:22px; font-weight:800; margin-top:4px; }
+.stat-v small { font-size:13px; color:#8b949e; font-weight:600; }
+.verdict { font-size:17px; line-height:1.5; color:#c9d1d9; border-left:3px solid #f5c518; padding-left:14px; }
+.foot { margin-top:18px; font-size:12px; color:#6e7681; }
+.bar { height:8px; border-radius:4px; background:#21262d; margin-top:8px; overflow:hidden; }
+.bar>i { display:block; height:100%; border-radius:4px; }
+</style></head>
+<body><div class=card>
+<div class=hrow>
+ <div><div class=model-name>LFM2.5-2.6B</div><div class=model-quant>Q8_0 · 3.2GB file · 32K ctx</div></div>
+ <div class=rank><div class=rank-letter style="color:#57a8ff">B</div><div class=rank-label style="color:#57a8ff">CAPABLE GAPS</div></div>
+</div>
+<div class=overall><span class=overall-pct style="color:#57a8ff">77.8%</span>
+<div class=overall-sub>GAUNTLET SCORE — 47 TESTS</div></div>
+<div class=suites><div class=suite><div class=suite-name>tooluse</div>
+        <div class=suite-val style="color:#f5c518">76%</div>
+        <div class=bar><i style="width:76%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>coding</div>
+        <div class=suite-val style="color:#7bd88f">100%</div>
+        <div class=bar><i style="width:100%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>instruction</div>
+        <div class=suite-val style="color:#e3b341">62%</div>
+        <div class=bar><i style="width:62%;background:#e3b341"></i></div></div><div class=suite><div class=suite-name>structured</div>
+        <div class=suite-val style="color:#f5c518">75%</div>
+        <div class=bar><i style="width:75%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>retrieval</div>
+        <div class=suite-val style="color:#f5c518">75%</div>
+        <div class=bar><i style="width:75%;background:#f5c518"></i></div></div></div>
+<div class=stats>
+        <div class=stat><div class=stat-k>Speed (1 stream)</div><div class=stat-v>25.88<small> tok/s</small></div></div>
+        <div class=stat><div class=stat-k>Speed (8 streams)</div><div class=stat-v>44.36<small> tok/s</small></div></div>
+        <div class=stat><div class=stat-k>TTFT</div><div class=stat-v>2.6<small> s</small></div></div>
+        <div class=stat><div class=stat-k>Max subagents (8K ctx)</div><div class=stat-v>303</div></div>
+        <div class=stat><div class=stat-k>KV pool</div><div class=stat-v>3792<small> MB</small></div></div>
+        <div class=stat><div class=stat-k>Weights VRAM</div><div class=stat-v>3200<small> MB</small></div></div><div class=stat style="margin-bottom:22px;display:block">
+        <div class=stat-k>Pagoda build</div><div class=stat-v>100%<small> elements (5 tiers)</small></div></div></div>
+<div class=verdict>Q8 buys +0.02 over Q4. Fast and stable, but the instruction suite (0.625) shows reasoning gaps under multi-step constraints.</div>
+<div class=foot>slm-gauntlet 0.1 · seed=1 · pass^1 · all layers on GTX 1070 Ti · zero offload · 20260925T211928Z</div>
+</div></body></html>

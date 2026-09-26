@@ -1,0 +1,130 @@
+[
+ {
+  "model": "minicpm5-2b-q8_0",
+  "display_name": "MiniCPM5-2B",
+  "sub": "Q8_0 \u00b7 2.9GB file \u00b7 131K ctx tested",
+  "suites": {
+   "tooluse": 0.880503144654088,
+   "coding": 0.8333333333333334,
+   "instruction": 0.875,
+   "structured": 0.875,
+   "retrieval": 1.0
+  },
+  "overall_pct": 89.27672955974842,
+  "n": 17,
+  "verdict": "Current champion. Tied-highest gauntlet score, the only model that ran 131K context \u00d7 8 parallel streams on-card. Costliest small-quant in tokens/GB but unkillable under load.",
+  "ts": "20260925T170528Z"
+ },
+ {
+  "model": "minicpm5-2b-q4_K_M",
+  "display_name": "MiniCPM5-2B",
+  "sub": "Q4_K_M \u00b7 2.5GB file \u00b7 32K ctx",
+  "suites": {
+   "coding": 0.8333333333333334,
+   "instruction": 0.75,
+   "structured": 1.0,
+   "tooluse": 1.0,
+   "retrieval": 1.0
+  },
+  "overall_pct": 91.66666666666666,
+  "n": 47,
+  "verdict": "Same score as Q8 at 40% the size \u2014 the value pick. Perfect tooluse incl. hard tier and 32K retrieval. Leave ~5.5GB for KV and it is a subagent farm.",
+  "ts": "20260925T192632Z"
+ },
+ {
+  "model": "qwen3.5-4b-q4_K_M",
+  "display_name": "Qwen3.5-4B",
+  "sub": "Q4_K_M \u00b7 2.7GB file \u00b7 32K ctx",
+  "suites": {
+   "coding": 0.8333333333333334,
+   "instruction": 0.875,
+   "structured": 0.875,
+   "tooluse": 0.9411764705882353,
+   "retrieval": 0.875
+  },
+  "overall_pct": 87.99019607843137,
+  "n": 47,
+  "verdict": "Smartest per-token of the 4B class: 1.00 tooluse, near-perfect instruction. Slowest decoder and one loop failure under tool pressure. Best 'brains over speed' choice.",
+  "ts": "20260925T210836Z"
+ },
+ {
+  "model": "bonsai2-ptq1_0",
+  "display_name": "Bonsai-2 27B",
+  "sub": "PTQ1_0 1-bit ternary \u00b7 5.9GB \u00b7 8K ctx max",
+  "suites": {
+   "coding": 0.8333333333333334,
+   "instruction": 0.875,
+   "structured": 1.0,
+   "tooluse": 1.0,
+   "retrieval": 0.375
+  },
+  "overall_pct": 81.66666666666667,
+  "n": 17,
+  "verdict": "The upset: a 27B 1-bit model in 6GB with PERFECT tooluse (17/17 incl. hard tier) and 1.00 structured. Slow (~3 tok/s) and capped at 8K context \u2014 a specialist, not a daily driver.",
+  "ts": "20260925T223929Z"
+ },
+ {
+  "model": "bonsai2-pq2_0",
+  "display_name": "Bonsai-2 27B",
+  "sub": "PQ2_0 2.16-bpw ternary \u00b7 7.2GB \u00b7 8K ctx hard max",
+  "suites": {
+   "coding": 1.0,
+   "instruction": 0.875,
+   "structured": 1.0,
+   "tooluse": 1.0,
+   "retrieval": 0.25
+  },
+  "overall_pct": 82.5,
+  "n": 47,
+  "verdict": "0.830 with 1.00 tooluse. Weights alone fill the card: zero KV headroom, no concurrency. Requires PrismML fork (stock llama.cpp outputs gibberish silently).",
+  "ts": "20260925T214602Z"
+ },
+ {
+  "model": "lfm2.5-2.6b-q8_0",
+  "display_name": "LFM2.5-2.6B",
+  "sub": "Q8_0 \u00b7 3.2GB file \u00b7 32K ctx",
+  "suites": {
+   "coding": 1.0,
+   "instruction": 0.625,
+   "structured": 0.75,
+   "tooluse": 0.7647058823529411,
+   "retrieval": 0.75
+  },
+  "overall_pct": 77.79411764705883,
+  "n": 47,
+  "verdict": "Q8 buys +0.02 over Q4. Fast and stable, but the instruction suite (0.625) shows reasoning gaps under multi-step constraints.",
+  "ts": "20260925T211928Z"
+ },
+ {
+  "model": "lfm2.5-2.6b-q4_K_M",
+  "display_name": "LFM2.5-2.6B",
+  "sub": "Q4_K_M \u00b7 2.3GB file \u00b7 32K ctx",
+  "suites": {
+   "coding": 1.0,
+   "instruction": 0.625,
+   "structured": 0.75,
+   "tooluse": 0.7647058823529411,
+   "retrieval": 0.625
+  },
+  "overall_pct": 75.29411764705883,
+  "n": 47,
+  "verdict": "Loops under tool pressure (2 loop-outs). Cheapest viable model here, but the gauntlet found real failure modes.",
+  "ts": "20260925T184546Z"
+ },
+ {
+  "model": "gemma-e4b-q4_K_M",
+  "display_name": "Gemma-3n E4B",
+  "sub": "Q4_K_M \u00b7 3.0GB file \u00b7 16K ctx",
+  "suites": {
+   "coding": 0.8333333333333334,
+   "instruction": 0.625,
+   "structured": 1.0,
+   "tooluse": 0.29411764705882354,
+   "retrieval": 0.75
+  },
+  "overall_pct": 70.04901960784314,
+  "n": 47,
+  "verdict": "1.00 structured, good retrieval \u2014 but NO native tool-calling in the GGUF template: it writes tool_code blocks instead of tool_calls, scoring 0.29 on the gauntlet's function-calling contract.",
+  "ts": "20260925T211416Z"
+ }
+]
