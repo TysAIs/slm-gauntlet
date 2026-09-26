@@ -43,11 +43,6 @@ def cap_latest(model: str) -> dict | None:
     return json.load(open(f)) if Path(f).exists() else None
 
 
-def pagoda_latest(model: str) -> dict | None:
-    f = f"results/pagoda_{model}.json"
-    return json.load(open(f)) if Path(f).exists() else None
-
-
 def voxel_latest(model: str) -> dict | None:
     f = f"results/pagoda_code_{model}.json"
     return json.load(open(f)) if Path(f).exists() else None
@@ -99,7 +94,7 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 """
 
 
-def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) -> str:
+def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
     letter, color, label = rank_for(m["overall_pct"])
     suites = m["suites"]
     order = ["tooluse", "adversarial", "agent_chains", "structured", "retrieval", "coding", "instruction"]
@@ -150,13 +145,6 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
             f'<div class=stat><div class=stat-k>Offload</div>'
             f'<div class=stat-v style="color:#7bd88f">None<small> (100% VRAM)</small></div></div>'
         )
-    pag_tile = ""
-    if pag:
-        pag_tile = (
-            f'<div class=suite><div class=suite-name>Pagoda prose</div>'
-            f'<div class=suite-val style="color:#7bd88f">{pag["pct"]:.0f}%</div>'
-            f'<div class=bar><i style="width:{pag["pct"]:.0f}%;background:#7bd88f"></i></div></div>'
-        )
     vox_tile = ""
     vox = voxel_latest(m["model"])
     if vox:
@@ -185,7 +173,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
         f'<div><span class=overall-pct style="color:{color}">{m["overall_pct"]:.1f}%</span>'
         f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS</div></div>'
         f'</div>'
-        f'<div class=suites>{suite_html}{pag_tile}{vox_tile}</div>'
+        f'<div class=suites>{suite_html}{vox_tile}</div>'
         f'<div class=stats>{stats_html}</div>'
         f'<div class=verdict>{verdict}</div>'
         f'<div class=foot><span>slm-gauntlet 0.2 · seed 1 · temp 0 · zero offload</span>'
@@ -201,8 +189,7 @@ def main() -> None:
     for m in models:
         perf = perf_latest(m["model"])
         cap = cap_latest(m["model"])
-        pag = pagoda_latest(m["model"])
-        html = render_card(m, perf, cap, pag)
+        html = render_card(m, perf, cap)
         p = outdir / f"card_{m['model']}.html"
         p.write_text(html)
         print("wrote", p)

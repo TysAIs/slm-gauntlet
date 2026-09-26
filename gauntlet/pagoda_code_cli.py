@@ -49,6 +49,5 @@ def main() -> None:
     a = ap.parse_args()
     asyncio.run(run(a.endpoint, a.model, a.max_tokens, a.out))
 
-
 if __name__ == "__main__":
     main()

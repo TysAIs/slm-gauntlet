@@ -3,7 +3,7 @@
 All runs on a single GTX 1070 Ti (8 GB), zero offload, `-ngl 99`, seed 1, temp 0.
 Gauntlet v0.3 = 71 tasks / 7 suites (adds instruction-hard, structured-hard, tooluse-hard).
 Bonsai-2: 65 merged tasks across the 7 suites (ran before the hard-suite expansion).
-Pagoda voxel = headlessly-graded 3D voxel garden build (execution-graded, Chromium).
+Voxel Pagoda = headlessly-graded 3D voxel garden build (execution-graded in Chromium).
 
 | # | Model | Quant | Gauntlet % | Tests | tok/s (1 stream) | Voxel Pagoda |
 |---|-------|-------|-----------:|------:|-----------------:|-------------:|

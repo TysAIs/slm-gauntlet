@@ -2,7 +2,7 @@
 """Night queue driver: run every model through the newest gauntlet end-to-end.
 
 Runs LOCALLY (Mac). For each model: swap CT server via ssh, wait for endpoint,
-run gauntlet (all suites incl. hard), prose pagoda, perf. Logs per model.
+run gauntlet (all suites incl. hard), voxel pagoda (pagoda-code), perf.
 Bonsai uses the PrismML fork binary.
 """
 import os as _os
@@ -85,9 +85,9 @@ def main():
         log.write(f"=== {name} gauntlet rc={r.stdout.strip()[-6:]} {time.strftime('%H:%M:%S')} ===\n")
         # prose pagoda
         sh(["bash", "-c",
-            f".venv/bin/python -m gauntlet.pagoda_cli --endpoint {ENDPOINT} "
+            f".venv/bin/python -m gauntlet.pagoda_code_cli --endpoint {ENDPOINT} "
             f"--model {name} --max-tokens 1400 "
-            f"--out results/pagoda_{name}.json"], timeout=400)
+            f"--out results/pagoda_code_{name}.json"], timeout=580)
         # voxel pagoda
         import os
         env = {**os.environ, "PLAYWRIGHT_BROWSERS_PATH": os.path.expanduser("~/Library/Caches/ms-playwright")}

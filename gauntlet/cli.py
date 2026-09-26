@@ -103,17 +103,11 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_pagoda(args: argparse.Namespace) -> int:
-    import asyncio
+def cmd_pagoda_code(args: argparse.Namespace) -> int:
+    from gauntlet.pagoda_code_cli import main as pc_main
 
-    from gauntlet.pagoda_cli import run as pagoda_run
-
-    data = asyncio.run(pagoda_run(args.endpoint, args.model, args.max_tokens, args.out))
-    out = args.out or f"results/pagoda_{args.model.replace('/', '_')}.json"
-    Path(out).parent.mkdir(parents=True, exist_ok=True)
-    Path(out).write_text(json.dumps({"model": args.model, "score": data.as_dict(), "output": ""}, indent=1))
-    print(f"[gauntlet] pagoda results -> {out}")
-    return 0
+    sys.argv = ["pagoda-code", "--endpoint", args.endpoint, "--model", args.model]
+    return pc_main()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -134,14 +128,12 @@ def main(argv: list[str] | None = None) -> int:
         "--repeats", type=int, default=1,
         help="run every task k times; pass^k = all-reps reliability (tau-bench style). 3 recommended",
     )
-    # add pagoda subcommand
-    pag_p = sub.add_parser("pagoda", help="run the Pagoda creative-build benchmark")
-    pag_p.add_argument("--endpoint", required=True)
-    pag_p.add_argument("--model", required=True)
-    pag_p.add_argument("--max-tokens", type=int, default=1500)
-    pag_p.add_argument("--out", default=None)
-    pag_p.set_defaults(fn=cmd_pagoda)
     run_p.set_defaults(fn=cmd_run)
+
+    pc_p = sub.add_parser("pagoda-code", help="voxel pagoda build test (execution-graded, needs local Chromium)")
+    pc_p.add_argument("--endpoint", required=True)
+    pc_p.add_argument("--model", required=True)
+    pc_p.set_defaults(fn=cmd_pagoda_code)
 
     perf_p = sub.add_parser("perf", help="throughput benchmark (TTFT/tok-s at c=1/4/8)")
     perf_p.add_argument("--endpoint", required=True)

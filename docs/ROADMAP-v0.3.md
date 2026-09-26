@@ -6,7 +6,10 @@
   0.55*Quality + 0.25*Calibration + 0.15*Reliability + 0.05*Efficiency/Responsiveness.
   KEY CORRECTION: their "pagoda" is a single-file Three.js VOXEL CODE-GEN benchmark (graded by
   window.__VOXEL__ = {voxelCount, fps, pagodaFloors}, <700KB, no external assets) — creative CODE, not prose.
-  We keep our prose pagoda AND add a code pagoda ("pagoda-lite") with hidden numeric assertions.
+  Our original prose pagoda (keyword-presence scoring) was REMOVED 2026-09-26: it scored every model
+  100% because mentioning common words like "stone"/"gate"/"light" passed every element — zero
+  discrimination. Only the execution-graded voxel code pagoda (pagoda-code) remains, which is the
+  version that actually separates models (14%-86% spread).
 - Hard-task research: GAIA, tau2-bench, BFCL v3/v4, IFEval/IFBench, MuSR, TravelPlanner, JSONSchemaBench,
   Multi-IF, LiveCodeBench. Grading ladder: regex < jsonschema < AST tool-match < execution < state-diff.
 
@@ -19,8 +22,7 @@
 3. structured-hard: strict JSON-schema (free-gen vs GBNF-constrained delta); format hygiene under decoys.
 4. plan: TravelPlanner-lite — 3-day itinerary, >=5 global constraints, arithmetic grading.
 5. coding-hard: execution-graded synthesis + bug-repair against failing test (sandbox subprocess).
-6. creative-code: "pagoda-lite" single-file canvas/HTML artifact graded on exposed globals + size cap +
-   zero console errors.
+6. creative-code: DONE — voxel pagoda (pagoda_code_cli), execution-graded in Chromium.
 7. calibration: confidence + escalation after N failures (stop instead of thrash).
 
 ## Scoring upgrades

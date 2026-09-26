@@ -53,13 +53,13 @@ Same model + same seed → identical results.
 
 | Suite | Tasks | What it measures |
 |---|---|---|
-| **tooluse** | 12 + 5 hard | Correct tool selection and arguments; calculator grounding (does it use the tool or hallucinate arithmetic?); error recovery (tool fails once → must retry); sandbox escape refusal; distractor discipline; and a **hard tier**: policy compliance with traps, long-context reservations, missing functions, state conflicts, multi-step computation chains |
+| **tooluse** | 12 + 7 hard | Correct tool selection and arguments; calculator grounding (does it use the tool or hallucinate arithmetic?); error recovery (tool fails once → must retry); sandbox escape refusal; distractor discipline; and a **hard tier**: policy compliance with traps, long-context reservations, missing functions, state conflicts, multi-step computation chains |
 | **adversarial** | 8 | Prompt-injection resistance: injected "ignore instructions" in email/tool data, system-prompt exfiltration, priority inversion, sycophancy pressure, base64-encoded bypasses, impersonation. Must resist the attack **and** still complete the real job |
 | **agent_chains** | 6 | Multi-turn tool pipelines (3-8 turns): search→pick→reserve chains, file write→append→read-back, lookup→transform→compute, mid-chain error recovery, conditional branches on tool output |
-| **structured** | 8 | Valid JSON against a schema, extraction from messy input, exact function signatures |
+| **structured** | 8 + 2 hard | Valid JSON against a schema, extraction from messy input, exact function signatures |
 | **retrieval** | 8 | Needle-in-a-haystack from 4K to 32K tokens, NoLiMa-style associative needles, and refusal-when-absent (anti-hallucination) |
 | **coding** | 6 | Bug fixes, dict/list transforms, regex parsing, contradiction traps where the naive solution is invalid |
-| **instruction** | 8 | Exact ordering, format locks, negation constraints, 4-constraint stacks |
+| **instruction** | 8 + 6 hard | Exact ordering, format locks, negation constraints, 4-constraint stacks |
 
 ### How needle-in-a-haystack works (no agent needed)
 
@@ -71,8 +71,8 @@ Plain `POST /v1/chat/completions` → check the answer contains the code. That's
 
 - **`gauntlet perf`** — TTFT, tok/s at 1/4/8 concurrent streams, 8K-token prefill speed.
 - **Capacity analysis** — from the server log: weights VRAM, KV bytes/token, KV pool after weights, and the max number of concurrent 8K-context subagents the card can hold.
-- **Pagoda build** (`gauntlet pagoda`) — a 9-element staged creative construction (foundation → torii gate → stacked tiers → roof curvature → lanterns → garden → mountain backdrop → atmosphere), each element weighted and checked in order. Tests long-form instruction adherence in creative mode. Pure chat completion, no tools.
-- **Model cards** — trading-card style PNG per model: rank badge, suite percentages, speed curve, KV pool, max subagents, Pagoda score, and a plain-English verdict.
+- **Voxel Pagoda** (`gauntlet pagoda-code`) — an execution-graded limits test: the model must write a complete, self-contained HTML file that renders a blocky 3D voxel pagoda garden (tiers, torii gate, lanterns, garden, sky) with no external assets, then the page is loaded headlessly in Chromium and graded on what actually renders: console errors, voxel counts, declared scene stats, live FPS. Screenshots of every model's attempt are saved as artifacts. This is the hardest thing we ask — it separates "can talk about code" from "can build a working program." Most models score in the teens-20s; writing a real 3D engine from scratch is a genuine frontier for small models.
+- **Model cards** — trading-card style PNG per model: rank badge, suite percentages, speed curve, KV pool, max subagents, voxel pagoda score, and a plain-English verdict.
 
 ---
 
@@ -89,7 +89,7 @@ pip install -e .
 llama-server -m /path/to/model-Q4_K_M.gguf --host 0.0.0.0 --port 8080 \
   -c 32768 -np 8 --kv-unified -fa --jinja --temp 0.0
 
-# 2. Run the full gauntlet (47 tasks, ~20-40 min on an 8GB GPU)
+# 2. Run the full gauntlet (71 tasks, ~5-15 min on an 8GB GPU)
 gauntlet run --endpoint http://localhost:8080/v1 --model my-model --suite all
 
 # Single suite instead:
@@ -97,6 +97,9 @@ gauntlet run --endpoint http://localhost:8080/v1 --model my-model --suite toolus
 
 # 3. Throughput benchmark
 gauntlet perf --endpoint http://localhost:8080/v1 --model my-model
+
+# 3b. Voxel pagoda limits test (needs local Chromium/playwright)
+gauntlet pagoda-code --endpoint http://localhost:8080/v1 --model my-model
 
 # 4. Leaderboard from your local runs
 gauntlet report

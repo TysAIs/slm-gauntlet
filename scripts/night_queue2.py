@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Night queue v2: swap server (direct-exec pattern), gauntlet, perf, pagoda per model."""
+"""Night queue v2: swap server (direct-exec pattern), gauntlet, perf, voxel pagoda per model."""
 import os as _os
 import subprocess
 import sys
@@ -59,7 +59,7 @@ def run(model):
     # pagoda (voxel)
     r = sh(["bash", "-c",
             f".venv/bin/python -m gauntlet.pagoda_code_cli --endpoint {EP} --model {model}"], timeout=580)
-    log(f"=== {model} pagoda rc={r.returncode} ===")
+    log(f"=== {model} voxel-pagoda rc={r.returncode} ===")
     return True
 
 if __name__ == "__main__":
