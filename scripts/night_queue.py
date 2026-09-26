@@ -9,9 +9,11 @@ import subprocess
 import sys
 import time
 
-CT = ["ssh", "-o", "ConnectTimeout=15", "pve", "pct", "exec", "100", "--"]
+CT = ["ssh", "-o", "ConnectTimeout=15", _os.environ.get("GAUNTLET_SSH_ALIAS", "pve-lab"), "pct", "exec", "100", "--"]
 PORT = "18081"
-ENDPOINT = f"http://CT_HOST:{PORT}/v1"
+import os as _os
+CT_HOST = _os.environ.get("GAUNTLET_CT_HOST", "localhost")
+ENDPOINT = f"http://{CT_HOST}:{PORT}/v1"
 
 MODELS = [
     # (name, path, ctx, np, binary)  binary: LLAMA | PRISM
@@ -42,9 +44,7 @@ def swap_server(name, path, ctx, np_, binary):
               f"--no-reasoning-preserve --temp 0.0 </dev/null > /tmp/srv_{name}.log 2>&1 &\n")
     # write script via stdin then execute detached (proven pattern)
     sh(CT + ["tee", "/tmp/nq_start.sh"], input=script)
-    subprocess.run(["ssh", "-o", "ConnectTimeout=15", "pve",
-                    "pct", "exec", "100", "--",
-                    "bash", "-c",
+    subprocess.run(CT + ["bash", "-c",
                     "setsid bash /tmp/nq_start.sh </dev/null >/dev/null 2>&1 &"],
                    capture_output=True, timeout=30)
     time.sleep(2)
