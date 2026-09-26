@@ -121,7 +121,6 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
         )
     if cap:
         wgb = cap.get("weights_mb", 0) / 1000
-        agents = cap.get("max_concurrent_agents_at_8k_ctx")
         max_tok = cap.get("kv_max_tokens_pool")
         if max_tok and max_tok >= 1000:
             kv_disp = f"{max_tok/1000:.0f}K tok"
@@ -129,7 +128,6 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
             kv_disp = f"{max_tok} tok"
         else:
             kv_disp = "—"
-        agents_disp = f"{agents}" if agents is not None and agents > 0 else "0"
         stats_html += (
             f'<div class=stat><div class=stat-k>Weights VRAM</div>'
             f'<div class=stat-v>{wgb:.1f}<small> GB</small></div></div>'
@@ -148,7 +146,6 @@ def render_card(m: dict, perf: dict | None, cap: dict | None, pag: dict | None) 
         )
     pag_tile = ""
     if pag:
-        tiers = pag.get("tiers_mentioned", "?")
         pag_tile = (
             f'<div class=suite><div class=suite-name>Pagoda build</div>'
             f'<div class=suite-val style="color:#7bd88f">{pag["pct"]:.0f}%</div>'
