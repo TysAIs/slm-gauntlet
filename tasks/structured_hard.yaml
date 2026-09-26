@@ -1,0 +1,60 @@
+# Hard structured suite (v0.3): strict schema with decoys and cross-item checks.
+- id: hst_nested_fleet
+  suite: structured
+  description: nested fleet report, strict schema, decoy field forbidden
+  tier: hard
+  prompt: |
+    A delivery company has 3 vehicles. Produce a JSON object describing them.
+    Schema (STRICT — no extra keys, no markdown fences, no commentary):
+    {"fleet": [{"id": "<regex V[0-9]{3}>", "type": "van"|"truck"|"bike",
+                "capacity_kg": <int 50-5000>, "addons": [<array of strings, may be empty>]}]}
+    Rules: exactly 3 vehicles, ids must be unique, one vehicle must be a "bike",
+    the "addons" array is REQUIRED for every vehicle (use [] if none).
+    Vehicles: V101 is a van with a fridge addon rated 1200kg; V202 is a bike
+    with no addons; V303 is a truck rated 3500kg with gps and dashcam addons.
+  asserts:
+    - type: json_schema
+      schema_:
+        type: object
+        properties:
+          fleet:
+            type: array
+            minItems: 3
+            maxItems: 3
+            items:
+              type: object
+              properties:
+                id: {type: string, pattern: "^V[0-9]{3}$"}
+                type: {type: string, enum: [van, truck, bike]}
+                capacity_kg: {type: integer, minimum: 50, maximum: 5000}
+                addons: {type: array, items: {type: string}}
+              required: [id, type, capacity_kg, addons]
+              additionalProperties: false
+        required: [fleet]
+        additionalProperties: false
+    - type: predicate
+      expr: "len({v['id'] for v in out_dict['fleet']}) == 3"
+    - type: predicate
+      expr: "any(v['type']=='bike' for v in out_dict['fleet'])"
+  max_tokens: 512
+
+- id: hst_types_strict
+  suite: structured
+  description: integer must be int not string; no fences
+  tier: hard
+  prompt: |
+    Return ONLY this JSON, nothing else (no code fences):
+    {"count": <the number of days in two weeks>, "unit": "days", "is_prime": <true or false>}
+  asserts:
+    - type: json_schema
+      schema_:
+        type: object
+        properties:
+          count: {type: integer}
+          unit: {type: string, enum: [days]}
+          is_prime: {type: boolean}
+        required: [count, unit, is_prime]
+        additionalProperties: false
+    - type: predicate
+      expr: "out_dict['count'] == 14 and out_dict['is_prime'] is False"
+  max_tokens: 128

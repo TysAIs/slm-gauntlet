@@ -159,3 +159,64 @@
   max_turns: 8
   flaky: true
   repeats: 3
+
+- id: tool_hard_malformed_then_repair
+  suite: tooluse
+  tier: hard
+  description: First lookup fails — must repair the id format and retry
+  system: You are a data assistant. If a tool returns an error, fix the request and try again.
+  prompt: |
+    Get the profile for customer id "c7788" using lookup_record, then report the
+    customer's email. NOTE: lookup_record requires ids in uppercase format "C-7788".
+  fail_injections:
+    - tool: lookup_record
+      times: 1
+  tools:
+    - name: lookup_record
+      description: Look up a customer record by id. Returns record JSON with email.
+      parameters: {type: object, properties: {id: {type: string}}, required: [id]}
+  asserts:
+    - type: regex
+      pattern: "[A-Za-z0-9_.]+@[A-Za-z0-9_.]+"
+      weight: 2.0
+  state_asserts:
+    - type: tool_called
+      tool: lookup_record
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: tool_hard_write_then_verify_chain
+  suite: tooluse
+  tier: hard
+  description: Compute, persist, then verify persisted value (3-step dependent chain)
+  system: You are a file assistant.
+  prompt: |
+    1) Use the calculator to compute 47 * 83.
+    2) Write the exact result to the file "calc_result.txt" using write_file.
+    3) Use read_file on "calc_result.txt" and confirm the content matches step 1.
+    Report the final verified number.
+  tools:
+    - name: calculator
+      description: Evaluate arithmetic.
+      parameters: {type: object, properties: {expression: {type: string}}, required: [expression]}
+    - name: write_file
+      description: Write a file in the workspace.
+      parameters: {type: object, properties: {path: {type: string}, content: {type: string}}, required: [path, content]}
+    - name: read_file
+      description: Read a file from the workspace.
+      parameters: {type: object, properties: {path: {type: string}}, required: [path]}
+  asserts:
+    - type: contains_all
+      values: ["3901"]
+      weight: 2.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: write_file
+      weight: 2.0
+    - type: tool_called
+      tool: read_file
+      weight: 2.0
+      must_pass: true
+  max_turns: 8
