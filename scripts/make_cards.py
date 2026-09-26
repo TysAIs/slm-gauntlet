@@ -173,8 +173,8 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         order2 = sorted([k for k in s if s.get(k) is not None], key=lambda k: s[k])
         best = sorted([k for k in s if s.get(k) is not None], key=lambda k: -s[k])
         bnames = {"tooluse": "tool calling", "adversarial": "prompt-injection resistance",
-                  "agent_chains": "multi-turn agent chains", "structured": "strict structured output",
-                  "retrieval": "long-context retrieval", "coding": "bug-fixing", "instruction": "stacked-constraint instruction following"}
+                  "agent_chains": "multi-turn agent chains", "structured": "strict structured output", "retrieval": "long-context retrieval",
+                  "coding": "bug-fixing", "instruction": "stacked-constraint instruction following"}
         strong = ", ".join(bnames[k] for k in best[:2])
         weak = bnames.get(order2[0], "instruction following")
         verdict = (f"Scores {m['overall_pct']:.1f}% across 71 tasks. Strongest at {strong}; "
