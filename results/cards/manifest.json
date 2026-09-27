@@ -104,7 +104,7 @@
   "n": 71,
   "ts": "20260927",
   "rank": 5,
-  "verdict": "Reasoning specialist: perfect agent chains, coding and structured. Slow decode (11 tok/s) plus weak stacked-instruction following are the costs; needs the IFM llama.cpp fork to run.",
+  "verdict": "Reasoning specialist: perfect agent chains, coding and structured output. Costs: huge 144KiB/token KV leaves room for only ~10K context on 8GB (1 agent at 8K), slow 11 tok/s decode, weak stacked-instruction following (36%). Q8 does not fit 8GB \u2014 Q4 is the only option; needs the IFM llama.cpp fork.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia"
