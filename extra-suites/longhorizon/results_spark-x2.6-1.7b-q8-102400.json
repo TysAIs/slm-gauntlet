@@ -1,0 +1,95 @@
+{
+  "model": "spark-x2.6-1.7b-q8",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 8,
+  "overall_score": 0.625,
+  "n_failures": 3,
+  "failures": [
+    {
+      "id": "lh-buried-policy-total",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-distance",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-count",
+      "score": 0.0,
+      "response_head": ""
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "latency_ms": 159937.1,
+      "prompt_tokens": 100652,
+      "response": "$145,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "latency_ms": 36210.9,
+      "prompt_tokens": 100659,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "latency_ms": 35876.8,
+      "prompt_tokens": 100662,
+      "response": "",
+      "fields_present": [],
+      "score": 0.0
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1_response": "$80,000",
+      "turn1_prompt_tokens": 100642,
+      "turn1_answer_present": true,
+      "latency_ms": 4384.5,
+      "prompt_tokens": 100680,
+      "response": "92000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "latency_ms": 4092.0,
+      "prompt_tokens": 100656,
+      "response": "$47,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "latency_ms": 35800.5,
+      "prompt_tokens": 100658,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "latency_ms": 4587.0,
+      "prompt_tokens": 100659,
+      "response": "2026-03-04",
+      "score": 1.0
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "latency_ms": 5217.8,
+      "prompt_tokens": 100653,
+      "response": "$145,000",
+      "score": 1.0
+    }
+  ]
+}
