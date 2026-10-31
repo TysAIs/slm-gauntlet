@@ -1,0 +1,58 @@
+{
+  "version": "1.0",
+  "tasks": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "question": "What is the combined budget of Project Orion and Project Vega? Exclude internal transfers. Reply with just the dollar total.",
+      "answer": 145000
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "question": "What is the total budget of all Q3 projects with status delayed? Apply the reporting policy stated at the start of the document. Reply with just the dollar total.",
+      "answer": 164000
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "fields": [
+        "Priya",
+        "delayed"
+      ],
+      "question": "Who leads Project Orion (early in the document) and what is the status of Project Vega (late in the document)? Reply with just the lead name and the status."
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1": "What is the budget of Project Orion? Reply with just the dollar amount.",
+      "turn1_answer": 80000,
+      "turn2": "Add a 15% contingency to that budget and report the new total. Reply with just the dollar total.",
+      "answer": 92000
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "question": "What is the budget of Project Falcon Prime? (There are several similarly named Falcon projects; report only Falcon Prime.) Reply with just the dollar total.",
+      "answer": 47000
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "question": "How many projects in Q3 have status delayed, excluding internal transfers? Apply the reporting policy stated at the start of the document. Reply with just the number.",
+      "answer": 7
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "answer": "2026-03-04",
+      "question": "On what date was Project Willow approved? Report the date in the format required by the reporting policy stated at the start of the document. Reply with just the date."
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "question": "What is the current budget of Project Harbor? (A later amended entry supersedes the earlier one.) Reply with just the dollar total.",
+      "answer": 145000
+    }
+  ]
+}

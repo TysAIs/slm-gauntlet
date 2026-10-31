@@ -1,0 +1,40 @@
+[
+ {
+  "model": "qwen35-9b-q4km",
+  "display_name": "Qwen3.5-9B",
+  "sub": "Q4_K_M \u00b7 FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Feb\u2013Mar 2026",
+  "overall_pct": 86.7,
+  "suites": {
+   "adversarial": 0.75,
+   "agent_chains": 1.0,
+   "coding": 1.0,
+   "instruction": 0.571,
+   "structured": 0.9,
+   "tooluse": 0.895,
+   "retrieval": 0.875
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "error": 1
+  },
+  "details": {
+   "release_date": "Feb\u2013Mar 2026",
+   "gguf_file": "Qwen3.5-9B-Q4_K_M.gguf",
+   "gguf_size_bytes": 5680522464,
+   "quant": "Q4_K_M",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_used_mb": 6527,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "on-GPU \u226412B"
+  }
+ }
+]

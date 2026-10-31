@@ -28,9 +28,10 @@ SUITE_WEIGHTS = {
 }
 
 
-def load_tasks(suites: list[str] | None = None) -> list[Task]:
+def load_tasks(suites: list[str] | None = None, tasks_dir: Path | None = None) -> list[Task]:
     tasks: list[Task] = []
-    for path in sorted(TASKS_DIR.glob("*.yaml")):
+    tasks_dir = Path(tasks_dir) if tasks_dir else TASKS_DIR
+    for path in sorted(tasks_dir.glob("*.yaml")):
         data = yaml.safe_load(path.read_text())
         for raw in data:
             t = Task(**raw)
@@ -41,7 +42,8 @@ def load_tasks(suites: list[str] | None = None) -> list[Task]:
 
 def cmd_run(args: argparse.Namespace) -> int:
     suites = args.suite.split(",") if args.suite != "all" else None
-    tasks = load_tasks(suites)
+    tasks_dir = Path(args.tasks_dir) if getattr(args, "tasks_dir", None) else TASKS_DIR
+    tasks = load_tasks(suites, tasks_dir)
     if args.repeats > 1:
         # pass^k reliability mode: every task runs k times, pass^k = all-reps rate
         for t in tasks:
@@ -50,7 +52,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     # generated (contamination-resistant) tasks for retrieval
     from gauntlet.taskgen.needle_haystack import make_needle_task, make_refusal_task
 
-    retrieval_wanted = suites is None or "retrieval" in suites
+    retrieval_wanted = (suites is None or "retrieval" in suites) and tasks_dir == TASKS_DIR
     if retrieval_wanted:
         gen: list[Task] = []
         for i, ctx in enumerate((4000, 8000, 16000, 32000)):
@@ -111,6 +113,7 @@ def main(argv: list[str] | None = None) -> int:
     run_p.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL, e.g. http://host:8080/v1")
     run_p.add_argument("--model", required=True)
     run_p.add_argument("--suite", default="all", help="comma-separated suites or 'all'")
+    run_p.add_argument("--tasks-dir", default=None, help="task YAML directory (default: tasks/); extra suites MUST live outside tasks/ so --suite all never mixes them in")
     run_p.add_argument(
         "--concurrency", type=int, default=2,
         help="parallel tasks; keep low (1-2) for 8GB GPU endpoints",

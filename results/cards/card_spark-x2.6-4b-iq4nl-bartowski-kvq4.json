@@ -1,0 +1,40 @@
+[
+ {
+  "model": "spark-x2.6-4b-iq4nl-bartowski-kvq4",
+  "display_name": "Spark-X2.6 4B",
+  "sub": "IQ4_NL bartowski \u00b7 KV q4_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
+  "overall_pct": 87.1,
+  "suites": {
+   "tooluse": 0.895,
+   "adversarial": 0.875,
+   "agent_chains": 1.0,
+   "structured": 1.0,
+   "retrieval": 0.875,
+   "coding": 0.833,
+   "instruction": 0.5
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261030",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 2026",
+   "gguf_file": "Spark-X2.6-4B-IQ4_NL.gguf",
+   "gguf_size_bytes": 2621104768,
+   "quant": "IQ4_NL",
+   "kv_type": "q4_0",
+   "context_tokens": 32768,
+   "vram_used_mb": 3297,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "0.8.0-dev (new primary)",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {
+   "error": 1
+  }
+ }
+]

@@ -1,0 +1,41 @@
+[
+ {
+  "model": "lfm3-1.7b-q5km",
+  "display_name": "LFM3 1.7B",
+  "sub": "Q5_K_M \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
+  "overall_pct": 84.6,
+  "suites": {
+   "tooluse": 0.842,
+   "adversarial": 0.625,
+   "agent_chains": 1.0,
+   "structured": 0.9,
+   "retrieval": 0.875,
+   "coding": 1.0,
+   "instruction": 0.643
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 24 2026",
+   "gguf_file": "LFM3-1.7B-Q5_K_M.gguf",
+   "gguf_size_bytes": 1258663200,
+   "quant": "Q5_K_M",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_used_mb": 1823,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "0.8.0-dev (new primary)",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {
+   "looped": 1,
+   "error": 1
+  }
+ }
+]

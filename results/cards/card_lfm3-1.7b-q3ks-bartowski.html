@@ -1,0 +1,45 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
+  background:#0d1117; font-family:'SF Pro Display','Segoe UI',sans-serif; }
+.card { width:1080px; height:1080px; background:linear-gradient(145deg,#161b22,#1a2230);
+  border:1px solid #30363d; border-radius:22px; padding:40px 44px; color:#e6edf3;
+  position:relative; overflow:hidden; display:flex; flex-direction:column; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,#f5c518,#ff6b6b,#57a8ff); }
+.hrow { display:flex; justify-content:space-between; align-items:center; }
+.model-name { font-size:54px; font-weight:800; letter-spacing:-1px; line-height:1.05; }
+.model-quant { font-size:26px; color:#8b949e; margin-top:5px; }
+.rank { text-align:center; display:flex; align-items:center; gap:22px; }
+.rank-num { font-size:32px; color:#8b949e; font-weight:800; }
+.rank-letter { font-size:88px; font-weight:900; line-height:0.9; }
+.rank-label { font-size:17px; font-weight:800; letter-spacing:2.5px; }
+.scoreband { display:flex; align-items:center; gap:26px; margin:12px 0 10px; }
+.overall-pct { font-size:98px; font-weight:900; line-height:0.95; }
+.overall-sub { font-size:18px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
+.suites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:12px 0 10px; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:8px 10px; text-align:center; }
+.suite-name { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.suite-val { font-size:40px; font-weight:800; margin-top:5px; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:7px 10px; }
+.stat-k { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.stat-v { font-size:31px; font-weight:800; margin-top:3px; }
+.stat-v small { font-size:17px; color:#8b949e; font-weight:600; }
+.verdict { font-size:22px; line-height:1.45; color:#c9d1d9; border-left:4px solid #f5c518;
+  padding-left:18px; margin:12px 0 10px; }
+.details-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 2px; }
+.detail { background:#0d1117; border:1px solid #30363d; border-radius:10px; padding:6px 10px; }
+.detail-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.detail-v { font-size:20px; font-weight:700; margin-top:2px; word-break:break-all; }
+.failmodes { font-size:18px; color:#c9d1d9; margin:8px 0 2px; }
+.failmodes b { color:#e3b341; }
+.foot { margin-top:auto; font-size:15px; color:#8b949e; display:flex; justify-content:space-between; gap:20px;
+  border-top:1px solid #21262d; padding-top:12px; }
+.foot span { white-space:nowrap; }
+.verdict-sm { font-size:18px; line-height:1.34; }
+.verdict-xs { font-size:16px; line-height:1.3; }
+@media (max-height:1080px){ .stat{padding:10px 12px} }
+.bar { height:7px; border-radius:4px; background:#21262d; margin-top:7px; overflow:hidden; }
+.bar>i { display:block; height:100%; border-radius:4px; }
+</style></head><body><div class=card><div class=hrow> <div><div class=model-name>LFM3 1.7B</div><div class=model-quant>Q3_K_S bartowski · KV f16 · 32K · GTX 1070 Ti · Oct 2026 · NEW BUILD 0.8.0-dev</div></div><div class=rank><span class=rank-num>#</span><div><div class=rank-letter style="color:#57a8ff">B</div><div class=rank-label style="color:#57a8ff">CAPABLE GAPS</div></div></div></div><div class=scoreband><div><span class=overall-pct style="color:#57a8ff">84.2%</span><div class=overall-sub>GAUNTLET SCORE · 71 TESTS · 7 SUITES</div></div></div><div class=suites><div class=suite><div class=suite-name>tooluse</div><div class=suite-val style="color:#f5c518">90%</div><div class=bar><i style="width:90%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>adversarial</div><div class=suite-val style="color:#f5c518">88%</div><div class=bar><i style="width:88%;background:#f5c518"></i></div></div><div class=suite><div class=suite-name>agent chains</div><div class=suite-val style="color:#7bd88f">100%</div><div class=bar><i style="width:100%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>structured</div><div class=suite-val style="color:#7bd88f">90%</div><div class=bar><i style="width:90%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>retrieval</div><div class=suite-val style="color:#e3b341">62%</div><div class=bar><i style="width:62%;background:#e3b341"></i></div></div><div class=suite><div class=suite-name>coding</div><div class=suite-val style="color:#7bd88f">100%</div><div class=bar><i style="width:100%;background:#7bd88f"></i></div></div><div class=suite><div class=suite-name>instruction</div><div class=suite-val style="color:#e3b341">57%</div><div class=bar><i style="width:57%;background:#e3b341"></i></div></div></div><div class=stats><div class=stat><div class=stat-k>Speed 1→8 streams</div><div class=stat-v>39<small> → </small>89<small> tok/s</small></div></div><div class=stat><div class=stat-k>TTFT</div><div class=stat-v>1.8<small> s</small></div></div></div><div class=details-grid><div class=detail><div class=detail-k>Release</div><div class=detail-v>Oct 24 2026</div></div><div class=detail><div class=detail-k>Quant</div><div class=detail-v>Q3_K_S</div></div><div class=detail><div class=detail-k>KV cache</div><div class=detail-v>FP16</div></div><div class=detail><div class=detail-k>Context</div><div class=detail-v>32,768 tok</div></div><div class=detail><div class=detail-k>VRAM used</div><div class=detail-v>1,397 / 8,192 MiB</div></div><div class=detail><div class=detail-k>KV pool</div><div class=detail-v>32,768 tok</div></div><div class=detail><div class=detail-k>Max 8K subagents</div><div class=detail-v>4</div></div><div class=detail><div class=detail-k>Server build</div><div class=detail-v>0.8.0-dev (new primary)</div></div><div class=detail><div class=detail-k>Category</div><div class=detail-v>on-GPU ≤12B</div></div></div><div class=failmodes>Failure modes: <b>error 1 · looped 2</b></div><div class=verdict verdict-xs>Scores 84.2% across 71 tasks. Strongest at multi-turn agent chains, bug-fixing; stacked-constraint instruction following is the weak suite. Zero-offload on GTX 1070 Ti 8GB.</div><div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · 71 tasks</span><span>GTX 1070 Ti 8GB · 20261030</span></div></div></body></html>

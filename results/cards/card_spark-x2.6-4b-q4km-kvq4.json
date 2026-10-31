@@ -1,0 +1,40 @@
+[
+ {
+  "model": "spark-x2.6-4b-q4km-kvq4",
+  "display_name": "Spark-X2.6-4B",
+  "sub": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026",
+  "overall_pct": 87.6,
+  "suites": {
+   "tooluse": 0.842,
+   "adversarial": 1.0,
+   "agent_chains": 1.0,
+   "structured": 0.9,
+   "retrieval": 0.875,
+   "coding": 1.0,
+   "instruction": 0.571
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 2026",
+   "gguf_file": "Spark-X2.6-4B-Q4_K_M.gguf",
+   "gguf_size_bytes": 3543441312,
+   "quant": "Q4_K_M",
+   "kv_type": "q4_0",
+   "context_tokens": 32768,
+   "vram_used_mb": 3527,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {
+   "error": 1
+  }
+ }
+]
