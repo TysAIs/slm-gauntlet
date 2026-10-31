@@ -1,0 +1,42 @@
+[
+ {
+  "model": "spark-x2.6-1.7b-q8_0",
+  "display_name": "Spark-X2.6-1.7B",
+  "sub": "Q8_0 \u00b7 FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026",
+  "overall_pct": 82.3,
+  "suites": {
+   "adversarial": 0.875,
+   "agent_chains": 0.833,
+   "coding": 0.667,
+   "instruction": 0.571,
+   "structured": 1.0,
+   "tooluse": 0.825,
+   "retrieval": 0.875
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "max_turns": 1,
+   "looped": 1,
+   "error": 1
+  },
+  "details": {
+   "release_date": "Oct 2026",
+   "gguf_file": "Spark-X2.6-1.7B-Q8_0.gguf",
+   "gguf_size_bytes": 1820113440,
+   "quant": "Q8_0",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_used_mb": 2575,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "on-GPU \u226412B"
+  }
+ }
+]
