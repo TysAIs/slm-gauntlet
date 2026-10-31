@@ -1,0 +1,120 @@
+{
+  "model": "lfm25-1.2b-q8",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 8,
+  "overall_score": 0.0,
+  "n_failures": 8,
+  "failures": [
+    {
+      "id": "lh-multihop-sum",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-distance",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-multiturn-state",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-distractor",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-count",
+      "score": 0.0,
+      "response_head": "The entries for all entries. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was "
+    },
+    {
+      "id": "lh-date-policy",
+      "score": 0.0,
+      "response_head": "The entries for all entries. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was "
+    },
+    {
+      "id": "lh-amendment",
+      "score": 0.0,
+      "response_head": ""
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "latency_ms": 110846.2,
+      "prompt_tokens": 100704,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "latency_ms": 1253.6,
+      "prompt_tokens": 100713,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "latency_ms": 1202.3,
+      "prompt_tokens": 100714,
+      "response": "",
+      "fields_present": [],
+      "score": 0.0
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1_response": "",
+      "turn1_prompt_tokens": 100695,
+      "turn1_answer_present": false,
+      "latency_ms": 255.4,
+      "prompt_tokens": 100729,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "latency_ms": 1228.3,
+      "prompt_tokens": 100710,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "latency_ms": 23440.9,
+      "prompt_tokens": 100712,
+      "response": "The entries for all entries. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewe",
+      "score": 0.0
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "latency_ms": 23424.4,
+      "prompt_tokens": 100714,
+      "response": "The entries for all entries. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewe",
+      "score": 0.0
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "latency_ms": 1259.5,
+      "prompt_tokens": 100707,
+      "response": "",
+      "score": 0.0
+    }
+  ]
+}

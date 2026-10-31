@@ -1,0 +1,117 @@
+{
+  "model": "lfm25-8b-a1b-udq4",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 8,
+  "overall_score": 0.1875,
+  "n_failures": 7,
+  "failures": [
+    {
+      "id": "lh-multihop-sum",
+      "score": 0.0,
+      "response_head": "\nInsufficient information to calculate the combined budget."
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-distance",
+      "score": 0.5,
+      "response_head": "\nMona, delayed; Sam, delayed"
+    },
+    {
+      "id": "lh-multiturn-state",
+      "score": 0.0,
+      "response_head": "\nI don't know."
+    },
+    {
+      "id": "lh-distractor",
+      "score": 0.0,
+      "response_head": ""
+    },
+    {
+      "id": "lh-count",
+      "score": 0.0,
+      "response_head": "\n\\boxed{9}"
+    },
+    {
+      "id": "lh-date-policy",
+      "score": 0.0,
+      "response_head": ""
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "latency_ms": 138020.7,
+      "prompt_tokens": 98075,
+      "response": "\nInsufficient information to calculate the combined budget.",
+      "score": 0.0
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "latency_ms": 61982.6,
+      "prompt_tokens": 98085,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "latency_ms": 6596.4,
+      "prompt_tokens": 98086,
+      "response": "\nMona, delayed; Sam, delayed",
+      "fields_present": [
+        "delayed"
+      ],
+      "score": 0.5
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1_response": "\nNOT FOUND",
+      "turn1_prompt_tokens": 98067,
+      "turn1_answer_present": false,
+      "latency_ms": 3086.3,
+      "prompt_tokens": 98104,
+      "response": "\nI don't know.",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "latency_ms": 62214.9,
+      "prompt_tokens": 98082,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "latency_ms": 33095.5,
+      "prompt_tokens": 98084,
+      "response": "\n\\boxed{9}",
+      "score": 0.0
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "latency_ms": 62322.8,
+      "prompt_tokens": 98086,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "latency_ms": 6859.2,
+      "prompt_tokens": 98079,
+      "response": "\n145,000",
+      "score": 1.0
+    }
+  ]
+}
