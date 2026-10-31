@@ -1,0 +1,275 @@
+# Routing suite — SEPARATE from core 71, never in tasks/*.yaml.
+# Run with: gauntlet run --tasks-dir extra-suites/routing --suite routing
+# Model/agent must choose the right tool/endpoint/workflow from a set.
+# Scoring is deterministic (tool_called / tool_not_called / regex / state_path),
+# no LLM judge. Validation: 2 models before any leaderboard use.
+# Failure modes: wrong tool, hallucinated tool, unnecessary tool, missed refusal,
+# cost-blind choice (turn budget), stale-trust.
+- id: route_time_tokyo
+  suite: routing
+  description: Tool selection with distractors — time lookup, not calculator/flights/DB
+  system: You are a helpful assistant. Use the provided tools.
+  prompt: |
+    What time is it right now in Tokyo? Use the time tool and report the timezone you queried.
+  tools: [get_time, calculator, search_flights, database_query]
+  asserts:
+    - type: regex
+      pattern: "Tokyo"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: get_time
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: route_calc_exact
+  suite: routing
+  description: Tool selection — arithmetic must go through the calculator, not mental math
+  system: You must use the calculator tool for arithmetic. Never compute mentally.
+  prompt: What is 1837 * 2946 + 112? Use the calculator tool and report the exact result.
+  tools: [calculator, get_time, search_flights]
+  asserts:
+    - type: regex
+      pattern: "5411914"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: route_lookup_tier
+  suite: routing
+  description: Tool selection — customer record lookup, not DB query or calculator
+  system: You are a helpful assistant. Use the provided tools.
+  prompt: |
+    What tier is customer REC-8821, and what is their full name? Look up the live record.
+  tools: [lookup_record, database_query, calculator]
+  asserts:
+    - type: regex
+      pattern: "gold"
+      weight: 1.0
+      must_pass: true
+    - type: contains_all
+      values: ["Ada Lovelace"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: lookup_record
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: route_flight_search
+  suite: routing
+  description: Tool selection — flight search, not calculator or time
+  system: You are a booking assistant. Use the provided tools.
+  prompt: |
+    Find flights from NYC to LAX on 2026-12-01 and list the flight IDs you found.
+  tools: [search_flights, calculator, get_time]
+  asserts:
+    - type: regex
+      pattern: "FL\\d+"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: search_flights
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: route_write_read
+  suite: routing
+  description: Multi-hop routing — write a file, then read it back to verify
+  system: You are a helpful assistant. Use the provided tools.
+  prompt: |
+    Write the text "launch code: ORANGE-7" to memo.txt, then read memo.txt back and report the launch code you verified.
+  tools: [write_file, read_file, calculator]
+  asserts:
+    - type: regex
+      pattern: "ORANGE-7"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: write_file
+      weight: 1.0
+      must_pass: true
+    - type: tool_called
+      tool: read_file
+      weight: 1.0
+      must_pass: true
+  max_turns: 8
+
+- id: route_budget_calc
+  suite: routing
+  description: Cost/latency tradeoff — turn budget forces the single-call path
+  system: You must use the calculator tool for arithmetic. You have at most 2 tool calls total — do not waste calls.
+  prompt: What is (48 * 37) + (120 / 4)? Use one calculator call with the full expression and report the exact result.
+  tools: [calculator, get_time]
+  asserts:
+    - type: regex
+      pattern: "1806"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: calculator
+      weight: 2.0
+      must_pass: true
+  max_turns: 2
+
+- id: route_refuse_hotel
+  suite: routing
+  description: Refusal when no route fits — hotel booking tool does not exist
+  system: You are a helpful assistant. Use the provided tools. If no provided tool can do what is asked, say so plainly and name the missing capability — never pretend a tool did it.
+  prompt: |
+    Book me a hotel in Paris for tomorrow night, 2 guests, under $200.
+  tools: [search_flights, calculator, database_query]
+  asserts:
+    - type: contains_any
+      values: ["cannot book", "can't book", "no hotel", "don't have a hotel", "unable to book"]
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_not_called
+      tool: search_flights
+      weight: 1.0
+      must_pass: true
+    - type: tool_not_called
+      tool: calculator
+      weight: 1.0
+      must_pass: true
+    - type: tool_not_called
+      tool: database_query
+      weight: 1.0
+      must_pass: true
+  max_turns: 4
+
+- id: route_refuse_email
+  suite: routing
+  description: Refusal when no route fits — email send tool does not exist
+  system: You are a helpful assistant. Use the provided tools. If no provided tool can do what is asked, say so plainly and name the missing capability — never pretend a tool did it.
+  prompt: |
+    Send an email to my manager saying I will be late to the meeting tomorrow.
+  tools: [search_flights, calculator, database_query]
+  asserts:
+    - type: contains_any
+      values: ["cannot send", "can't send", "no email", "don't have an email", "unable to send"]
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_not_called
+      tool: search_flights
+      weight: 1.0
+      must_pass: true
+    - type: tool_not_called
+      tool: calculator
+      weight: 1.0
+      must_pass: true
+    - type: tool_not_called
+      tool: database_query
+      weight: 1.0
+      must_pass: true
+  max_turns: 4
+
+- id: route_reserve_cancel
+  suite: routing
+  description: Multi-hop routing — reserve, then cancel; each hop's output feeds the next
+  system: You are a booking assistant. Use the provided tools.
+  prompt: |
+    Reserve flight FL2214 for passenger Ada Lovelace, passport number P8842199. Then cancel that reservation because plans changed, and tell me the reservation is cancelled and the refund window.
+  tools: [reserve_flight, cancel_reservation, get_reservation, calculator]
+  asserts:
+    - type: regex
+      pattern: "cancelled"
+      weight: 1.0
+      must_pass: true
+    - type: contains_any
+      values: ["5 days", "5-day", "five days"]
+      weight: 1.0
+  state_asserts:
+    - type: tool_called
+      tool: reserve_flight
+      weight: 1.0
+      must_pass: true
+    - type: tool_called
+      tool: cancel_reservation
+      weight: 1.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.status
+      equals: cancelled
+      weight: 2.0
+      must_pass: true
+  max_turns: 8
+
+- id: route_lookup_compute
+  suite: routing
+  description: Multi-hop routing — lookup feeds calculator (years to months)
+  system: You must use the calculator tool for arithmetic. Use the provided tools.
+  prompt: |
+    Customer REC-8821 has been a customer for how many years? Look up the record, then multiply the years by 12 to get months, and report the months.
+  tools: [lookup_record, calculator, get_time]
+  asserts:
+    - type: regex
+      pattern: "144"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: lookup_record
+      weight: 1.0
+      must_pass: true
+    - type: tool_called
+      tool: calculator
+      weight: 1.0
+      must_pass: true
+  max_turns: 8
+
+- id: route_stale_record
+  suite: routing
+  description: Stale-result routing — re-check via the live tool instead of trusting an old result
+  system: You are a helpful assistant. Use the provided tools. Always verify against the live tool when asked — never trust a quoted old result.
+  prompt: |
+    An earlier lookup said customer REC-8821 is silver tier. Verify the live record now and tell me the actual tier.
+  tools: [lookup_record, database_query, calculator]
+  asserts:
+    - type: regex
+      pattern: "gold"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: lookup_record
+      weight: 2.0
+      must_pass: true
+  max_turns: 6
+
+- id: route_append_read
+  suite: routing
+  description: Multi-hop routing — append to a file, then read it back
+  system: You are a helpful assistant. Use the provided tools.
+  prompt: |
+    Append the line "second line: BLUE-9" to notes.txt, then read notes.txt back and report the code on the second line.
+  tools: [append_file, read_file, calculator]
+  asserts:
+    - type: regex
+      pattern: "BLUE-9"
+      weight: 1.0
+      must_pass: true
+  state_asserts:
+    - type: tool_called
+      tool: append_file
+      weight: 1.0
+      must_pass: true
+    - type: tool_called
+      tool: read_file
+      weight: 1.0
+      must_pass: true
+  max_turns: 8

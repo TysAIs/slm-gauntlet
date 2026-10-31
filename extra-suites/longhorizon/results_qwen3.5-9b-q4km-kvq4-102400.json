@@ -1,0 +1,88 @@
+{
+  "model": "qwen3.5-9b-q4km-kvq4-102400",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 8,
+  "overall_score": 0.875,
+  "n_failures": 1,
+  "failures": [
+    {
+      "id": "lh-multihop-sum",
+      "score": 0.0,
+      "response_head": ""
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "latency_ms": 681335.9,
+      "prompt_tokens": 93504,
+      "response": "",
+      "score": 0.0
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "latency_ms": 255728.7,
+      "prompt_tokens": 93514,
+      "response": "$164,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "latency_ms": 208904.5,
+      "prompt_tokens": 93515,
+      "response": "Priya, delayed",
+      "fields_present": [
+        "Priya",
+        "delayed"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1_response": "$80,000",
+      "turn1_prompt_tokens": 93496,
+      "turn1_answer_present": true,
+      "latency_ms": 47376.0,
+      "prompt_tokens": 93536,
+      "response": "$92,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "latency_ms": 55677.0,
+      "prompt_tokens": 93511,
+      "response": "$47,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "latency_ms": 289963.0,
+      "prompt_tokens": 93513,
+      "response": "7",
+      "score": 1.0
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "latency_ms": 199257.3,
+      "prompt_tokens": 93514,
+      "response": "2026-03-04",
+      "score": 1.0
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "latency_ms": 198634.2,
+      "prompt_tokens": 93509,
+      "response": "$145,000",
+      "score": 1.0
+    }
+  ]
+}

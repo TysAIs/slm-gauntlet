@@ -1,0 +1,40 @@
+[
+ {
+  "model": "minicpm-v-4.7-1b-q8-kvq8",
+  "display_name": "MiniCPM-V 4.7 1B",
+  "sub": "Q8_0 \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 text-only",
+  "overall_pct": 67.4,
+  "suites": {
+   "tooluse": 0.684,
+   "adversarial": 0.625,
+   "agent_chains": 1.0,
+   "structured": 0.8,
+   "retrieval": 0.625,
+   "coding": 0.5,
+   "instruction": 0.429
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 12 2026",
+   "gguf_file": "MiniCPM-V-4_7-1B-Q8_0.gguf",
+   "gguf_size_bytes": 1081517920,
+   "quant": "Q8_0",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_used_mb": 1363,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {
+   "error": 1
+  }
+ }
+]

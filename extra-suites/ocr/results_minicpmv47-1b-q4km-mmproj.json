@@ -1,0 +1,131 @@
+{
+  "model": "minicpmv47-1b-q4km-mmproj",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 10,
+  "n_scored": 10,
+  "overall_field_score": 0.95,
+  "n_failures": 0,
+  "failures": [],
+  "rows": [
+    {
+      "id": "ocr-invoice",
+      "type": "extract",
+      "latency_ms": 213.2,
+      "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
+      "fields_present": [
+        "Acme Supplies Ltd",
+        "2026-10-15",
+        "$32.25"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-table",
+      "type": "extract",
+      "latency_ms": 852.1,
+      "response": "Here is the list of each name with their score:\n\n- Alice: 92\n- Bob: 78\n- Carol: 85\n- Dan: 61",
+      "fields_present": [
+        "Alice",
+        "92",
+        "Bob",
+        "78",
+        "Carol",
+        "85",
+        "Dan",
+        "61"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-rot15",
+      "type": "extract",
+      "latency_ms": 1328.1,
+      "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
+      "fields_present": [
+        "Acme Supplies Ltd",
+        "2026-10-15",
+        "$32.25"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-lowcontrast",
+      "type": "extract",
+      "latency_ms": 733.3,
+      "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
+      "fields_present": [
+        "Acme Supplies Ltd",
+        "2026-10-15",
+        "$32.25"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-blur",
+      "type": "refuse",
+      "latency_ms": 623.5,
+      "response": "Image is illegible.",
+      "refused": true,
+      "hallucinated_values": [],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-redacted",
+      "type": "redacted",
+      "latency_ms": 912.9,
+      "response": "Vendor: Acme Supplies Ltd  \nDate: 2026-10-15  \nTotal: $12.50 x 2 + $7.25 x 1 = $25.75",
+      "fields_present": [
+        "Acme Supplies Ltd",
+        "2026-10-15"
+      ],
+      "refused_total": false,
+      "hallucinated_values": [],
+      "score": 0.5
+    },
+    {
+      "id": "ocr-mixed",
+      "type": "extract",
+      "latency_ms": 783.1,
+      "response": "Vendor: Acme Supplies Ltd\nDate: 2026-10-15\nTotal: $32.25",
+      "fields_present": [
+        "Acme Supplies Ltd",
+        "2026-10-15",
+        "$32.25"
+      ],
+      "score": 1.0,
+      "contamination": []
+    },
+    {
+      "id": "ocr-receipt",
+      "type": "extract",
+      "latency_ms": 919.2,
+      "response": "Here is the list of each item price and the total:\n\n- Coffee: $4.50\n- Bagel: $3.25\n- Tax: $0.62\n- Total: $8.37",
+      "fields_present": [
+        "$4.50",
+        "$3.25",
+        "$0.62",
+        "$8.37"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-ui",
+      "type": "extract",
+      "latency_ms": 817.3,
+      "response": "Here is the information from the app window:\n\n- Username: tyler_dev\n- Balance: $1,240.50\n- Status: Active",
+      "fields_present": [
+        "tyler_dev",
+        "$1,240.50",
+        "Active"
+      ],
+      "score": 1.0
+    },
+    {
+      "id": "ocr-twocol",
+      "type": "leftcol",
+      "latency_ms": 596.9,
+      "response": "Project: Falcon",
+      "score": 1.0
+    }
+  ]
+}

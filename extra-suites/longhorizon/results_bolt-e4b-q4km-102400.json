@@ -1,0 +1,84 @@
+{
+  "model": "bolt-e4b-q4km-102400",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 0,
+  "overall_score": null,
+  "n_failures": 8,
+  "failures": [
+    {
+      "id": "lh-multihop-sum",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-distance",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-multiturn-state",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-distractor",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-count",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-date-policy",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-amendment",
+      "error": "HTTP Error 400: Bad Request"
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "error": "HTTP Error 400: Bad Request"
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "error": "HTTP Error 400: Bad Request"
+    }
+  ]
+}

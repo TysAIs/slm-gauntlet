@@ -1,0 +1,43 @@
+[
+ {
+  "model": "lfm25-24b-a2b-udq4xl",
+  "display_name": "LFM2.5-24B-A2B",
+  "sub": "UD-Q4_K_XL \u00b7 FP16 \u00b7 8K offload \u00b7 GTX 1070 Ti \u00b7 Oct 2026",
+  "overall_pct": 59.2,
+  "suites": {
+   "adversarial": 0.125,
+   "agent_chains": 1.0,
+   "coding": 1.0,
+   "instruction": 0.214,
+   "structured": 0.7,
+   "tooluse": 0.842,
+   "retrieval": 0.0
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "empty_response": 21,
+   "max_turns": 1,
+   "looped": 1,
+   "error": 5
+  },
+  "details": {
+   "release_date": "Oct 2026",
+   "gguf_file": "LFM2.5-24B-A2B-UD-Q4_K_XL.gguf",
+   "gguf_size_bytes": 14876901632,
+   "quant": "UD-Q4_K_XL",
+   "kv_type": "FP16",
+   "context_tokens": 8192,
+   "vram_used_mb": 1293,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 8192,
+   "max_subagents": 1,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "offload"
+  }
+ }
+]

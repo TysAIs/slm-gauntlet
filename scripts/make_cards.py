@@ -77,16 +77,22 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 .overall-pct { font-size:98px; font-weight:900; line-height:0.95; }
 .overall-sub { font-size:18px; color:#8b949e; letter-spacing:2px; font-weight:600; margin-top:6px; }
 .suites { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:12px 0 10px; }
-.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:10px 10px; text-align:center; }
+.suite { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:8px 10px; text-align:center; }
 .suite-name { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
 .suite-val { font-size:40px; font-weight:800; margin-top:5px; }
 .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
-.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:9px 12px; }
+.stat { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:7px 10px; }
 .stat-k { font-size:16px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
 .stat-v { font-size:31px; font-weight:800; margin-top:3px; }
 .stat-v small { font-size:17px; color:#8b949e; font-weight:600; }
 .verdict { font-size:22px; line-height:1.45; color:#c9d1d9; border-left:4px solid #f5c518;
-  padding-left:18px; margin:16px 0 12px; }
+  padding-left:18px; margin:12px 0 10px; }
+.details-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0 2px; }
+.detail { background:#0d1117; border:1px solid #30363d; border-radius:10px; padding:6px 10px; }
+.detail-k { font-size:14px; color:#8b949e; text-transform:uppercase; letter-spacing:1.2px; }
+.detail-v { font-size:20px; font-weight:700; margin-top:2px; word-break:break-all; }
+.failmodes { font-size:18px; color:#c9d1d9; margin:8px 0 2px; }
+.failmodes b { color:#e3b341; }
 .foot { margin-top:auto; font-size:15px; color:#8b949e; display:flex; justify-content:space-between; gap:20px;
   border-top:1px solid #21262d; padding-top:12px; }
 .foot span { white-space:nowrap; }
@@ -187,6 +193,41 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         vcls = "verdict verdict-sm"
     else:
         vcls = "verdict verdict-xs"
+    d = m.get("details", {}) or {}
+    def _gb(nbytes):
+        return f"{nbytes/1e9:.2f} GB" if nbytes else "—"
+    def _cell(k, v):
+        return f'<div class=detail><div class=detail-k>{k}</div><div class=detail-v>{v}</div></div>'
+    dcells = []
+    if d.get("release_date"):
+        dcells.append(_cell("Release", d["release_date"]))
+    if d.get("gguf_file"):
+        dcells.append(_cell("GGUF", d["gguf_file"] + f' ({_gb(d.get("gguf_size_bytes"))})'))
+    if d.get("quant"):
+        dcells.append(_cell("Quant", d["quant"]))
+    if d.get("kv_type"):
+        dcells.append(_cell("KV cache", d["kv_type"]))
+    if d.get("context_tokens"):
+        dcells.append(_cell("Context", f'{d["context_tokens"]:,} tok'))
+    if d.get("vram_used_mb"):
+        dcells.append(_cell("VRAM used", f'{d["vram_used_mb"]:,} / {d.get("vram_total_mb", 8192):,} MiB'))
+    else:
+        dcells.append(_cell("VRAM used", "not recorded"))
+    if d.get("kv_pool_tokens"):
+        dcells.append(_cell("KV pool", f'{d["kv_pool_tokens"]:,} tok'))
+    if d.get("max_subagents") is not None:
+        dcells.append(_cell("Max 8K subagents", str(d["max_subagents"])))
+    if d.get("server_build"):
+        dcells.append(_cell("Server build", d["server_build"]))
+    if d.get("category"):
+        dcells.append(_cell("Category", d["category"]))
+    details_html = f'<div class=details-grid>{"".join(dcells)}</div>' if dcells else ""
+    fm = m.get("failure_modes", {}) or {}
+    if fm:
+        fm_txt = " · ".join(f"{k} {v}" for k, v in sorted(fm.items()))
+        failmodes_html = f'<div class=failmodes>Failure modes: <b>{fm_txt}</b></div>'
+    else:
+        failmodes_html = '<div class=failmodes>Failure modes: none</div>'
     n = m.get("n", 61)
     rank_num = m.get("rank", "")
     rank_html = (
@@ -207,6 +248,8 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'</div>'
         f'<div class=suites>{suite_html}</div>'
         f'<div class=stats>{stats_html}</div>'
+        f'{details_html}'
+        f'{failmodes_html}'
         f'<div class={vcls}>{verdict}</div>'
         f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · 71 tasks</span>'
         f'<span>{dev_name}{(" " + dev_mem) if dev_mem else ""} · {str(m.get("ts",""))[:8]}</span></div>'

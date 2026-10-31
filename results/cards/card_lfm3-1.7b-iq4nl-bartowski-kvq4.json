@@ -1,0 +1,41 @@
+[
+ {
+  "model": "lfm3-1.7b-iq4nl-bartowski-kvq4",
+  "display_name": "LFM3 1.7B",
+  "sub": "IQ4_NL bartowski \u00b7 KV q4_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
+  "overall_pct": 82.1,
+  "suites": {
+   "tooluse": 0.789,
+   "adversarial": 0.75,
+   "agent_chains": 1.0,
+   "structured": 0.9,
+   "retrieval": 0.875,
+   "coding": 1.0,
+   "instruction": 0.429
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261030",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 24 2026",
+   "gguf_file": null,
+   "gguf_size_bytes": null,
+   "quant": "IQ4_NL",
+   "kv_type": "q4_0",
+   "context_tokens": 32768,
+   "vram_used_mb": 1421,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "0.8.0-dev (new primary)",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {
+   "looped": 2,
+   "error": 1
+  }
+ }
+]

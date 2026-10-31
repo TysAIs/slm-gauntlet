@@ -1,0 +1,117 @@
+{
+  "model": "minicpmv47-1b-iq4xs-102400",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "n_tasks": 8,
+  "n_scored": 8,
+  "overall_score": 0.1875,
+  "n_failures": 7,
+  "failures": [
+    {
+      "id": "lh-multihop-sum",
+      "score": 0.0,
+      "response_head": "$88,000"
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "score": 0.0,
+      "response_head": "$110,000"
+    },
+    {
+      "id": "lh-distance",
+      "score": 0.5,
+      "response_head": "Priya; complete"
+    },
+    {
+      "id": "lh-multiturn-state",
+      "score": 0.0,
+      "response_head": "$87,000"
+    },
+    {
+      "id": "lh-count",
+      "score": 0.0,
+      "response_head": "4"
+    },
+    {
+      "id": "lh-date-policy",
+      "score": 0.0,
+      "response_head": "March 4, 2026"
+    },
+    {
+      "id": "lh-amendment",
+      "score": 0.0,
+      "response_head": "$120,000"
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh-multihop-sum",
+      "type": "numeric",
+      "latency_ms": 91698.6,
+      "prompt_tokens": 93506,
+      "response": "$88,000",
+      "score": 0.0
+    },
+    {
+      "id": "lh-buried-policy-total",
+      "type": "numeric",
+      "latency_ms": 1337.7,
+      "prompt_tokens": 93516,
+      "response": "$110,000",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distance",
+      "type": "fields",
+      "latency_ms": 1247.8,
+      "prompt_tokens": 93517,
+      "response": "Priya; complete",
+      "fields_present": [
+        "Priya"
+      ],
+      "score": 0.5
+    },
+    {
+      "id": "lh-multiturn-state",
+      "type": "multiturn",
+      "turn1_response": "$80,000",
+      "turn1_prompt_tokens": 93498,
+      "turn1_answer_present": true,
+      "latency_ms": 434.2,
+      "prompt_tokens": 93542,
+      "response": "$87,000",
+      "score": 0.0
+    },
+    {
+      "id": "lh-distractor",
+      "type": "numeric",
+      "latency_ms": 1234.2,
+      "prompt_tokens": 93513,
+      "response": "$47,000",
+      "score": 1.0
+    },
+    {
+      "id": "lh-count",
+      "type": "numeric",
+      "latency_ms": 1173.9,
+      "prompt_tokens": 93515,
+      "response": "4",
+      "score": 0.0
+    },
+    {
+      "id": "lh-date-policy",
+      "type": "exact",
+      "latency_ms": 1273.2,
+      "prompt_tokens": 93516,
+      "response": "March 4, 2026",
+      "score": 0.0
+    },
+    {
+      "id": "lh-amendment",
+      "type": "numeric",
+      "latency_ms": 1264.3,
+      "prompt_tokens": 93511,
+      "response": "$120,000",
+      "score": 0.0
+    }
+  ]
+}

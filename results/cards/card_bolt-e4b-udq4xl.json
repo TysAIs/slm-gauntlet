@@ -1,0 +1,38 @@
+[
+ {
+  "model": "bolt-e4b-udq4xl",
+  "display_name": "Nemotron 3.5 Bolt E4B",
+  "sub": "UD-Q4_K_XL \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026",
+  "overall_pct": 87.9,
+  "suites": {
+   "tooluse": 0.947,
+   "adversarial": 0.75,
+   "agent_chains": 1.0,
+   "structured": 1.0,
+   "retrieval": 0.75,
+   "coding": 1.0,
+   "instruction": 0.571
+  },
+  "n": 71,
+  "rank": "",
+  "ts": "20261028",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "details": {
+   "release_date": "Oct 23 2026",
+   "gguf_file": null,
+   "gguf_size_bytes": null,
+   "quant": "UD-Q4_K_XL",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_used_mb": null,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "Sep 11 \u00b7 0.4.0-dev",
+   "category": "on-GPU \u226412B"
+  },
+  "failure_modes": {}
+ }
+]
