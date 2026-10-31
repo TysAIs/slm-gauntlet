@@ -12,17 +12,19 @@ ROOT = Path("results")
 CARDS = ROOT / "cards"
 
 FAM_ORDER = ["spark-x2.6-4b", "spark-x2.6-1.7b", "bolt-e4b", "lfm3-1.7b",
-             "minicpmv47-1b", "minicpm-v-4.7-1b", "dory-4b", "dory-1.0-4b",
+             "minicpm", "dory-4b", "dory-1.0-4b",
              "qwen35-9b", "lfm25-8b-a1b", "lfm25-1.2b", "lfm25-24b-a2b"]
 FAM_LABEL = {"spark-x2.6-4b": "Spark-X2.6-4B", "spark-x2.6-1.7b": "Spark-X2.6-1.7B",
              "bolt-e4b": "Bolt E4B", "lfm3-1.7b": "LFM3-1.7B",
-             "minicpmv47-1b": "MiniCPM-V 4.7 1B", "minicpm-v-4.7-1b": "MiniCPM-V 4.7 1B",
+             "minicpm": "MiniCPM-V 4.7 1B",
              "dory-4b": "Dory 1.0 4B", "dory-1.0-4b": "Dory 1.0 4B",
              "qwen35-9b": "Qwen3.5-9B", "lfm25-8b-a1b": "LFM2.5-8B-A1B",
              "lfm25-1.2b": "LFM2.5-1.2B", "lfm25-24b-a2b": "LFM2.5-24B-A2B (offload)"}
 
 
 def fam_of(mid):
+    if mid.startswith("minicpm"):
+        return "minicpm"
     for p in FAM_ORDER:
         if mid.startswith(p):
             return p
