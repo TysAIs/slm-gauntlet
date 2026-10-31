@@ -311,7 +311,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 | d1-omni-600M | Q8_0 | 96.15% | 100% | 58.33% / 0.512 | 0.054 / 0.0318 | 39 / 51 ms | 8.33% | 1/26 |
 | Laya 421M | Q8_0 | 88.46% | 100% | 50.00% / 0.682 | 0.112 / 0.1473 | 47 / 58 ms | 14.58% | 1/26 |
 
-Notes: Clef-flash Q8_0 does-not-fit on-GPU (9.4 GB weights > 8 GB VRAM). d1-omni-600M, d1-Omni-2B, and Laya have NO Q4 GGUF (Q8_0 used). Clef vendor inference code defaults max_length 16,384 with silent trimming — benchmarks must pass max_length explicitly. Unverified candidates (not scored): Julia-1, Kev-4B, lev, Strands Decider, Sieve family, s1-llm-auto-router.
+Notes: Clef-flash Q8_0 does-not-fit on-GPU (9.4 GB weights > 8 GB VRAM). d1-omni-600M, d1-Omni-2B, and Laya have NO Q4 GGUF (Q8_0 used). Clef vendor inference code defaults max_length 16,384 with silent trimming — benchmarks must pass max_length explicitly. Candidate identification, Oct 31: Julia-1 (SupersonicLabs/Julia-1, Sep 23 2026; GGUF Oct 1), Kev-4B (jaredpalmer/kev-4b, Sep 19 2026; GGUF Oct 1), Strands Decider (StrandsAgents, Oct 2026 variants), s1-llm-auto-router (system1models Oct 2 / decisionmodels Oct 15 2026), Sieve family (sthanika-ai, Oct 2026) all EXIST on HF, but their type (classifier vs generative), weights/format for decision serving, size, and PVE fit are NOT verified and they are NOT benched — do not assume them. 'lev' remains ambiguous (no confident classifier match).
 
 ## Routing suite (SEPARATE — 12 tasks, validated on 2 models)
 
@@ -341,10 +341,13 @@ Shared 71,438-word ledger; buried policies (exclude [INTERNAL] transfers; ISO da
 | LFM3-1.7B IQ4_NL FP16 | 102400 / FP16 | 2,571 MiB | ~98.1K | 0.75 (6/8) | Failures are wrong values ($149K vs $164K; count 3 vs 7) |
 | Spark-X2.6-4B IQ3_M FP16 | 102400 / FP16 | 6,519 MiB (spare 1,673) | ~100.6K | 0.50 (4/8) | Aggregation tasks empty (full reasoning, no answer); run-to-run unstable |
 | MiniCPM-V 4.7 1B IQ4_XS FP16 | 102400 / FP16 | 2,103 MiB | ~93.5K | 0.1875 (1.5/8) | Near-total collapse; date policy violated; amendment took original budget |
-| Dory 1.0 4B Q5_K_M q4_0 | 102400 / q4_0 | 6,909 MiB (spare 1,283) | 103.3K | does-not-fit | Tokenizer needs 103,328+ tokens > 102400 cap (clean 400s, server healthy) |
-| Bolt E4B Q4_K_M | 102400 req. / FP16 | 5,153 MiB | 93,154 | does-not-fit | Model context capped at 65,536 (training); prompt exceeds cap |
+| Dory 1.0 4B Q5_K_M q4_0 | 102400 / q4_0 | 6,909 MiB (spare 1,283) | 103.3K | does-not-fit | Tokenizer needs 103,328+ tokens > 102400 cap (clean 400s, server healthy). q8_0 KV also fails at 102400 (KV alloc OOM): Dory does-not-fit at 100K+ for both KVs |
+| Bolt E4B Q4_K_M | 102400 req. / FP16 | 5,153 MiB | 93,154 | does-not-fit | Model context capped at 65,536 (training); prompt exceeds cap. Model-level cap (all Bolt quants share the architecture/config): Bolt does-not-fit at 100K+ as a model, not just Q4_K_M |
+| Spark-X2.6-1.7B Q8_0 FP16 | 102400 / FP16 | 3,599 MiB (spare 4,593) | ~100.7K | 0.625 (5/8) | Pass multihop, multiturn, distractor, date, amendment. Fail (all EMPTY, fast ~36s): buried-total, distance, count. Beats Spark 4B best (0.50) at 100K |
+| LFM2.5-8B-A1B UD-Q4_K_M FP16 | 102400 / FP16 | 6,549 MiB (spare 1,643) | ~98.1K | 0.1875 (1.5/8) | Pass amendment; distance partial 0.5. Fail: multihop refusal after 138s reasoning; buried/distractor/date EMPTY (~62s); multiturn 'I don't know'; count boxed 9 (truth 7). Genuine reasoning failures, not the 8B 71-task format artifact (LH reads content directly) |
+| LFM2.5-1.2B Q8_0 FP16 | 102400 / FP16 | 2,673 MiB (spare 5,519) | ~100.7K | 0.0 (0/8) | Complete collapse, worst in the set: 6/8 EMPTY (fast); multihop EMPTY after 110.8s; count + date-policy echoed ledger boilerplate instead of answering |
 
-Finding: 32K rank does NOT predict 100K rank. Remaining fitting variants are scored variant-by-variant after this leaderboard (fit test: 102400 serve + spare ≥1 GiB + tokenizer prompt ≤ cap + model context cap ≥ prompt).
+Finding: 32K rank does NOT predict 100K rank. Best-per-model LH coverage is now complete (Qwen, LFM3, Spark 4B, Spark 1.7B, MiniCPM, LFM2.5-8B, LFM2.5-1.2B scored; Dory + Bolt does-not-fit with distinct reasons). Remaining per-variant LH rows (every other fitting quant/KV) are a documented continuation queue, not silently dropped (fit test: 102400 serve + spare ≥1 GiB + tokenizer prompt ≤ cap + model context cap ≥ prompt).
 
 ## 71-task audit (Oct 28, 2026)
 
