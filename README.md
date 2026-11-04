@@ -1,32 +1,60 @@
 # SLM Gauntlet
 
-A benchmark for **small language models** (sub-12B class) that runs on whatever device you have — NVIDIA, AMD, or Apple Silicon. The card generator auto-detects your GPU and its memory, so every model card shows **your** hardware, not ours. that measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
+A benchmark for **small language models** (sub-12B class) that runs on whatever device you have — NVIDIA, AMD, or Apple Silicon. The card generator auto-detects your GPU and its memory, so every model card shows **your** hardware, not ours. It measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
 
-**Current leaderboard — v0.3.1 gauntlet (GTX 1070 Ti 8GB, all layers on-GPU, zero CPU offload, 71 tasks):**
+<!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->
 
-| Rank | Model | Quant | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | Gemma 4 · E4B | Q4_K_M | **87.9%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% |
-| 🥈 | MiniCPM-V 5 · 2B | Q8_0 | **87.7%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% |
-| 🥉 | Ternary Bonsai-2 · 27B | PTQ1_0 | **86.2%** | 95% | 100% | 100% | 100% | 38% | 83% | 88% |
-| 4 | MiniCPM-V 5 · 2B | Q4_K_M | **85.6%** | 95% | 88% | 83% | 100% | 100% | 83% | 50% |
-| 5 | Ornith 1.5 · 9B | Q4_K_M | **75.7%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% |
-| 6 | MiMo V2.6 · 9B | Q4_K_M | **75.3%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% |
-| 7 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% |
-| 8 | LFM 2.5 · 2.6B | Q8_0 | **69.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% |
-| 9 | LFM 2.5 · 2.6B | Q4_K_M | **69.6%** | 74% | 50% | 83% | 80% | 50% | 100% | 50% |
-| 10 | Qwen 3.5 · 4B | Q4_K_M | **68.2%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% |
-| 11 | Gemma 4 · 12B | IQ3_XXS | **68.0%** | 74% | 62% | 67% | 80% | 50% | 100% | 43% |
-| 12 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.4%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% |
-| 13 | Gemma 3n · E4B | Q4_K_M | **56.3%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% |
+**Current leaderboard — 71 tasks, scorer v0.3.1, PVE GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
 
-Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · trading cards in [`results/cards/`](results/cards/).
+One row per model: the **best-scoring configuration** of that model in the corpus (231 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
-**v0.3 takeaways:**
-- **Gemma 4 E4B (Q4_K_M)** edges the win (87.9%) — the PaT arch punches above its size, but only by 0.2pp over MiniCPM Q8.
-- **MiniCPM5-2B Q8_0** is statistically tied at #2 (87.7%) at DOUBLE the speed (26 vs 14 tok/s) — the practical daily-driver pick.
-- **Bonsai-2 1-bit (27B)** is the reasoning specialist (perfect adversarial + chains + structured, 86.2%) at 3 tok/s.
-- v0.3.1 grader audit: fixed 2 broken structured-hard predicates; the top-2 models' near-identical scores (70/71 same outcomes) verified genuine via per-run output logs.
+| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 🥇 | Spark-X2.6 4B | IQ3_M · KV FP16 · 32K ctx | **91.5%** | 95% | 100% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 |
+| 🥈 | Gemma 4 · E4B | Q4_K_M | **90.5%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 |
+| 🥉 | MiniCPM-V 5 · 2B | Q8_0 | **90.0%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 |
+| 4 | Bolt E4B | UD-IQ3_XXS · KV q4_0 · 32K ctx | **89.1%** | 95% | 88% | 100% | 100% | 75% | 100% | 57% | 71 t · v0.3.1 |
+| 5 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **88.7%** | 89% | 88% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 |
+| 6 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **86.7%** | 89% | 75% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 |
+| 7 | LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | **86.3%** | 84% | 88% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 |
+| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **82.3%** | 82% | 88% | 83% | 100% | 88% | 67% | 57% | 71 t · v0.3.1 |
+| 9 | K2-Horizon · 7B | Q4_K_M | **81.1%** | 77% | 62% | 100% | 100% | 88% | 100% | 36% | 71 t · v0.3.1 |
+| 10 | Ornith 1.5 · 9B | Q4_K_M | **77.8%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% | 71 t · v0.3.1 |
+| 11 | MiMo V2.6 · 9B | Q4_K_M | **74.9%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% | 71 t · v0.3.1 |
+| 12 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **74.5%** | 79% | 62% | 100% | 90% | 62% | 67% | 50% | 71 t · v0.3.1 |
+| 13 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% | 71 t · v0.3.1 |
+| 14 | LFM 2.5 · 2.6B | Q8_0 | **70.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% | 71 t · v0.3.1 |
+| 15 | Qwen 3.5 · 4B | Q4_K_M | **67.9%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 |
+| 16 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.7%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 |
+| 17 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **65.2%** | 63% | 50% | 83% | 70% | 88% | 50% | 43% | 71 t · v0.3.1 |
+| 18 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **56.1%** | 84% | 12% | 83% | 50% | 25% | 100% | 0% | 71 t · v0.3.1 |
+| 19 | Gemma 3n · E4B | Q4_K_M | **52.4%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | 71 t · v0.3.1 |
+
+**Legacy rows — NOT comparable, kept for provenance:**
+
+| Model | Configuration | Score | Why it is not comparable |
+|---|---|---|---|
+| Ternary Bonsai-2 · 27B | PTQ1_0 | 86.2% | 65 tasks (current methodology is 71) |
+
+**Offload / >12B — scored separately, never merged with the on-GPU table:**
+
+| Model | Configuration | Score | Method |
+|---|---|---|---|
+| LFM2.5-24B-A2B | UD-Q4_K_XL · KV FP16 · 8K ctx | 59.2% | 71 t · v0.3.1 |
+
+**What this table says:**
+
+- **Best on-GPU: Spark-X2.6 4B (IQ3_M · KV FP16 · 32K ctx) at 91.5%** — 63 configuration(s) of this model were scored; this is the best of them.
+- Next: Gemma 4 · E4B (Q4_K_M) at 90.5% — inside one task (1.4 pp on this task set), so a tie, not a win.
+- 1 legacy row is excluded from the ranking (task count or scorer version differs); it keeps the published number below but is never ranked against current rows.
+
+_Generated by `scripts/leaderboard_check.py` from `results/cards/*.json`. `python3 scripts/leaderboard_check.py` fails when this block and the corpus disagree — edit the generator, not the table._
+
+<!-- END GENERATED LEADERBOARD -->
+
+Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · machine-readable [`results/_published/leaderboard.json`](results/_published/leaderboard.json) · trading cards in [`results/cards/`](results/cards/).
+
+**How to read this:** every published score is the weighted aggregate defined in `scripts/leaderboard_check.py` (the same weights `gauntlet run` prints) and is recomputed from that run's log — a row you cannot trace to a run log does not appear in the table. The table above is generated, not written: `python3 scripts/leaderboard_check.py` exits non-zero when it and the card corpus disagree, and `--write` regenerates it.
 
 ---
 

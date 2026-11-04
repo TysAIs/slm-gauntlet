@@ -5,13 +5,13 @@
   "sub": "Q4_K_S XHToken \u00b7 KV q4_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
   "overall_pct": 71.4,
   "suites": {
-   "tooluse": 0.632,
    "adversarial": 0.875,
-   "agent_chains": 0.833,
-   "structured": 0.9,
+   "agent_chains": 0.8333,
+   "coding": 0.3333,
+   "instruction": 0.5714,
    "retrieval": 0.75,
-   "coding": 0.333,
-   "instruction": 0.571
+   "structured": 0.9,
+   "tooluse": 0.6842
   },
   "n": 71,
   "rank": "",
@@ -36,6 +36,18 @@
   "failure_modes": {
    "looped": 1,
    "error": 1
+  },
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/spark-x2.6-1.7b-q4ks-xhtoken-kvq4_20261030T035604Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
   }
  }
 ]

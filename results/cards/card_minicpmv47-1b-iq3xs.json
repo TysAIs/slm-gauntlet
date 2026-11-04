@@ -5,13 +5,13 @@
   "sub": "IQ3_XS openbmb \u00b7 KV f16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev \u00b7 text-only",
   "overall_pct": 55.7,
   "suites": {
-   "tooluse": 0.526,
    "adversarial": 0.625,
    "agent_chains": 0.5,
-   "structured": 0.6,
+   "coding": 0.3333,
+   "instruction": 0.4286,
    "retrieval": 0.625,
-   "coding": 0.333,
-   "instruction": 0.429
+   "structured": 0.6,
+   "tooluse": 0.614
   },
   "n": 71,
   "rank": "",
@@ -36,6 +36,18 @@
   "failure_modes": {
    "looped": 1,
    "error": 1
+  },
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/minicpmv47-1b-iq3xs_20261030T192245Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
   }
  }
 ]

@@ -3,15 +3,15 @@
   "model": "lfm3-1.7b-iq3xxs-bartowski-kvq4",
   "display_name": "LFM3 1.7B",
   "sub": "IQ3_XXS bartowski \u00b7 KV q4_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
-  "overall_pct": 76.1,
+  "overall_pct": 76.2,
   "suites": {
-   "tooluse": 0.684,
    "adversarial": 0.625,
    "agent_chains": 1.0,
-   "structured": 0.9,
-   "retrieval": 0.75,
    "coding": 1.0,
-   "instruction": 0.357
+   "instruction": 0.3571,
+   "retrieval": 0.75,
+   "structured": 0.9,
+   "tooluse": 0.7193
   },
   "n": 71,
   "rank": "",
@@ -36,6 +36,18 @@
   "failure_modes": {
    "looped": 2,
    "error": 1
+  },
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/lfm3-1.7b-iq3xxs-bartowski-kvq4_20261030T121110Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
   }
  }
 ]

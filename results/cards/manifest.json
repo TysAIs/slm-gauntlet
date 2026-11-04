@@ -5,21 +5,33 @@
   "sub": "Q4_K_M \u00b7 Google",
   "suites": {
    "adversarial": 0.875,
-   "agent_chains": 0.8333333333333334,
+   "agent_chains": 0.8333,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 1.0,
    "structured": 1.0,
-   "tooluse": 0.9473684210526315,
-   "retrieval": 1.0
+   "tooluse": 0.9474
   },
-  "overall_pct": 87.9,
+  "overall_pct": 90.5,
   "n": 71,
   "ts": "20260926T1",
   "rank": 1,
   "verdict": "Accuracy king by a hair. PaT arch punches above its size; stacked-constraint instruction following is the one gap.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/gemma4-e4b-q4_K_M_20260926T121532Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "minicpm5-2b-q8_0",
@@ -27,21 +39,33 @@
   "sub": "Q8_0 \u00b7 openbmb",
   "suites": {
    "adversarial": 0.875,
-   "agent_chains": 0.8333333333333334,
+   "agent_chains": 0.8333,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 1.0,
    "structured": 1.0,
-   "tooluse": 0.9298245614035089,
-   "retrieval": 1.0
+   "tooluse": 0.9298
   },
-  "overall_pct": 87.7,
+  "overall_pct": 90.0,
   "n": 71,
   "ts": "20260926T1",
   "rank": 2,
   "verdict": "Statistically tied with #1 (0.2pp) at DOUBLE the speed. The practical daily-driver pick.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/minicpm5-2b-q8_0_20260926T125808Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "bonsai2-ptq1_0",
@@ -71,21 +95,33 @@
   "sub": "Q4_K_M \u00b7 openbmb",
   "suites": {
    "adversarial": 0.875,
-   "agent_chains": 0.8333333333333334,
-   "coding": 0.8333333333333334,
+   "agent_chains": 0.8333,
+   "coding": 0.8333,
    "instruction": 0.5,
+   "retrieval": 1.0,
    "structured": 1.0,
-   "tooluse": 0.9473684210526315,
-   "retrieval": 1.0
+   "tooluse": 0.9474
   },
-  "overall_pct": 85.6,
+  "overall_pct": 88.8,
   "n": 71,
   "ts": "20260926T1",
   "rank": 4,
   "verdict": "Value pick: 85.6% at the fastest useful speed (32 tok/s).",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/minicpm5-2b-q4_K_M_20260926T130333Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "k2horizon-7b-q4_K_M",
@@ -95,19 +131,31 @@
    "adversarial": 0.625,
    "agent_chains": 1.0,
    "coding": 1.0,
-   "instruction": 0.357,
+   "instruction": 0.3571,
+   "retrieval": 0.875,
    "structured": 1.0,
-   "tooluse": 0.772,
-   "retrieval": 0.875
+   "tooluse": 0.7719
   },
-  "overall_pct": 80.4,
+  "overall_pct": 81.1,
   "n": 71,
   "ts": "20260927",
   "rank": 5,
   "verdict": "Reasoning specialist: perfect agent chains, coding and structured output. Costs: huge 144KiB/token KV leaves room for only ~10K context on 8GB (1 agent at 8K), slow 11 tok/s decode, weak stacked-instruction following (36%). Q8 does not fit 8GB \u2014 Q4 is the only option; needs the IFM llama.cpp fork.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/k2horizon-7b-q4_K_M_20260927T063302Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "ornith-9b-q4_K_M",
@@ -116,20 +164,32 @@
   "suites": {
    "adversarial": 0.625,
    "agent_chains": 1.0,
-   "coding": 0.8333333333333334,
-   "instruction": 0.5714285714285714,
+   "coding": 0.8333,
+   "instruction": 0.5714,
+   "retrieval": 0.375,
    "structured": 1.0,
-   "tooluse": 0.8947368421052632,
-   "retrieval": 0.375
+   "tooluse": 0.8947
   },
-  "overall_pct": 75.7,
+  "overall_pct": 77.8,
   "n": 71,
   "ts": "20260926T1",
   "rank": 6,
   "verdict": "Solid mid-pack brain at 10 tok/s single-stream.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/ornith-9b-q4_K_M_20260926T120504Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "mimo-9b-q4_K_M",
@@ -138,20 +198,32 @@
   "suites": {
    "adversarial": 0.875,
    "agent_chains": 1.0,
-   "coding": 0.8333333333333334,
+   "coding": 0.8333,
    "instruction": 0.5,
+   "retrieval": 0.375,
    "structured": 0.9,
-   "tooluse": 0.7894736842105263,
-   "retrieval": 0.375
+   "tooluse": 0.7895
   },
-  "overall_pct": 75.3,
+  "overall_pct": 74.9,
   "n": 71,
   "ts": "20260926T1",
   "rank": 7,
   "verdict": "Strong reasoner; context capped at 8K by its VRAM footprint on this card.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/mimo-9b-q4_K_M_20260926T123256Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "gemma4-12b-ud-q2_K_XL",
@@ -181,21 +253,33 @@
   "sub": "Q8_0 \u00b7 LiquidAI",
   "suites": {
    "adversarial": 0.375,
-   "agent_chains": 0.8333333333333334,
+   "agent_chains": 0.8333,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 0.75,
    "structured": 0.7,
-   "tooluse": 0.7368421052631579,
-   "retrieval": 0.75
+   "tooluse": 0.7368
   },
-  "overall_pct": 69.9,
+  "overall_pct": 70.9,
   "n": 71,
   "ts": "20260926T1",
   "rank": 9,
   "verdict": "Fast and efficient; accuracy trails the leaders.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/lfm2.5-2.6b-q8_0_20260926T113827Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "lfm2.5-2.6b-q4_K_M",
@@ -203,21 +287,33 @@
   "sub": "Q4_K_M \u00b7 LiquidAI",
   "suites": {
    "adversarial": 0.5,
-   "agent_chains": 0.8333333333333334,
+   "agent_chains": 0.8333,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 0.5,
    "structured": 0.8,
-   "tooluse": 0.7368421052631579,
-   "retrieval": 0.5
+   "tooluse": 0.7368
   },
-  "overall_pct": 69.6,
+  "overall_pct": 69.9,
   "n": 71,
   "ts": "20260926T1",
   "rank": 10,
   "verdict": "Fastest useful model tested; accuracy trails.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/lfm2.5-2.6b-q4_K_M_20260926T100538Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "qwen3.5-4b-q4_K_M",
@@ -225,21 +321,33 @@
   "sub": "Q4_K_M \u00b7 Alibaba",
   "suites": {
    "adversarial": 0.625,
-   "agent_chains": 0.6666666666666666,
+   "agent_chains": 0.6667,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 0.5,
    "structured": 0.8,
-   "tooluse": 0.6842105263157895,
-   "retrieval": 0.5
+   "tooluse": 0.6842
   },
-  "overall_pct": 68.2,
+  "overall_pct": 67.9,
   "n": 71,
   "ts": "20260926T0",
   "rank": 11,
   "verdict": "Mid-pack accuracy; aced coding while staying fast.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/qwen3.5-4b-q4_K_M_20260926T095817Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "gemma4-12b-iq3_XXS",
@@ -247,21 +355,33 @@
   "sub": "IQ3_XXS",
   "suites": {
    "adversarial": 0.625,
-   "agent_chains": 0.6666666666666666,
+   "agent_chains": 0.6667,
    "coding": 1.0,
-   "instruction": 0.42857142857142855,
+   "instruction": 0.4286,
+   "retrieval": 0.5,
    "structured": 0.8,
-   "tooluse": 0.7368421052631579,
-   "retrieval": 0.5
+   "tooluse": 0.7368
   },
-  "overall_pct": 68.0,
+  "overall_pct": 68.8,
   "n": 71,
   "ts": "20260926T1",
   "rank": 12,
   "verdict": "12B squeezed to IQ3: runs, but below the 4B leaders. UD-Q2 is the better 12B quant.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/gemma4-12b-iq3_XXS_20260926T101214Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "sharp-spark-4b-q4_K_XL",
@@ -269,21 +389,33 @@
   "sub": "Q4_K_XL \u00b7 PrismML",
   "suites": {
    "adversarial": 0.5,
-   "agent_chains": 0.6666666666666666,
+   "agent_chains": 0.6667,
    "coding": 1.0,
    "instruction": 0.5,
+   "retrieval": 0.5,
    "structured": 0.8,
-   "tooluse": 0.6842105263157895,
-   "retrieval": 0.5
+   "tooluse": 0.6842
   },
-  "overall_pct": 66.4,
+  "overall_pct": 66.7,
   "n": 71,
   "ts": "20260926T1",
   "rank": 13,
   "verdict": "Mid-pack across the board.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/sharp-spark-4b-q4_K_XL_20260926T100137Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  },
  {
   "model": "gemma-e4b-q4_K_M",
@@ -291,20 +423,32 @@
   "sub": "Q4_K_M \u00b7 Google",
   "suites": {
    "adversarial": 0.625,
-   "agent_chains": 0.16666666666666666,
-   "coding": 0.8333333333333334,
+   "agent_chains": 0.1667,
+   "coding": 0.8333,
    "instruction": 0.5,
+   "retrieval": 0.75,
    "structured": 0.8,
-   "tooluse": 0.2631578947368421,
-   "retrieval": 0.75
+   "tooluse": 0.2632
   },
-  "overall_pct": 56.3,
+  "overall_pct": 52.4,
   "n": 71,
   "ts": "20260926T1",
   "rank": 14,
   "verdict": "Last place \u2014 the older 3n arch can't keep up with the v0.3 hard suites.",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
-  "device_kind": "nvidia"
+  "device_kind": "nvidia",
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/gemma-e4b-q4_K_M_20260926T114606Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
+  }
  }
 ]
