@@ -51,6 +51,14 @@ class ToolSandbox:
             return fn(**arguments)
         except TypeError as e:
             return {"error": "bad_arguments", "message": str(e)}
+        except (OSError, UnicodeDecodeError, ValueError) as e:
+            # A tool call the model got wrong (e.g. read_file on a directory, a
+            # binary file, a bad JSON blob) must come back as a TOOL ERROR the
+            # model can recover from -- never as an exception that aborts the
+            # whole gauntlet run. Crashing here silently truncated a 71-task
+            # run to zero results, which would unfairly score a wrong-but-
+            # recoverable model as "no result" instead of "failed this task".
+            return {"error": type(e).__name__, "message": str(e)[:200]}
 
     # --- calculator: exact arithmetic the model must not do mentally ---
     def _tool_calculator(self, expression: str) -> dict:
