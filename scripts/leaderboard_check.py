@@ -369,16 +369,17 @@ def render_block(data: dict) -> str:
              "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)." % (
                  sum(r["variants"] for r in data["rows"] + data["offload"])))
     L.append("")
-    L.append("| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method |")
-    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|")
+    L.append("| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |")
+    L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for i, r in enumerate(data["rows"]):
         su = r["suites"]
         cells = [pct((su.get(k) or 0) * 100, 0) for k in
                  ("tooluse", "adversarial", "agent_chains", "structured", "retrieval", "coding", "instruction")]
         rank = MEDALS.get(i, str(i + 1))
-        L.append("| %s | %s | %s | **%s** | %s | %d t · %s |" % (
+        card = "card_%s.png" % r["model"]
+        L.append("| %s | %s | %s | **%s** | %s | %d t · %s | [png](results/cards/%s) |" % (
             rank, r["display_name"], r["config"], pct(r["recomputed"]),
-            " | ".join(cells), FULL_TASKS, r["epoch"]))
+            " | ".join(cells), FULL_TASKS, r["epoch"], card))
     L.append("")
     if data["legacy"]:
         L.append("**Legacy rows — NOT comparable, kept for provenance:**")
@@ -444,6 +445,7 @@ def publish_json(data: dict) -> str:
             "tasks": FULL_TASKS,
             "scorer": r["epoch"],
             "variants_scored": r["variants"],
+            "card_png": "results/cards/card_%s.png" % r["model"],
             "source_log": os.path.relpath(r["source_log"]),
         })
     doc = {
@@ -687,6 +689,10 @@ def main(argv=None) -> int:
         if data["card_repairs"]:
             out.append("%d card(s) do not reproduce their run log (run --fix-cards)"
                        % len(data["card_repairs"]))
+        for r in data["rows"] + data["offload"]:
+            png = root / "results" / "cards" / ("card_%s.png" % r["model"])
+            if not png.exists():
+                out.append("card image missing for %r: %s" % (r["display_name"], os.path.relpath(png)))
         out += detail_problems()
         return out
 

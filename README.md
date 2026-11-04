@@ -8,27 +8,27 @@ A benchmark for **small language models** (sub-12B class) that runs on whatever 
 
 One row per model: the **best-scoring configuration** of that model in the corpus (231 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
-| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | Spark-X2.6 4B | IQ3_M · KV FP16 · 32K ctx | **91.5%** | 95% | 100% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 |
-| 🥈 | Gemma 4 · E4B | Q4_K_M | **90.5%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 |
-| 🥉 | MiniCPM-V 5 · 2B | Q8_0 | **90.0%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 |
-| 4 | Bolt E4B | UD-IQ3_XXS · KV q4_0 · 32K ctx | **89.1%** | 95% | 88% | 100% | 100% | 75% | 100% | 57% | 71 t · v0.3.1 |
-| 5 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **88.7%** | 89% | 88% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 |
-| 6 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **86.7%** | 89% | 75% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 |
-| 7 | LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | **86.3%** | 84% | 88% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 |
-| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **82.3%** | 82% | 88% | 83% | 100% | 88% | 67% | 57% | 71 t · v0.3.1 |
-| 9 | K2-Horizon · 7B | Q4_K_M | **81.1%** | 77% | 62% | 100% | 100% | 88% | 100% | 36% | 71 t · v0.3.1 |
-| 10 | Ornith 1.5 · 9B | Q4_K_M | **77.8%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% | 71 t · v0.3.1 |
-| 11 | MiMo V2.6 · 9B | Q4_K_M | **74.9%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% | 71 t · v0.3.1 |
-| 12 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **74.5%** | 79% | 62% | 100% | 90% | 62% | 67% | 50% | 71 t · v0.3.1 |
-| 13 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% | 71 t · v0.3.1 |
-| 14 | LFM 2.5 · 2.6B | Q8_0 | **70.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% | 71 t · v0.3.1 |
-| 15 | Qwen 3.5 · 4B | Q4_K_M | **67.9%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 |
-| 16 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.7%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 |
-| 17 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **65.2%** | 63% | 50% | 83% | 70% | 88% | 50% | 43% | 71 t · v0.3.1 |
-| 18 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **56.1%** | 84% | 12% | 83% | 50% | 25% | 100% | 0% | 71 t · v0.3.1 |
-| 19 | Gemma 3n · E4B | Q4_K_M | **52.4%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | 71 t · v0.3.1 |
+| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 🥇 | Spark-X2.6 4B | IQ3_M · KV FP16 · 32K ctx | **91.5%** | 95% | 100% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_spark-x2.6-4b-iq3m-bartowski.png) |
+| 🥈 | Gemma 4 · E4B | Q4_K_M | **90.5%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_gemma4-e4b-q4_K_M.png) |
+| 🥉 | MiniCPM-V 5 · 2B | Q8_0 | **90.0%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_minicpm5-2b-q8_0.png) |
+| 4 | Bolt E4B | UD-IQ3_XXS · KV q4_0 · 32K ctx | **89.1%** | 95% | 88% | 100% | 100% | 75% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_bolt-e4b-udiq3xxs-kvq4.png) |
+| 5 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **88.7%** | 89% | 88% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_dory-1.0-4b-q5km-kvq8.png) |
+| 6 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **86.7%** | 89% | 75% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_qwen35-9b-q4km.png) |
+| 7 | LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | **86.3%** | 84% | 88% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_lfm3-1.7b-iq4nl-bartowski.png) |
+| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **82.3%** | 82% | 88% | 83% | 100% | 88% | 67% | 57% | 71 t · v0.3.1 | [png](results/cards/card_spark-x2.6-1.7b-q8_0.png) |
+| 9 | K2-Horizon · 7B | Q4_K_M | **81.1%** | 77% | 62% | 100% | 100% | 88% | 100% | 36% | 71 t · v0.3.1 | [png](results/cards/card_k2horizon-7b-q4_K_M.png) |
+| 10 | Ornith 1.5 · 9B | Q4_K_M | **77.8%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% | 71 t · v0.3.1 | [png](results/cards/card_ornith-9b-q4_K_M.png) |
+| 11 | MiMo V2.6 · 9B | Q4_K_M | **74.9%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% | 71 t · v0.3.1 | [png](results/cards/card_mimo-9b-q4_K_M.png) |
+| 12 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **74.5%** | 79% | 62% | 100% | 90% | 62% | 67% | 50% | 71 t · v0.3.1 | [png](results/cards/card_minicpmv47-1b-iq4xs.png) |
+| 13 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% | 71 t · v0.3.1 | [png](results/cards/card_gemma4-12b-ud-q2_K_XL.png) |
+| 14 | LFM 2.5 · 2.6B | Q8_0 | **70.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_lfm2.5-2.6b-q8_0.png) |
+| 15 | Qwen 3.5 · 4B | Q4_K_M | **67.9%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_qwen3.5-4b-q4_K_M.png) |
+| 16 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.7%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_sharp-spark-4b-q4_K_XL.png) |
+| 17 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **65.2%** | 63% | 50% | 83% | 70% | 88% | 50% | 43% | 71 t · v0.3.1 | [png](results/cards/card_lfm25-1.2b-q8_0.png) |
+| 18 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **56.1%** | 84% | 12% | 83% | 50% | 25% | 100% | 0% | 71 t · v0.3.1 | [png](results/cards/card_lfm25-8b-a1b-udq4km.png) |
+| 19 | Gemma 3n · E4B | Q4_K_M | **52.4%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | 71 t · v0.3.1 | [png](results/cards/card_gemma-e4b-q4_K_M.png) |
 
 **Legacy rows — NOT comparable, kept for provenance:**
 
