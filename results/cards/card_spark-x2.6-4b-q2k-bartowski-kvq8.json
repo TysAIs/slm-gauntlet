@@ -5,13 +5,13 @@
   "sub": "Q2_K bartowski \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
   "overall_pct": 57.6,
   "suites": {
-   "tooluse": 0.526,
    "adversarial": 0.875,
-   "agent_chains": 0.333,
-   "structured": 0.8,
-   "retrieval": 0.625,
+   "agent_chains": 0.3333,
    "coding": 0.5,
-   "instruction": 0.286
+   "instruction": 0.2857,
+   "retrieval": 0.625,
+   "structured": 0.8,
+   "tooluse": 0.5439
   },
   "n": 71,
   "rank": "",
@@ -38,6 +38,18 @@
    "max_turns": 1,
    "timeout": 3,
    "error": 1
+  },
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/spark-x2.6-4b-q2k-bartowski-kvq8_20261029T121733Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
   }
  }
 ]

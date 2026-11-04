@@ -5,13 +5,13 @@
   "sub": "Q5_0 openbmb \u00b7 KV f16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev \u00b7 text-only",
   "overall_pct": 71.4,
   "suites": {
-   "tooluse": 0.684,
    "adversarial": 0.75,
    "agent_chains": 1.0,
-   "structured": 0.9,
-   "retrieval": 0.625,
    "coding": 0.5,
-   "instruction": 0.5
+   "instruction": 0.5,
+   "retrieval": 0.625,
+   "structured": 0.9,
+   "tooluse": 0.7018
   },
   "n": 71,
   "rank": "",
@@ -37,6 +37,18 @@
    "looped": 1,
    "max_turns": 1,
    "error": 1
+  },
+  "scorer": "v0.3.1",
+  "score_weights": "cli-7suite",
+  "source_log": "results/minicpmv47-1b-q50_20261030T211829Z.json",
+  "tasks_per_suite": {
+   "adversarial": 8,
+   "agent_chains": 6,
+   "coding": 6,
+   "instruction": 14,
+   "structured": 10,
+   "tooluse": 19,
+   "retrieval": 8
   }
  }
 ]
