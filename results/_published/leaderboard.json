@@ -24,6 +24,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 63,
+   "card_png": "results/cards/card_spark-x2.6-4b-iq3m-bartowski.png",
    "source_log": "results/spark-x2.6-4b-iq3m-bartowski_20261029T172423Z.json"
   },
   {
@@ -44,6 +45,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_gemma4-e4b-q4_K_M.png",
    "source_log": "results/gemma4-e4b-q4_K_M_20260926T121532Z.json"
   },
   {
@@ -64,6 +66,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 2,
+   "card_png": "results/cards/card_minicpm5-2b-q8_0.png",
    "source_log": "results/minicpm5-2b-q8_0_20260926T125808Z.json"
   },
   {
@@ -84,6 +87,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 25,
+   "card_png": "results/cards/card_bolt-e4b-udiq3xxs-kvq4.png",
    "source_log": "results/bolt-e4b-udiq3xxs-kvq4_20261029T090753Z.json"
   },
   {
@@ -104,6 +108,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 2,
+   "card_png": "results/cards/card_dory-1.0-4b-q5km-kvq8.png",
    "source_log": "results/dory-1.0-4b-q5km-kvq8_20261028T215952Z.json"
   },
   {
@@ -124,6 +129,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_qwen35-9b-q4km.png",
    "source_log": "results/qwen35-9b-q4km_20261028T093120Z.json"
   },
   {
@@ -144,6 +150,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 60,
+   "card_png": "results/cards/card_lfm3-1.7b-iq4nl-bartowski.png",
    "source_log": "results/lfm3-1.7b-iq4nl-bartowski_20261030T131930Z.json"
   },
   {
@@ -164,6 +171,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 21,
+   "card_png": "results/cards/card_spark-x2.6-1.7b-q8_0.png",
    "source_log": "results/spark-x2.6-1.7b-q8_0_20261028T071728Z.json"
   },
   {
@@ -184,6 +192,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_k2horizon-7b-q4_K_M.png",
    "source_log": "results/k2horizon-7b-q4_K_M_20260927T063302Z.json"
   },
   {
@@ -204,6 +213,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_ornith-9b-q4_K_M.png",
    "source_log": "results/ornith-9b-q4_K_M_20260926T120504Z.json"
   },
   {
@@ -224,6 +234,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_mimo-9b-q4_K_M.png",
    "source_log": "results/mimo-9b-q4_K_M_20260926T123256Z.json"
   },
   {
@@ -244,6 +255,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 42,
+   "card_png": "results/cards/card_minicpmv47-1b-iq4xs.png",
    "source_log": "results/minicpmv47-1b-iq4xs_20261030T231628Z.json"
   },
   {
@@ -264,6 +276,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 2,
+   "card_png": "results/cards/card_gemma4-12b-ud-q2_K_XL.png",
    "source_log": "results/gemma4-12b-ud-q2_K_XL_20260926T105720Z.json"
   },
   {
@@ -284,6 +297,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 2,
+   "card_png": "results/cards/card_lfm2.5-2.6b-q8_0.png",
    "source_log": "results/lfm2.5-2.6b-q8_0_20260926T113827Z.json"
   },
   {
@@ -304,6 +318,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_qwen3.5-4b-q4_K_M.png",
    "source_log": "results/qwen3.5-4b-q4_K_M_20260926T095817Z.json"
   },
   {
@@ -324,6 +339,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_sharp-spark-4b-q4_K_XL.png",
    "source_log": "results/sharp-spark-4b-q4_K_XL_20260926T100137Z.json"
   },
   {
@@ -344,6 +360,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 2,
+   "card_png": "results/cards/card_lfm25-1.2b-q8_0.png",
    "source_log": "results/lfm25-1.2b-q8_0_20261028T091215Z.json"
   },
   {
@@ -364,6 +381,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_lfm25-8b-a1b-udq4km.png",
    "source_log": "results/lfm25-8b-a1b-udq4km_20261028T084230Z.json"
   },
   {
@@ -384,6 +402,7 @@
    "tasks": 71,
    "scorer": "v0.3.1",
    "variants_scored": 1,
+   "card_png": "results/cards/card_gemma-e4b-q4_K_M.png",
    "source_log": "results/gemma-e4b-q4_K_M_20260926T114606Z.json"
   }
  ],
