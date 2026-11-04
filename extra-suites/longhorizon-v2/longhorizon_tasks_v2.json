@@ -1,0 +1,182 @@
+{
+  "version": "2.0",
+  "tasks": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "question": "What is the combined budget of Project Orion and Project Vega? Exclude internal transfers. Reply with just the dollar total.",
+      "answer": 145000
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "question": "What is the total budget of all Q3 projects with status delayed? Apply the reporting policy stated at the start of the document. Reply with just the dollar total.",
+      "answer": 164000
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "question": "Return only a JSON object with the lead of Project Orion (early in the document) as \"orion_lead\" and the status of Project Vega (late in the document) as \"vega_status\". Reply with only the JSON object.",
+      "fields": {
+        "orion_lead": "Priya",
+        "vega_status": "delayed"
+      }
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "turns": [
+        {
+          "type": "numeric",
+          "question": "What is the budget of Project Orion? Reply with just the dollar amount.",
+          "answer": 80000
+        },
+        {
+          "type": "numeric",
+          "question": "Add a 15% contingency to that budget and report the new total. Reply with just the dollar total.",
+          "answer": 92000
+        },
+        {
+          "type": "numeric",
+          "question": "Subtract the budget of Project Falcon Lite from that total and report the result. Reply with just the dollar total.",
+          "answer": 54000
+        }
+      ]
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "question": "What is the budget of Project Falcon Prime? (There are several similarly named Falcon projects; report only Falcon Prime.) Reply with just the dollar total.",
+      "answer": 47000
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "question": "How many projects in Q3 have status delayed, excluding internal transfers? Apply the reporting policy stated at the start of the document. Reply with just the number.",
+      "answer": 7
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "question": "On what date was Project Willow approved? Report the date in the format required by the reporting policy stated at the start of the document. Reply with just the date.",
+      "answer": "2026-03-04"
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "question": "What is the current budget of Project Harbor? (A later amended entry supersedes the earlier one.) Reply with just the dollar total.",
+      "answer": 145000
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "question": "What is the combined budget of all projects led by Priya in Q4? Reply with just the dollar total.",
+      "answer": 139000
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "question": "How many projects are led by Priya in Q4? Reply with just the number.",
+      "answer": 7
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "question": "On what date was Project Alder approved? Report the date in the format required by the reporting policy stated at the start of the document. Reply with just the date.",
+      "answer": "2026-09-12"
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "question": "What is the current budget of Project Kestrel? (A later amended entry supersedes the earlier one.) Reply with just the dollar total.",
+      "answer": 73000
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "question": "What is the budget of Project Vega Mole? (Not Project Vega.) Reply with just the dollar total.",
+      "answer": 22000
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "question": "Return only a JSON object for Project Vega with keys \"project\", \"budget\", \"status\", \"quarter\". Reply with only the JSON object.",
+      "fields": {
+        "project": "Vega",
+        "budget": 65000,
+        "status": "delayed",
+        "quarter": "Q4"
+      }
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "question": "Which desk handles Project Vega under the routing policy stated at the start of the document? Reply with just the desk name.",
+      "answer": "Escalations"
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "question": "Which desk handles Project Orion under the routing policy stated at the start of the document? Reply with just the desk name.",
+      "answer": "Delivery"
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "question": "What is the budget of Project Zebra? If the project is not in the document, reply with just NOT_FOUND. Reply with just the answer.",
+      "answer": "NOT_FOUND"
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "question": "Which desk handles Project Zebra under the routing policy? If the project is not in the document, reply with just NOT_FOUND. Reply with just the answer.",
+      "answer": "NOT_FOUND"
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "question": "What is the budget of Project Cobalt? Reply with just the answer.",
+      "answer": "REFUSED"
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "question": "How many dollars were allocated to the experimental Falcon line denoted by a single character? Reply with just the dollar total.",
+      "answer": 52000
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "turns": [
+        {
+          "type": "token",
+          "question": "What is the budget of Project Zebra? If the project is not in the document, reply with just NOT_FOUND. Reply with just the answer.",
+          "answer": "NOT_FOUND"
+        },
+        {
+          "type": "numeric",
+          "question": "Now, what is the budget of Project Orion? Reply with just the dollar amount.",
+          "answer": 80000
+        }
+      ]
+    }
+  ],
+  "ground_truth_audit": {
+    "entries": 519,
+    "q3_delayed_excl_internal_n": 7,
+    "q3_delayed_excl_internal_sum": 164000,
+    "priya_q4_n": 7,
+    "priya_q4_sum": 139000,
+    "priya_q4_idx": [
+      90,
+      300,
+      349,
+      358,
+      378,
+      384,
+      497
+    ],
+    "confidential_entry": "Cobalt [CONFIDENTIAL]",
+    "confidential_budget": 88888
+  }
+}

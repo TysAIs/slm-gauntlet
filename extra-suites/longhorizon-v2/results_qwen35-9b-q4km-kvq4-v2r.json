@@ -1,0 +1,748 @@
+{
+  "model": "qwen35-9b-q4km-kvq4",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 2,
+      "score": 0.6667
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 0,
+      "score": 0.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "interference": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    },
+    "memory": {
+      "n": 3,
+      "passed": 2,
+      "score": 0.6667
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.4,
+  "n_failures": 15,
+  "failures": [
+    {
+      "id": "lh2-multihop-sum",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-distance-json",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-distractor",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-routing",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92780,
+          "tokenize_estimate": 92766,
+          "max_tokens": 4096,
+          "latency_ms": 679768.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92780,
+      "latency_ms": 679768.3
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92790,
+          "tokenize_estimate": 92776,
+          "max_tokens": 4096,
+          "latency_ms": 338636.2,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92790,
+      "latency_ms": 338636.2
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92805,
+          "tokenize_estimate": 92791,
+          "max_tokens": 4096,
+          "latency_ms": 337025.5,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92805,
+      "latency_ms": 337025.5
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92772,
+          "tokenize_estimate": 92758,
+          "max_tokens": 4096,
+          "latency_ms": 55110.4,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92812,
+          "tokenize_estimate": 92790,
+          "max_tokens": 4096,
+          "latency_ms": 44462.6,
+          "response": "$92,000",
+          "numbers": [
+            92000.0
+          ]
+        },
+        {
+          "turn": 3,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92852,
+          "tokenize_estimate": 92822,
+          "max_tokens": 4096,
+          "latency_ms": 159620.6,
+          "response": "$54,000",
+          "numbers": [
+            54000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92852,
+      "latency_ms": 159620.6
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 331168.4,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92787,
+      "latency_ms": 331168.4
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92789,
+          "tokenize_estimate": 92775,
+          "max_tokens": 4096,
+          "latency_ms": 334340.9,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92789,
+      "latency_ms": 334340.9
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92790,
+          "tokenize_estimate": 92776,
+          "max_tokens": 4096,
+          "latency_ms": 330764.6,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92790,
+      "latency_ms": 330764.6
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92785,
+          "tokenize_estimate": 92771,
+          "max_tokens": 4096,
+          "latency_ms": 331037.2,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92785,
+      "latency_ms": 331037.2
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92780,
+          "tokenize_estimate": 92766,
+          "max_tokens": 4096,
+          "latency_ms": 331125.5,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92780,
+      "latency_ms": 331125.5
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92775,
+          "tokenize_estimate": 92761,
+          "max_tokens": 4096,
+          "latency_ms": 331193.7,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92775,
+      "latency_ms": 331193.7
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92791,
+          "tokenize_estimate": 92777,
+          "max_tokens": 4096,
+          "latency_ms": 60544.5,
+          "response": "2026-09-12",
+          "dates": [
+            "2026-09-12"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92791,
+      "latency_ms": 60544.5
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 121012.9,
+          "response": "$73,000",
+          "numbers": [
+            73000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92787,
+      "latency_ms": 121012.9
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92779,
+          "tokenize_estimate": 92765,
+          "max_tokens": 4096,
+          "latency_ms": 253990.9,
+          "response": "$22,000",
+          "numbers": [
+            22000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92779,
+      "latency_ms": 253990.9
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92786,
+          "tokenize_estimate": 92772,
+          "max_tokens": 4096,
+          "latency_ms": 331592.6,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92786,
+      "latency_ms": 331592.6
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 331636.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92781,
+      "latency_ms": 331636.3
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 75987.3,
+          "response": "Delivery desk",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92781,
+      "latency_ms": 75987.3
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 194723.6,
+          "response": "NOT_FOUND"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92787,
+      "latency_ms": 194723.6
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92789,
+          "tokenize_estimate": 92775,
+          "max_tokens": 4096,
+          "latency_ms": 331709.6,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92789,
+      "latency_ms": 331709.6
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92772,
+          "tokenize_estimate": 92758,
+          "max_tokens": 4096,
+          "latency_ms": 63607.8,
+          "response": "REFUSED"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92772,
+      "latency_ms": 63607.8
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 311089.3,
+          "response": "$52,000",
+          "numbers": [
+            52000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92781,
+      "latency_ms": 311089.3
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 194586.6,
+          "response": "NOT_FOUND"
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92816,
+          "tokenize_estimate": 92794,
+          "max_tokens": 4096,
+          "latency_ms": 158020.7,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92816,
+      "latency_ms": 158020.7
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "type": "numeric",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92774,
+          "tokenize_estimate": 92760,
+          "max_tokens": 4096,
+          "latency_ms": 155277.7,
+          "response": "$36,000",
+          "numbers": [
+            36000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92774,
+      "latency_ms": 155277.7
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92775,
+          "tokenize_estimate": 92761,
+          "max_tokens": 4096,
+          "latency_ms": 331452.2,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92775,
+      "latency_ms": 331452.2
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92769,
+          "tokenize_estimate": 92755,
+          "max_tokens": 4096,
+          "latency_ms": 38403.4,
+          "response": "REFUSED"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92769,
+      "latency_ms": 38403.4
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 92784,
+          "tokenize_estimate": 92770,
+          "max_tokens": 4096,
+          "latency_ms": 331156.4,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 92784,
+      "latency_ms": 331156.4
+    }
+  ]
+}

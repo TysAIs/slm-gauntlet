@@ -1,0 +1,9 @@
+[2026-11-02T21:45:46-07:00] FATAL: a port-8080 llama-server is already running on PVE; refusing to disturb it
+[2026-11-02T21:46:49-07:00] watchdog started on PVE (pid 2462301), abort threshold 84C
+[2026-11-02T21:46:49-07:00] SERVE lfm3-1.7b-iq4nl (LFM3-1.7B IQ4_NL (bartowski), kv=FP16, fit_vram=2571)
+[2026-11-02T21:47:00-07:00] BENCH lfm3-1.7b-iq4nl (gpu_used=4539 MiB)
+[2026-11-02T22:01:22-07:00] THERMAL ABORT after lfm3-1.7b-iq4nl (peak 85C)
+[2026-11-02T22:13:07-07:00] watchdog started on PVE (pid 2496642), abort threshold 84C
+[2026-11-02T22:13:08-07:00] SERVE lfm3-1.7b-iq4nl (LFM3-1.7B IQ4_NL (bartowski), kv=FP16, fit_vram=2571)
+[2026-11-02T22:13:13-07:00] BENCH lfm3-1.7b-iq4nl (gpu_used=2571 MiB)
+[2026-11-02T22:20:19-07:00] THERMAL ABORT after lfm3-1.7b-iq4nl (peak 84C)
