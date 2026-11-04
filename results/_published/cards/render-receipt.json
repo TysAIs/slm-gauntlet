@@ -1,0 +1,95 @@
+{
+ "size": 1080,
+ "renders": [
+  {
+   "src": "results/cards/card_minicpm5-2b-q8_0.html",
+   "dst": "results/_published/cards/png_card_minicpm5-2b-q8_0.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 281295,
+   "stddev": 0.134686,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_minicpm5-2b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_minicpm5-2b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 281582,
+   "stddev": 0.134524,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_qwen3.5-4b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_qwen3.5-4b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 273462,
+   "stddev": 0.133074,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_bonsai2-ptq1_0.html",
+   "dst": "results/_published/cards/png_card_bonsai2-ptq1_0.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 282817,
+   "stddev": 0.138807,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_lfm2.5-2.6b-q8_0.html",
+   "dst": "results/_published/cards/png_card_lfm2.5-2.6b-q8_0.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 273674,
+   "stddev": 0.134468,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_lfm2.5-2.6b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_lfm2.5-2.6b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 272330,
+   "stddev": 0.134238,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_gemma-e4b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_gemma-e4b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 277601,
+   "stddev": 0.135254,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_mimo-9b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_mimo-9b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 279591,
+   "stddev": 0.134904,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_ornith-9b-q4_K_M.html",
+   "dst": "results/_published/cards/png_card_ornith-9b-q4_K_M.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 268869,
+   "stddev": 0.131069,
+   "ok": true
+  },
+  {
+   "src": "results/cards/card_sharp-spark-4b-q4_K_XL.html",
+   "dst": "results/_published/cards/png_card_sharp-spark-4b-q4_K_XL.png",
+   "w": 1080,
+   "h": 1080,
+   "bytes": 272792,
+   "stddev": 0.137582,
+   "ok": true
+  }
+ ]
+}
