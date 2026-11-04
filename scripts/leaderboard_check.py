@@ -410,7 +410,8 @@ def render_block(data: dict) -> str:
     if len(data["rows"]) > 1:
         nxt = data["rows"][1]
         gap = data["rows"][0]["recomputed"] - nxt["recomputed"]
-        verdict = (" — inside one task (1.4 pp on this task set), so a tie, not a win."
+        verdict = (" — inside the weight of a single task (0.7-1.6 pp here depending on the "
+                   "suite), so a tie, not a win."
                    if gap <= 1.5 else " — %.1f pp behind." % gap)
         L.append("- Next: %s (%s) at %s%s" % (nxt["display_name"], nxt["config"],
                                               pct(nxt["recomputed"]), verdict))
