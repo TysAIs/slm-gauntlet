@@ -1,0 +1,72 @@
+{
+  "model": "DeepSeek-V4.1-Flash-1017",
+  "endpoint": "http://<serving-host>:8888/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 4,
+      "score": 1.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "interference": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    },
+    "memory": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.92,
+  "n_failures": 2,
+  "failures": [
+    {
+      "id": "lh2-json-extraction",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ]
+}

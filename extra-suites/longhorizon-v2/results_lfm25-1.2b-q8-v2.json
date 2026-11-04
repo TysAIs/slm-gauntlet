@@ -1,0 +1,591 @@
+{
+  "model": "lfm25-1.2b-q8",
+  "endpoint": "http://127.0.0.1:8080/v1",
+  "suite": "longhorizon-v2",
+  "n_tasks": 21,
+  "n_scored": 21,
+  "overall_score": 0.0,
+  "n_failures": 21,
+  "failures": [
+    {
+      "id": "lh2-multihop-sum",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-distance-json",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "mode": "empty",
+      "turn_scores": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-distractor",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-budget",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-routing",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-low-overlap",
+      "mode": "empty",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "mode": "error",
+      "error": "HTTP Error 400: Bad Request"
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99858,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 106865.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99858,
+      "latency_ms": 106865.3
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99867,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34551.8,
+          "response": "Note: This is the end of the month. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly",
+          "numbers": []
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99867,
+      "latency_ms": 34551.8
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99883,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34419.2,
+          "response": "Note: The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The "
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99883,
+      "latency_ms": 34419.2
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99849,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1131.8,
+          "response": ""
+        },
+        {
+          "turn": 2,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99883,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 254.9,
+          "response": ""
+        },
+        {
+          "turn": 3,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99919,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 209.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99919,
+      "latency_ms": 209.3
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99864,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1157.2,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99864,
+      "latency_ms": 1157.2
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99866,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34530.1,
+          "response": "Note: This is the end of the month. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly",
+          "numbers": []
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99866,
+      "latency_ms": 34530.1
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99868,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34523.3,
+          "response": "Note: The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The "
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99868,
+      "latency_ms": 34523.3
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99861,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1238.6,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99861,
+      "latency_ms": 1238.6
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99857,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1255.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99857,
+      "latency_ms": 1255.3
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99852,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34713.0,
+          "response": "Note: This is the end of the year. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly ",
+          "numbers": []
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99852,
+      "latency_ms": 34713.0
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99868,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34524.8,
+          "response": "Note: The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The "
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99868,
+      "latency_ms": 34524.8
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99863,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1224.8,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99863,
+      "latency_ms": 1224.8
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99856,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1260.1,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99856,
+      "latency_ms": 1260.1
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99864,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34600.0,
+          "response": "Note: The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The "
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99864,
+      "latency_ms": 34600.0
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99858,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1225.2,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99858,
+      "latency_ms": 1225.2
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99858,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1230.9,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99858,
+      "latency_ms": 1230.9
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 99866,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 34595.6,
+          "response": "Note: This is the end of the day. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly audit trail was updated. The entry was reviewed by the oversight committee, the quarterly a"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 99866,
+      "latency_ms": 34595.6
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99868,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1371.8,
+          "response": "Note: This is the end of the road.",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99868,
+      "latency_ms": 1371.8
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99849,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1158.6,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99849,
+      "latency_ms": 1158.6
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "empty",
+          "prompt_tokens": 99857,
+          "tokenize_estimate": null,
+          "max_tokens": 4096,
+          "latency_ms": 1246.3,
+          "response": ""
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "empty",
+      "prompt_tokens": 99857,
+      "latency_ms": 1246.3
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "score": 0.0,
+      "failure_mode": "error",
+      "error": "HTTP Error 400: Bad Request"
+    }
+  ]
+}

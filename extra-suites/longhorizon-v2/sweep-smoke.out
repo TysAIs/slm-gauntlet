@@ -1,0 +1,5 @@
+[2026-11-02T21:46:49-07:00] watchdog started on PVE (pid 2462301), abort threshold 84C
+[2026-11-02T21:46:49-07:00] SERVE lfm3-1.7b-iq4nl (LFM3-1.7B IQ4_NL (bartowski), kv=FP16, fit_vram=2571)
+[2026-11-02T21:47:00-07:00] BENCH lfm3-1.7b-iq4nl (gpu_used=4539 MiB)
+Terminated                 timeout 10800 python3 "$SUITE/lh-bench-v2r.py" --endpoint http://127.0.0.1:8080/v1 --model "$mid" --doc "$SUITE/longhorizon_doc_v2.txt" --tasks "$SUITE/longhorizon_tasks_v2r.json" --out "$out" >> "$SUITE/sweep-bench.log" 2>&1
+[2026-11-02T22:01:22-07:00] THERMAL ABORT after lfm3-1.7b-iq4nl (peak 85C)
