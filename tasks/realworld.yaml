@@ -1,0 +1,349 @@
+# Real-world suite (v0.4): everyday agent work, graded on the OUTCOME.
+#
+# Why this suite exists: the 0.3 suites leaned on tool-calling puzzles. A model
+# that ranks well there can still get a real chore wrong — a split bill, a
+# refund under a policy, a file someone else has to read. Every task here is
+# work a person actually hands an assistant, and every assert checks a
+# number, an ordering, a parsed structure or a file's contents. No keyword
+# credit: "84.00" cannot be guessed from the phrasing, and a JSON key must be
+# in the right bucket.
+#
+# Grading rules used throughout:
+#   * amounts are compared as NUMBERS parsed out of the answer, so "$59.00",
+#     "59.00" and "USD 59.00" grade the same and a wrong 216.00 does not pass;
+#   * where a decision is requested, the parsed JSON is compared field by
+#     field, not searched for a word;
+#   * the file task writes a real file and the sandbox is read back, so the
+#     answer only counts if the work product exists.
+#
+# Validity proof: tests/test_realworld_validity.py runs a GOLD answer (must
+# pass, full score) and a NEAR-MISS answer (must fail) through the real scorer
+# for every task in this file. A task that a correct answer fails, or a
+# plausible wrong answer passes, fails the test suite.
+
+- id: rw_expense_split
+  suite: realworld
+  description: Split a bill where tax is included and tip is pre-tax (arithmetic trap)
+  prompt: |-
+    A team dinner receipt totals $216.00, and that total already includes 8% sales tax.
+    House policy: tip 18% of the PRE-TAX subtotal, and the total cost (subtotal + tip)
+    is split equally by 4 people.
+
+    Reply with exactly three lines and nothing else:
+    SUBTOTAL: <amount>
+    TIP: <amount>
+    PER_PERSON: <amount>
+    Write every amount with two decimals.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [200.0, 36.0, 59.0]"
+  max_tokens: 256
+  no_think: true
+
+- id: rw_inbox_triage
+  suite: realworld
+  description: Route 5 emails by a precedence rule set (blocklist beats VIP beats billing)
+  prompt: |-
+    Sort these emails into buckets using the policy below. Rules are applied in
+    this precedence order, first match wins:
+
+    R1. Sender domain is on the blocklist: spam.example.net  -> bucket "spam"
+    R2. Sender is a VIP contact and the body contains the word "cancel" -> bucket "urgent"
+    R3. Sender is a known vendor (acme-supply.com) AND an amount is due -> bucket "billing"
+    R4. Everything else -> bucket "other"
+
+    VIP contacts: ceo@bigclient.com
+
+    Emails:
+    e1 | from: billing@acme-supply.com | "Invoice 2291 for $412.90 is due March 3"
+    e2 | from: ceo@bigclient.com | "Please cancel our four seats. Invoice attached."
+    e3 | from: deals@spam.example.net | "Your invoice is ready — 70% off everything"
+    e4 | from: news@industry-weekly.com | "This week in logistics: five stories"
+    e5 | from: vendor@acme-supply.com | "Invoice 2298, $88.00 due Friday"
+
+    Reply with a single JSON object only:
+    {"spam": [...], "billing": [...], "urgent": [...], "other": [...]}
+    Each list holds the email ids (e1..e5) in ascending order.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and data.get('spam') == ['e3'] and data.get('urgent') == ['e2']"
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and data.get('billing') == ['e1', 'e5'] and data.get('other') == ['e4']"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_refund_eligibility
+  suite: realworld
+  description: Apply a refund policy with an exception to four orders (money, not words)
+  prompt: |-
+    Refund policy:
+    - Within 30 days and unopened: full refund.
+    - Within 30 days and opened: 50% refund.
+    - After 30 days: no refund, UNLESS the item arrived damaged (a photo was supplied).
+    - Damaged items always get a full refund regardless of age.
+
+    Orders:
+    A: $84.99, delivered 12 days ago, unopened, not damaged
+    B: $129.50, delivered 21 days ago, opened, not damaged
+    C: $39.99, delivered 45 days ago, opened, arrived damaged (photo supplied)
+    D: $59.00, delivered 45 days ago, unopened, not damaged
+
+    Reply with a single JSON object only, keyed A..D, e.g.
+    {"A": {"decision": "full|half|none", "amount": <number>}}
+    Amount is the refund in dollars with at most two decimals.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and data.get('A',{}).get('decision') == 'full' and abs(float(data.get('A',{}).get('amount',-1)) - 84.99) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and data.get('B',{}).get('decision') == 'half' and abs(float(data.get('B',{}).get('amount',-1)) - 64.75) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and data.get('C',{}).get('decision') == 'full' and abs(float(data.get('C',{}).get('amount',-1)) - 39.99) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and data.get('D',{}).get('decision') == 'none' and abs(float(data.get('D',{}).get('amount',-1))) < 0.005"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_timezone_meeting
+  suite: realworld
+  description: Convert one meeting time into three timezones (ISO 8601, explicit offsets)
+  prompt: |-
+    A meeting is booked for 2026-01-20 09:30 in America/Denver. Offsets on that
+    date (standard time, no DST in play):
+      America/Denver = UTC-07:00
+      Europe/Berlin  = UTC+01:00
+      Asia/Tokyo     = UTC+09:00
+
+    Give the same instant in three lines, each "<city>: <ISO 8601 timestamp with offset>",
+    in this order: UTC, Europe/Berlin, Asia/Tokyo. Use date T time with a colon in the
+    offset, e.g. 2026-01-20T16:30:00+00:00.
+  asserts:
+    - type: contains_all
+      must_pass: true
+      weight: 2.0
+      values: ["2026-01-20T16:30:00+00:00"]
+    - type: contains_all
+      must_pass: true
+      weight: 2.0
+      values: ["2026-01-20T17:30:00+01:00"]
+    - type: contains_all
+      must_pass: true
+      weight: 2.0
+      values: ["2026-01-21T01:30:00+09:00"]
+  max_tokens: 640
+  no_think: true
+
+- id: rw_shipping_quote
+  suite: realworld
+  description: Tiered shipping rate card applied to three orders (min charge, surcharges)
+  prompt: |-
+    Shipping rate card:
+      base = 5.00 + 1.50 per kg
+      remote address surcharge: +4.00 flat
+      express handling: +9.00 flat
+      minimum charge: 6.00 (apply AFTER surcharges; never charge less)
+
+    Quote these three orders and then the grand total:
+    O1: 2 kg, domestic, standard
+    O2: 7 kg, remote, standard
+    O3: 12 kg, remote, express
+
+    Reply with exactly four lines, nothing else:
+    O1: <amount>
+    O2: <amount>
+    O3: <amount>
+    TOTAL: <amount>
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [8.0, 19.5, 36.0, 63.5]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_write_order_totals
+  suite: realworld
+  description: Compute line totals and persist a sorted CSV the next person can read
+  prompt: |-
+    Here is a raw order dump (sku, qty, unit price). It is NOT sorted.
+
+      SKU-2,3,4.25
+      SKU-1,10,0.50
+      SKU-3,1,99.99
+
+    Use the write_file tool to create "out/order_totals.csv" with a header line
+    exactly "sku,qty,unit_price,line_total" followed by one row per SKU, sorted by
+    SKU ascending. Keep qty and unit_price as given, and compute line_total =
+    qty * unit_price with two decimals. Do not add blank lines.
+    Then reply with one short sentence confirming the file path.
+  tools:
+    - name: write_file
+      description: Write a file in the workspace.
+      parameters:
+        type: object
+        properties:
+          path: {type: string}
+          content: {type: string}
+        required: [path, content]
+  asserts:
+    - type: contains_all
+      weight: 1.0
+      values: ["out/order_totals.csv"]
+  state_asserts:
+    - type: tool_called
+      tool: write_file
+      must_pass: true
+      weight: 2.0
+    - type: file_lines
+      path: out/order_totals.csv
+      must_pass: true
+      weight: 3.0
+      lines:
+        - "sku,qty,unit_price,line_total"
+        - "SKU-1,10,0.50,5.00"
+        - "SKU-2,3,4.25,12.75"
+        - "SKU-3,1,99.99,99.99"
+    - type: file_content
+      path: out/order_totals.csv
+      contains: "sku,qty,unit_price,line_total"
+      must_pass: true
+      weight: 2.0
+    - type: file_content
+      path: out/order_totals.csv
+      contains: "SKU-1,10,0.50,5.00"
+      must_pass: true
+      weight: 2.0
+    - type: file_content
+      path: out/order_totals.csv
+      contains: "SKU-2,3,4.25,12.75"
+      must_pass: true
+      weight: 2.0
+    - type: file_content
+      path: out/order_totals.csv
+      contains: "SKU-3,1,99.99,99.99"
+      must_pass: true
+      weight: 2.0
+  max_tokens: 768
+  no_think: true
+
+- id: rw_budget_plan
+  suite: realworld
+  description: Buy one item per required category at the lowest cost (not cheapest overall)
+  prompt: |-
+    You must buy exactly one item from each category. Prices:
+
+    food:  rice 8.50 | beans 4.25
+    tools: tape 3.10 | knife 12.00
+    clean: soap 2.75 | spray 6.40
+
+    Choose the cheapest option in each category. Reply with a single JSON object
+    only: {"food": "<item>", "tools": "<item>", "clean": "<item>", "total": <number>}
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and data.get('food') == 'beans' and data.get('tools') == 'tape' and data.get('clean') == 'soap'"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('total', -1)) - 10.10) < 0.005"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_ticket_priority
+  suite: realworld
+  description: Order a support queue by severity, then age, then id (tie-break matters)
+  prompt: |-
+    Sort this support queue. Order by: severity number ASCENDING (1 is most severe),
+    then age in days DESCENDING (oldest first), then ticket id ASCENDING.
+
+    T-4 | severity 3 | 2 days old
+    T-1 | severity 1 | 1 day old
+    T-7 | severity 2 | 9 days old
+    T-2 | severity 1 | 4 days old
+    T-9 | severity 2 | 9 days old
+
+    Reply with a single JSON array of the ticket ids in order, nothing else.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "data == ['T-2', 'T-1', 'T-7', 'T-9', 'T-4']"
+  max_tokens: 256
+  no_think: true
+
+- id: rw_warranty_expiry
+  suite: realworld
+  description: Month arithmetic with a missing day (leap-year month end)
+  prompt: |-
+    Warranty rule: coverage runs through the last day of the month that is N months
+    after the purchase month. If the purchase day does not exist in that later month,
+    coverage still ends on that month's last day.
+
+    Compute the coverage end date (YYYY-MM-DD) for:
+    W1: purchased 2026-08-31, 18 months of coverage
+    W2: purchased 2025-01-31, 13 months of coverage
+
+    Reply with exactly two lines: "W1: <date>" and "W2: <date>", nothing else.
+  asserts:
+    - type: contains_all
+      must_pass: true
+      weight: 3.0
+      values: ["W1: 2028-02-29"]
+    - type: contains_all
+      must_pass: true
+      weight: 3.0
+      values: ["W2: 2026-02-28"]
+  max_tokens: 384
+  no_think: true
+
+- id: rw_data_cleanup
+  suite: realworld
+  description: Deduplicate contact records keeping the most recently updated row
+  prompt: |-
+    Clean this contact export. Drop any record with an empty email. For duplicate
+    emails keep only the record with the LATEST updated date. Return the survivors
+    as a JSON array sorted by email ascending, each object with exactly the keys
+    email, name, plan.
+
+    Records:
+    ana@example.com | Ana | pro | updated 2026-05-02
+    ana@example.com | Ana Lopez | pro | updated 2026-07-19
+    (empty) | Ghost | free | updated 2026-06-01
+    bo@example.com | Bo | basic | updated 2026-01-04
+    cy@example.com | Cy | free | updated 2026-03-09
+    cy@example.com | Cy Nguyen | pro | updated 2026-09-30
+
+    Reply with the JSON array only.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, list) and len(data) == 3"
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, list) and data and data[0].get('email') == 'ana@example.com' and data[0].get('name') == 'Ana Lopez' and data[0].get('plan') == 'pro'"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, list) and data and data[1] == {'email': 'bo@example.com', 'name': 'Bo', 'plan': 'basic'}"
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, list) and data and data[2].get('name') == 'Cy Nguyen' and data[2].get('plan') == 'pro' and data[2].get('email') == 'cy@example.com'"
+  max_tokens: 768
+  no_think: true
