@@ -63,29 +63,47 @@ import tempfile
 from pathlib import Path
 
 # --- methodology constants -------------------------------------------------
-# Weight vector MUST stay identical to gauntlet/cli.py SUITE_WEIGHTS; the check
-# fails loudly if the two ever disagree (that is a methodology change, and the
-# README has to say so).
-SUITE_WEIGHTS = {
-    "tooluse": 0.30,
-    "structured": 0.15,
-    "retrieval": 0.15,
-    "coding": 0.10,
-    "instruction": 0.10,
-    "adversarial": 0.10,
-    "agent_chains": 0.10,
-}
-WEIGHT_LABEL = ("CLI 7-suite weights (tool .30 / structured .15 / retrieval .15 / "
-                "coding .10 / instruction .10 / adversarial .10 / agent chains .10)")
-FULL_TASKS = 71          # current task count: tooluse 19 + adversarial 8 + chains 6
-                         # + structured 10 + retrieval 8 + coding 6 + instruction 14
+# The weight vector is IMPORTED from gauntlet/methodology.py (one source of
+# truth); the check still verifies it matches what gauntlet.cli ships, so a
+# silent divergence between the runner and the publisher fails loudly.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from gauntlet.methodology import (  # noqa: E402
+    EPOCHS,
+    METHODOLOGY_VERSION,
+    SUITE_WEIGHTS,
+    epoch_spec,
+    newest_published_epoch,
+)
+
 SCORER_EPOCHS = [        # (epoch, first card timestamp it applies to, commit)
     ("v0.3.1", "20260926", "8244f05"),
+    (METHODOLOGY_VERSION, "20261105", "v0.4-suite"),
 ]
-CURRENT_EPOCH = SCORER_EPOCHS[-1][0]
 TOL = 0.2                # published-vs-recomputed tolerance, percentage points
 BLOCK_BEGIN = "<!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->"
 BLOCK_END = "<!-- END GENERATED LEADERBOARD -->"
+
+
+def _epoch_label(version: str) -> str:
+    return epoch_spec(version)["label"]
+
+
+# Set by set_epoch() from the corpus before any row is built. Every row is
+# scored with ITS OWN epoch's weights; the headline table only ever holds rows
+# from one epoch.
+CURRENT_EPOCH = METHODOLOGY_VERSION
+FULL_TASKS = epoch_spec(METHODOLOGY_VERSION)["tasks"]
+WEIGHT_LABEL = _epoch_label(METHODOLOGY_VERSION)
+
+
+def set_epoch(version: str) -> None:
+    """Publish the newest epoch that actually has rows."""
+    global CURRENT_EPOCH, FULL_TASKS, WEIGHT_LABEL
+    spec = epoch_spec(version)
+    CURRENT_EPOCH = version
+    FULL_TASKS = spec["tasks"]
+    WEIGHT_LABEL = spec["label"]
+
 
 # display_name values that denote the same model but were spelled differently
 # by hand over time. Keyed on the normalized (lowercase alphanumeric) form.
@@ -112,8 +130,10 @@ def scorer_epoch(ts: str) -> str:
     return "pre-v0.3.1"
 
 
-def weighted_score(suites: dict) -> float | None:
-    active = {s: w for s, w in SUITE_WEIGHTS.items() if suites.get(s) is not None}
+def weighted_score(suites: dict, weights: dict | None = None) -> float | None:
+    """Weighted aggregate under ONE epoch's weights (default: current)."""
+    weights = weights or SUITE_WEIGHTS
+    active = {s: w for s, w in weights.items() if suites.get(s) is not None}
     if not active:
         return None
     total = sum(active.values())
@@ -182,8 +202,9 @@ def index_logs(results_dir: Path) -> dict[str, list[tuple[str, str, int]]]:
     return idx
 
 
-def score_log(path: str) -> dict:
-    """Recompute suites + weighted score from a run log, exactly as gauntlet does."""
+def score_log(path: str, weights: dict | None = None) -> dict:
+    """Recompute suites + weighted score from a run log, under the epoch weights
+    that run was produced with (never today's, unless they are the same)."""
     d = json.loads(Path(path).read_text())
     by: dict[str, list] = {}
     for r in d["results"]:
@@ -193,7 +214,7 @@ def score_log(path: str) -> dict:
     return {
         "suites": suites,
         "binary_suites": binary,
-        "overall": weighted_score(suites),
+        "overall": weighted_score(suites, weights),
         "equal_mean": equal_suite_mean(suites),
         "n": len(d["results"]),
         "tasks": {s: len(v) for s, v in by.items()},
@@ -201,7 +222,8 @@ def score_log(path: str) -> dict:
     }
 
 
-def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]]) -> tuple[dict | None, str]:
+def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]],
+             weights: dict | None = None) -> tuple[dict | None, str]:
     """Choose the run log a card should be sourced from, and say why.
 
     A card is a mirror of one run. Identify that run from the card itself:
@@ -218,7 +240,7 @@ def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]]) -> tuple[d
     scored = []
     for ts, p, n in cands:
         try:
-            s = score_log(p)
+            s = score_log(p, weights)
         except Exception:
             continue
         suite_eq = bool(card.get("suites")) and set(card["suites"]) == set(s["suites"]) and all(
@@ -280,7 +302,10 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
     rows, legacy, families = [], [], {}
     repaired, notes = [], []
     for c in cards:
-        src, note = pick_log(c, logs)
+        # score the card's run with the weights THAT run was produced under
+        card_epoch = scorer_epoch(c.get("ts", ""))
+        w = EPOCHS[card_epoch]["weights"] if card_epoch in EPOCHS else None
+        src, note = pick_log(c, logs, w)
         rankable, why = classify(c, src)
         canon = src["score"] if src else None
         entry = {
@@ -449,8 +474,10 @@ def publish_json(data: dict) -> str:
             "source_log": os.path.relpath(r["source_log"]),
         })
     doc = {
-        "benchmark": "slm-gauntlet %s (%d tasks: tooluse 19, adversarial 8, agent_chains 6, "
-                     "structured 10, retrieval 8, coding 6, instruction 14)" % (CURRENT_EPOCH, FULL_TASKS),
+        "benchmark": "slm-gauntlet %s (%d tasks: %s)" % (
+            CURRENT_EPOCH, FULL_TASKS,
+            ", ".join("%s %d" % (k, v) for k, v in sorted(
+                task_inventory(Path(__file__).resolve().parent.parent).items()) if k != "*")),
         "hardware": "8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp",
         "settings": "temperature 0, seed 1, thinking disabled, pass@1",
         "weights": WEIGHT_LABEL,
@@ -540,13 +567,16 @@ def fix_cards(data: dict, cards_dir: Path, dry_run=False) -> list[dict]:
             for obj in items:
                 if obj.get("model") != rep["model"]:
                     continue
-                src = score_log(os.path.abspath(rep["source_log"]))
+                _ep = scorer_epoch(obj.get("ts", ""))
+                src = score_log(os.path.abspath(rep["source_log"]),
+                                EPOCHS[_ep]["weights"] if _ep in EPOCHS else None)
                 before = (obj.get("overall_pct"), dict(obj.get("suites") or {}))
                 obj["suites"] = {k: round(v, 4) for k, v in src["suites"].items()}
                 obj["overall_pct"] = round(src["overall"], 1)
                 obj["n"] = src["n"]
                 obj["scorer"] = scorer_epoch(obj.get("ts", ""))
-                obj["score_weights"] = "cli-7suite"
+                obj["score_weights"] = "cli-%dsuite" % len(
+                    (EPOCHS[_ep]["weights"] if _ep in EPOCHS else SUITE_WEIGHTS))
                 obj["source_log"] = os.path.relpath(os.path.abspath(rep["source_log"]))
                 obj["tasks_per_suite"] = src["tasks"]
                 touched = True
@@ -571,17 +601,35 @@ def fix_cards(data: dict, cards_dir: Path, dry_run=False) -> list[dict]:
 # --- main ------------------------------------------------------------------
 
 def verify_weights() -> str | None:
-    """The script's weight vector must equal gauntlet/cli.py's, or nothing means anything."""
+    """The published weight vector must be the one the runner uses, and it must
+    cover the full task set it claims to."""
+    total = sum(SUITE_WEIGHTS.values())
+    if abs(total - 1.0) > 1e-9:
+        return "SUITE_WEIGHTS sum to %.4f, not 1.0 — the score is not a percentage" % total
     try:
-        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
         from gauntlet.cli import SUITE_WEIGHTS as SRC  # type: ignore
     except Exception:
-        return None
-    if {k: round(v, 6) for k, v in SRC.items()} != {k: round(v, 6) for k, v in SUITE_WEIGHTS.items()}:
-        return ("gauntlet/cli.py SUITE_WEIGHTS %s != leaderboard weights %s — "
+        SRC = None  # httpx absent under system python: the runner check is skipped
+    if SRC is not None and {k: round(v, 6) for k, v in SRC.items()} != {
+        k: round(v, 6) for k, v in SUITE_WEIGHTS.items()
+    }:
+        return ("gauntlet/cli.py SUITE_WEIGHTS %s != published weights %s — "
                 "methodology changed, update this script and the README method note"
                 % (SRC, SUITE_WEIGHTS))
     return None
+
+
+def task_inventory(root: Path) -> dict[str, int]:
+    """Count tasks per suite from the YAML, without importing the httpx stack."""
+    counts: dict[str, int] = {}
+    for path in sorted((root / "tasks").glob("*.yaml")):
+        text = path.read_text()
+        for m in re.finditer(r"^-\s+id:\s*\S+", text, re.M):
+            counts.setdefault("*", 0)
+            counts["*"] += 1
+        for suite in re.findall(r"^\s+suite:\s*(\w+)\s*$", text, re.M):
+            counts[suite] = counts.get(suite, 0) + 1
+    return counts
 
 
 def main(argv=None) -> int:
@@ -609,6 +657,14 @@ def main(argv=None) -> int:
         return 1
 
     cards = load_cards(cards_dir)
+    # Publish the newest epoch that actually has results. Without this, bumping
+    # METHODOLOGY_VERSION marked the entire existing corpus "legacy" and emptied
+    # the leaderboard the same day the new version was written.
+    try:
+        set_epoch(newest_published_epoch({scorer_epoch(c.get("ts", "")) for c in cards}))
+    except KeyError as e:
+        print("cannot pick a published epoch: %s" % e, file=sys.stderr)
+        return 2
     logs = index_logs(root / "results")
     data = build_rows(cards, logs, verbose=a.verbose)
     block = render_block(data)
@@ -619,7 +675,7 @@ def main(argv=None) -> int:
     for r in data["legacy"]:
         print("  legacy: %-28s n=%s published=%s — %s"
               % (r["display_name"], r["n"], pct(r["published"]), r["not_rankable_because"]))
-    print("methodology: %s, %d tasks, scorer %s" % (WEIGHT_LABEL, FULL_TASKS, CURRENT_EPOCH))
+    print("methodology: %s (scorer %s)" % (WEIGHT_LABEL, CURRENT_EPOCH))
     print("card repairs needed: %d" % len(data["card_repairs"]))
     for r in data["card_repairs"]:
         print("  %-38s card %-52s published=%s recomputed=%s (suites_match=%s headline_match=%s)"

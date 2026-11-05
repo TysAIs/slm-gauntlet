@@ -5,7 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-DEFAULT_WEIGHTS = {"tooluse": 0.40, "structured": 0.20, "retrieval": 0.20, "coding": 0.10, "instruction": 0.10}
+from gauntlet.methodology import METHODOLOGY_VERSION, SUITE_WEIGHTS
+
+# The published aggregate is the one the runner prints. Do not invent a second
+# weighting here: report.py used to carry its own (tooluse .40) and it silently
+# disagreed with `gauntlet run`.
+DEFAULT_WEIGHTS = SUITE_WEIGHTS
 
 
 def aggregate_results(results: list[dict], weights: dict | None = None) -> dict:
@@ -74,17 +79,20 @@ def generate_leaderboard(results_dir: Path) -> str:
         rows.append((meta.get("model", "?"), summary))
 
     rows.sort(key=lambda x: x[1]["subagent_capability_score"], reverse=True)
+    # The weight sentence is GENERATED from the one methodology table. It used to
+    # be a hand-written string and it went stale the moment weights changed.
+    weight_note = ", ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
+    cell_keys = tuple(SUITE_WEIGHTS)
     lines = [
         "# SLM Gauntlet Leaderboard",
         "",
-        "Subagent Capability Score = weighted pass@1 (tooluse 40%, structured 20%, retrieval 20%, coding 10%, IF 10%)",
+        f"Methodology {METHODOLOGY_VERSION}: Subagent Capability Score = weighted pass@1 ({weight_note}).",
         "",
-        "| Model | Score | Profile | tooluse | structured | retrieval | coding | instruction | loops |",
-        "|---|---|---|---|---|---|---|---|---|",
+        "| Model | Score | Profile | " + " | ".join(cell_keys) + " | loops |",
+        "|---" * (len(cell_keys) + 3) + "|",
     ]
     for model, s in rows:
         st = s["suites"]
-        cell_keys = ("tooluse", "structured", "retrieval", "coding", "instruction")
         cells = [st.get(k, {}).get("pass1", "-") for k in cell_keys]
         loops = s["failure_modes"].get("looped", 0) + s["failure_modes"].get("max_turns", 0)
         lines.append(

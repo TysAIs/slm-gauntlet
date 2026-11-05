@@ -9,7 +9,12 @@ from gauntlet.task import Task
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "tasks"
 
-EXPECTED_SUITES = {"tooluse", "structured", "retrieval", "coding", "instruction", "adversarial", "agent_chains"}
+# Derived from the published weight table, not hardcoded: a task in a suite the
+# methodology does not weight is silently UNSCORED, which is how the realworld
+# suite could have shipped with weight but no tasks (or tasks but no weight).
+from gauntlet.methodology import SUITE_WEIGHTS  # noqa: E402
+
+EXPECTED_SUITES = set(SUITE_WEIGHTS)
 
 
 def task_files():
@@ -54,3 +59,31 @@ def test_contamination_labels_valid():
         for raw in yaml.safe_load(path.read_text()):
             task = Task(**raw)
             assert task.contamination_risk in ("none", "generated", "known")
+
+
+def test_published_task_count_matches_the_corpus():
+    """The leaderboard prints a task count. It must be the number of tasks that
+    actually exist, not a number someone typed once."""
+    from gauntlet.methodology import CURRENT_TASK_COUNT, EPOCHS, METHODOLOGY_VERSION
+
+    real = 0
+    for path in task_files():
+        real += len(yaml.safe_load(path.read_text()) or [])
+    from gauntlet.methodology import NOLIMA_LADDER, RETRIEVAL_LADDER
+
+    real += len(RETRIEVAL_LADDER) + len(NOLIMA_LADDER) + 2  # refusal + multi
+    assert real == CURRENT_TASK_COUNT, f"corpus has {real}, methodology publishes {CURRENT_TASK_COUNT}"
+    assert EPOCHS[METHODOLOGY_VERSION]["tasks"] == real
+
+
+def test_every_weighted_suite_has_tasks():
+    """A weighted suite with no tasks inflates nobody's score, but a task whose
+    suite is unweighted never counts — both are methodology lies."""
+    from gauntlet.methodology import GENERATED_SUITES, SUITE_WEIGHTS
+
+    present = set(GENERATED_SUITES)
+    for path in task_files():
+        for raw in yaml.safe_load(path.read_text()) or []:
+            present.add(raw["suite"])
+    missing = sorted(set(SUITE_WEIGHTS) - present)
+    assert not missing, f"weighted suites with no task files: {missing}"

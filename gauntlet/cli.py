@@ -11,21 +11,53 @@ from pathlib import Path
 import yaml
 
 from gauntlet.client import GauntletClient
+from gauntlet.methodology import (
+    METHODOLOGY_VERSION,
+    NOLIMA_LADDER,
+    RETRIEVAL_LADDER,
+    SUITE_WEIGHTS,
+    check_weights,
+)
 from gauntlet.report import aggregate_results
 from gauntlet.runner import run_suite, write_results
 from gauntlet.task import Task
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "tasks"
 
-SUITE_WEIGHTS = {
-    "tooluse": 0.30,
-    "structured": 0.15,
-    "retrieval": 0.15,
-    "coding": 0.10,
-    "instruction": 0.10,
-    "adversarial": 0.10,
-    "agent_chains": 0.10,
-}
+
+def validate_tasks(tasks: list[Task]) -> None:
+    """Fail before the run, not in the results.
+
+    A regex that cannot compile (e.g. `^(?i)(yes|no)$` — Python forbids a global
+    inline flag that is not at the start) fails EVERY model and looks like a
+    model weakness in the table. A python_exec assert with no tests does the
+    same. Refuse to run such a suite.
+    """
+    import re as _re
+
+    problems = []
+    for t in tasks:
+        for a in t.asserts:
+            if a.type == "regex" and a.pattern:
+                try:
+                    _re.compile(a.pattern)
+                except _re.error as e:
+                    problems.append(f"{t.id}: bad regex {a.pattern!r}: {e}")
+            if a.type == "python_exec" and not a.tests:
+                problems.append(f"{t.id}: python_exec assert has no `tests`")
+            if a.type == "predicate" and not a.expr:
+                problems.append(f"{t.id}: predicate assert has no `expr`")
+            if a.type in ("contains_all", "contains_any") and not a.values:
+                problems.append(f"{t.id}: {a.type} assert has no `values`")
+        if not t.asserts and not t.state_asserts:
+            problems.append(f"{t.id}: no asserts")
+        for sa in t.state_asserts:
+            if sa.type == "file_lines" and not sa.lines:
+                problems.append(f"{t.id}: file_lines assert has no `lines`")
+            if sa.type in ("state_path", "file_content", "file_lines") and not sa.path:
+                problems.append(f"{t.id}: {sa.type} assert has no `path`")
+    if problems:
+        raise SystemExit("[gauntlet] task validation failed:\n  " + "\n  ".join(problems))
 
 
 def load_tasks(suites: list[str] | None = None, tasks_dir: Path | None = None) -> list[Task]:
@@ -41,6 +73,7 @@ def load_tasks(suites: list[str] | None = None, tasks_dir: Path | None = None) -
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    check_weights()
     suites = args.suite.split(",") if args.suite != "all" else None
     tasks_dir = Path(args.tasks_dir) if getattr(args, "tasks_dir", None) else TASKS_DIR
     tasks = load_tasks(suites, tasks_dir)
@@ -55,15 +88,19 @@ def cmd_run(args: argparse.Namespace) -> int:
     retrieval_wanted = (suites is None or "retrieval" in suites) and tasks_dir == TASKS_DIR
     if retrieval_wanted:
         gen: list[Task] = []
-        for i, ctx in enumerate((4000, 8000, 16000, 32000)):
+        for i, ctx in enumerate(RETRIEVAL_LADDER):
             gen.append(make_needle_task(f"gen_needle_{ctx//1000}k", ctx, seed=args.seed * 100 + i))
-        gen.append(make_needle_task("gen_nolima_8k", 8000, seed=args.seed * 100 + 50, nolima=True))
-        gen.append(make_needle_task("gen_nolima_16k", 16000, seed=args.seed * 100 + 51, nolima=True))
+        for j, ctx in enumerate(NOLIMA_LADDER):
+            gen.append(
+                make_needle_task(f"gen_nolima_{ctx//1000}k", ctx, seed=args.seed * 100 + 50 + j, nolima=True)
+            )
         gen.append(make_refusal_task("gen_refusal", seed=args.seed * 100 + 60))
-        gen.append(make_needle_task("gen_needle_multi_4k", 4000, seed=args.seed * 100 + 70))
+        gen.append(make_needle_task("gen_needle_multi_8k", 8000, seed=args.seed * 100 + 70))
         tasks.extend(gen)
 
-    print(f"[gauntlet] {len(tasks)} tasks -> {args.endpoint} (model={args.model})")
+    validate_tasks(tasks)
+
+    print(f"[gauntlet] {len(tasks)} tasks -> {args.endpoint} (model={args.model}, methodology {METHODOLOGY_VERSION})")
 
     async def go():
         client = GauntletClient(base_url=args.endpoint, model=args.model, timeout=args.timeout)
@@ -75,7 +112,14 @@ def cmd_run(args: argparse.Namespace) -> int:
     results = asyncio.run(go())
     out = write_results(
         results,
-        meta={"model": args.model, "endpoint": args.endpoint, "seed": args.seed},
+        meta={
+            "model": args.model,
+            "endpoint": args.endpoint,
+            "seed": args.seed,
+            "methodology": METHODOLOGY_VERSION,
+            "task_count": len(tasks),
+            "context_ladder": list(RETRIEVAL_LADDER),
+        },
         outdir=Path("results"),
     )
     print(f"[gauntlet] results -> {out}")

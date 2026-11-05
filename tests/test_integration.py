@@ -80,9 +80,21 @@ def test_report_generates_table(tmp_path, monkeypatch):
     (d / "model_test_20260925.json").write_text(
         json.dumps({"meta": {"model": "test/model"}, "results": results})
     )
-    from gauntlet.report import generate_leaderboard
+    from gauntlet.methodology import METHODOLOGY_VERSION, SUITE_WEIGHTS
+    from gauntlet.report import aggregate_results, generate_leaderboard
+
+    # The expected score is COMPUTED from the published weight table, never
+    # hardcoded: a literal in the test made a methodology change look like a
+    # rendering bug. tooluse 1.0 and coding 0.0 renormalized over their weights.
+    w = SUITE_WEIGHTS["tooluse"] + SUITE_WEIGHTS["coding"]
+    expected = round(SUITE_WEIGHTS["tooluse"] / w, 3)
 
     table = generate_leaderboard(d)
     assert "test/model" in table
-    # tooluse 1.0 * 0.4 + coding 0.0 * 0.1, renormalized over 0.5 total weight = 0.8
-    assert "0.8" in table
+    assert str(expected) in table, table
+    assert METHODOLOGY_VERSION in table
+    # the header must be the published weight table, not a stale hand-written one
+    for suite in SUITE_WEIGHTS:
+        assert suite in table.splitlines()[4], table.splitlines()[4]
+    assert aggregate_results(results)["subagent_capability_score"] == expected
+
