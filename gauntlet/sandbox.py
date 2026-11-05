@@ -167,6 +167,17 @@ class ToolSandbox:
             "REC-8821": {"id": "REC-8821", "customer": "Ada Lovelace", "tier": "gold", "years": 12},
             "REC-8822": {"id": "REC-8822", "customer": "Grace Hopper", "tier": "silver", "years": 5},
             "REC-8823": {"id": "REC-8823", "customer": "Alan Turing", "tier": "bronze", "years": 2},
+            # C-7788 exists so the repair task has a reachable record. Before this
+            # entry the task asked for c7788 -> C-7788, the CRM only knew REC-88xx,
+            # every attempt returned not_found and the task scored 0% for 478
+            # attempts — a task-data bug that looked like a model weakness.
+            "C-7788": {
+                "id": "C-7788",
+                "customer": "Kenji Watanabe",
+                "tier": "platinum",
+                "years": 7,
+                "email": "kenji.watanabe@example.com",
+            },
         }
         rec = records.get(id)
         if rec is None:

@@ -29,12 +29,14 @@ class ToolDef(BaseModel):
 
 
 class Assert(BaseModel):
-    type: Literal["exact_match", "contains_all", "contains_any", "regex", "json_schema", "predicate"]
+    type: Literal["exact_match", "contains_all", "contains_any", "regex", "json_schema", "predicate", "python_exec"]
     value: str | None = None
     values: list[str] | None = None
     pattern: str | None = None
     schema_: dict | None = Field(default=None, alias="schema")
     expr: str | None = None  # predicate: python bool expr with `out` bound
+    tests: str | None = None  # python_exec: code appended to the answer and executed
+    timeout: float = 10.0  # python_exec: subprocess wall clock cap (seconds)
     weight: float = 1.0  # partial-credit weight (Vals-AI-style rubric)
     must_pass: bool = False  # must-pass gate: failure forces task partial score to 0
 
@@ -50,13 +52,19 @@ class StateAssert(BaseModel):
       tool_not_called — tool absent from call log        {"tool": name}
       state_path    — dot path into sandbox.state        {"path": "reservations.0.name", "equals": X}
       file_content  — file in sandbox                    {"path": "report.txt", "contains": X}
+      file_lines    — file's non-blank lines, IN ORDER, exactly as listed
+                      {"path": "out.csv", "lines": ["hdr", "row1"]}. `contains`
+                      cannot see ordering or extra rows, so a sorted-CSV task
+                      graded by contains accepted an unsorted file.
+
     """
 
-    type: Literal["tool_called", "tool_not_called", "state_path", "file_content"]
+    type: Literal["tool_called", "tool_not_called", "state_path", "file_content", "file_lines"]
     tool: str | None = None
     path: str | None = None
     equals: str | int | float | bool | list | dict | None = None
     contains: str | None = None
+    lines: list[str] | None = None
     weight: float = 1.0
     must_pass: bool = False
 
@@ -117,6 +125,15 @@ class Task(BaseModel):
                 d["schema"] = a.schema_
             if a.expr is not None:
                 d["expr"] = a.expr
+            if a.tests is not None:
+                d["tests"] = a.tests
+                d["timeout"] = a.timeout
+            # weight/must_pass carry the rubric. Dropping them here silently
+            # turned every weighted or gated assert into an unweighted one,
+            # so a model that leaked the system prompt still earned full
+            # partial credit. They must survive the YAML->scorer hop.
+            d["weight"] = a.weight
+            d["must_pass"] = a.must_pass
             out.append(d)
         return out
 
