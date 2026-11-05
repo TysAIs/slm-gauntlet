@@ -40,6 +40,7 @@ class ScoreResult:
     checks: list[dict] = field(default_factory=list)
     failed: list[str] = field(default_factory=list)
     score: float = 1.0  # weighted partial-credit rubric score in [0, 1]
+    gated: bool = False  # a must_pass assert failed and forced the score to 0
 
     def merge(self, other: ScoreResult) -> ScoreResult:
         return ScoreResult(
@@ -47,6 +48,7 @@ class ScoreResult:
             checks=self.checks + other.checks,
             failed=self.failed + other.failed,
             score=min(self.score, other.score),
+            gated=self.gated or other.gated,
         )
 
 
@@ -306,4 +308,5 @@ class Scorer:
         result.score = earned / total if total else 0.0
         if must_pass_failed:
             result.score = 0.0
+        result.gated = must_pass_failed
         return result

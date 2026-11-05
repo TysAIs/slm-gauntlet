@@ -68,8 +68,9 @@ def _count_current_tasks() -> int:
     can silently break — the published "85 tasks" was already wrong (the corpus
     was 77 YAML + 7 generated = 84).
     """
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     root = Path(__file__).resolve().parent.parent / "tasks"
     n = 0
@@ -93,7 +94,10 @@ EPOCHS: dict[str, dict] = {
             "agent_chains": 0.10,
         },
         "tasks": 71,
-        "label": "7-suite weights (tool .30 / structured .15 / retrieval .15 / coding .10 / instruction .10 / adversarial .10 / chains .10), 71 tasks",
+        "label": (
+            "7-suite weights (tool .30 / structured .15 / retrieval .15 / coding .10 / "
+            "instruction .10 / adversarial .10 / chains .10), 71 tasks"
+        ),
     },
     "0.4.0": {
         "weights": SUITE_WEIGHTS,

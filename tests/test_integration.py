@@ -62,11 +62,12 @@ def test_cli_run_writes_results_and_scores(tmp_path, monkeypatch):
     passed_ids = {r["task_id"] for r in data["results"] if r["pass1"] > 0}
     assert "tool_irrelevant_refusal" in passed_ids
     assert "tool_single_call" not in passed_ids
-    # partial credit: file task gets text right (score 1.0) but never writes the
-    # file (state score 0.0) -> combined rubric 0.5, passed False
+    # partial credit: the file task gets the text right (score 1.0) but never
+    # writes the file; its file_content assert is must_pass, so the failed gate
+    # zeroes the whole task rather than averaging it to 0.5 (audit F8)
     file_task = by_id["tool_file_write_read"]
-    assert not file_task["attempts"][0]["passed"]
-    assert file_task["attempts"][0]["score"] == 0.5
+    assert file_task["attempts"][0]["passed"] is False
+    assert file_task["attempts"][0]["score"] == 0.0
     assert any("state:" in f for f in file_task["attempts"][0]["failed"])
 
 

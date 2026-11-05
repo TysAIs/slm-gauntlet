@@ -27,6 +27,9 @@ include = ["gauntlet*"]
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+# llama.cpp is vendored (a submodule pointer), and linting someone else's C++
+# repo's python helpers is noise: `ruff check .` in CI must be about our code.
+extend-exclude = ["llama.cpp"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]

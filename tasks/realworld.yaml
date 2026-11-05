@@ -129,7 +129,7 @@
 
     Give the same instant in three lines, each "<city>: <ISO 8601 timestamp with offset>",
     in this order: UTC, Europe/Berlin, Asia/Tokyo. Use date T time with a colon in the
-    offset, e.g. 2026-01-20T16:30:00+00:00.
+    offset, e.g. 2025-03-04T08:15:00+00:00.
   asserts:
     - type: contains_all
       must_pass: true

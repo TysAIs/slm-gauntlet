@@ -35,8 +35,8 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from gauntlet.scorer import Scorer  # noqa: E402
 from gauntlet.sandbox import ToolSandbox  # noqa: E402
+from gauntlet.scorer import Scorer  # noqa: E402
 from gauntlet.state_check import evaluate_state_asserts  # noqa: E402
 from gauntlet.task import Task  # noqa: E402
 

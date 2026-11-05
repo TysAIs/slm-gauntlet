@@ -108,8 +108,18 @@ class Task(BaseModel):
 
     @field_validator("repeats")
     @classmethod
-    def _flaky_needs_repeats(cls, v: int, info) -> int:
-        return v
+    def _repeats_floor(cls, v: int) -> int:
+        return max(1, v)
+
+    @model_validator(mode="after")
+    def _flaky_needs_repeats(self):
+        # `flaky: true` used to promise repeats>=3 through a field validator that
+        # returned its input unchanged (and could not see `flaky`, which is
+        # declared after `repeats`). A flaky task measured once is a coin flip,
+        # so the flag now actually raises the repeat count.
+        if self.flaky and self.repeats < 3:
+            self.repeats = 3
+        return self
 
     def to_assert_dicts(self) -> list[dict]:
         out = []

@@ -38,11 +38,23 @@ def aggregate_results(results: list[dict], weights: dict | None = None) -> dict:
                 fail_modes[a["terminated"]] = fail_modes.get(a["terminated"], 0) + 1
 
     profile = classify_profile(suite_scores)
+    # Coverage: a run over a subset of the methodology's suites renormalizes the
+    # weights, so 2 tasks can print a perfect 1.000. Say so in the summary
+    # instead of letting the headline imply full-suite coverage.
+    covered = sorted(suite_scores)
+    missing = sorted(s for s in weights if s not in suite_scores)
+    total_tasks = sum(v["tasks"] for v in suite_scores.values())
     return {
         "subagent_capability_score": round(score, 3),
         "profile": profile,
         "suites": suite_scores,
         "failure_modes": fail_modes,
+        "coverage": {
+            "tasks": total_tasks,
+            "suites": covered,
+            "missing_suites": missing,
+            "partial": bool(missing),
+        },
     }
 
 
