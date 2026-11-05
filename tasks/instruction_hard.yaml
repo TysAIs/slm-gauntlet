@@ -1,25 +1,43 @@
-# Hard instruction suite (v0.3): stacked verifiable constraints, IFBench-style.
+# Hard instruction suite (v0.4): stacked verifiable constraints, IFBench-style.
 # All deterministic grading — no LLM judge.
+#
+# v0.4 fixes (audited from the corpus, see results/_published/audit_v0.4/AUDIT.md):
+#   hif_letter_ban_long — the required sentinel END_OF_REPORT contains the letter
+#                         "e", which constraint 1 bans: the task was literally
+#                         impossible and scored 0% across 253 configurations.
+#   hif_negation_lock   — regex "^(?i)(yes|no)$" cannot compile in Python (a
+#                         global inline flag must start the pattern), so the
+#                         check errored for every model.
+#   hif_exact_bullets   — the predicate used `sorted`, absent from the safe
+#                         builtin set, and the grader allowed 10 words where the
+#                         prompt said 8.
+#   hif_verbatim_token  — carried a scrubbed placeholder any model can copy.
 
 - id: hif_letter_ban_long
   suite: instruction
-  description: 400+ words with zero letter 'e' (stacked constraints)
+  description: 150+ words with zero letter 'e' (stacked constraints)
   tier: hard
   prompt: |
-    Write a report of at least 400 words about how a medieval castle was built.
+    Write a report of at least 150 words about how a medieval castle was built.
     Constraints (ALL must hold):
     1) The letter "e" must NOT appear anywhere in your response (any case).
     2) Exactly 3 bullet lines, each starting with "- ".
-    3) The final line must be exactly: END_OF_REPORT.
+    3) The final line must be exactly: FINAL_MARK
   asserts:
     - type: predicate
-      expr: "len(out.split()) >= 350"  # tokenizer tolerance on 400
+      expr: "len(out.split()) >= 150"
+      must_pass: true
+      weight: 2.0
     - type: predicate
       expr: "'e' not in out.lower()"
+      must_pass: true
+      weight: 3.0
     - type: predicate
       expr: "len([l for l in out.splitlines() if l.strip().startswith('- ')]) == 3"
+      weight: 1.0
     - type: predicate
-      expr: "out.strip().endswith('END_OF_REPORT.')"
+      expr: "out.strip().splitlines()[-1].strip() == 'FINAL_MARK'"
+      weight: 1.0
   max_tokens: 2048
 
 - id: hif_count_window
@@ -33,21 +51,39 @@
   asserts:
     - type: predicate
       expr: "3 <= out.count('AI') <= 5"
+      must_pass: true
+      weight: 2.0
     - type: predicate
       expr: "not any(c.isdigit() for c in out)"
+      weight: 2.0
+    - type: predicate
+      expr: "150 <= len(out.split()) <= 260"
+      weight: 1.0
   max_tokens: 768
 
 - id: hif_verbatim_token
   suite: instruction
-  description: copy a token verbatim inside a reformatted answer
+  description: copy one token verbatim while ignoring a decoy token
   tier: hard
   prompt: |
-    Here is an API key: sk-K9mW2xR7vT4zQ8bN5cJ3fL6hD1sG0pY4
-    Explain in one paragraph what an API key is used for. You must include
-    the exact key above, character-for-character, somewhere in your paragraph.
+    Ticket headers from three systems, in order:
+      legacy:  TK-OLD-114
+      current: SKY-7Q4M-2XZP-9RKT
+      staging: TMP-SKY-000
+    Explain in one paragraph what an API access token is used for. You must
+    include the CURRENT token above, character-for-character. Do not include
+    the legacy or staging token anywhere in your answer.
   asserts:
     - type: contains_all
-      values: ["sk-K9mW2xR7vT4zQ8bN5cJ3fL6hD1sG0pY4"]
+      values: ["SKY-7Q4M-2XZP-9RKT"]
+      must_pass: true
+      weight: 3.0
+    - type: predicate
+      expr: "'TK-OLD-114' not in out and 'TMP-SKY-000' not in out"
+      weight: 1.0
+    - type: predicate
+      expr: "len(out.split()) >= 25"
+      weight: 1.0
   max_tokens: 384
 
 - id: hif_system_conflict
@@ -65,6 +101,8 @@
             type: array
             items: {type: string}
         required: [composition]
+      must_pass: true
+      weight: 3.0
   max_tokens: 512
 
 - id: hif_exact_bullets
@@ -73,16 +111,21 @@
   tier: hard
   prompt: |
     List 5 benefits of exercise. Constraints (ALL must hold):
-    1) Exactly 5 bullet lines.
-    2) Each bullet is at most 8 words.
+    1) Exactly 5 bullet lines, each starting with "- ".
+    2) Each bullet text is at most 8 words.
     3) The bullets are in alphabetical order (by first word).
+    Output only the bullets, nothing else.
   asserts:
     - type: predicate
-      expr: "len([l for l in out.splitlines() if l.strip().startswith(('-', '*'))]) == 5"
+      expr: "len([l for l in out.splitlines() if l.strip().startswith('- ')]) == 5"
+      must_pass: true
+      weight: 2.0
     - type: predicate
-      expr: "all(len(l.split()) <= 10 for l in out.splitlines() if l.strip().startswith(('-', '*')))"
+      expr: "all(len(l.strip()[2:].split()) <= 8 for l in out.splitlines() if l.strip().startswith('- '))"
+      weight: 2.0
     - type: predicate
-      expr: "[l.strip()[2:].split()[0].lower() for l in out.splitlines() if l.strip().startswith(('-', '*'))] == sorted(l.strip()[2:].split()[0].lower() for l in out.splitlines() if l.strip().startswith(('-', '*')))"
+      expr: "[(l.strip()[2:].split() or [''])[0].lower() for l in out.splitlines() if l.strip().startswith('- ')] == sorted((l.strip()[2:].split() or [''])[0].lower() for l in out.splitlines() if l.strip().startswith('- '))"
+      weight: 2.0
   max_tokens: 384
 
 - id: hif_negation_lock
@@ -94,5 +137,5 @@
     No punctuation, no explanation, nothing else.
   asserts:
     - type: regex
-      pattern: "^(?i)(yes|no)\\.?$"
+      pattern: '(?i)^\s*(yes|no)\s*\.?\s*$'
   max_tokens: 32

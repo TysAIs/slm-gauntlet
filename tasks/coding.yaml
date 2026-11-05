@@ -1,5 +1,14 @@
-# Coding suite: HumanEval+ sanity floor (labeled contamination-risk) + regex/log tasks.
-# Fresh arXiv-derived and auto-bugged tasks come from taskgen at run time.
+# Coding suite (v0.4): EXECUTION-graded, not keyword-graded.
+#
+# v0.3 graded code with substring/regex checks ("def flatten", "return"), which a
+# broken implementation satisfies. Every task here now ships a `tests` block that
+# is executed with the model's own code in an isolated subprocess (see
+# gauntlet/scorer.py python_exec_check): the model's answer either runs and
+# satisfies the tests, or it fails. This is the grading-ladder step from regex
+# to execution that the v0.3 roadmap called for.
+#
+# The tasks are everyday engineering work, not puzzle trivia: CSV parsing,
+# number cleanup, retry schedules, stable dedupe.
 - id: code_humaneval_fizzbuzz_variant
   suite: coding
   description: Classic-style function (contamination-risk known — sanity floor only)
@@ -8,14 +17,20 @@
     Write a Python function `fizzbuzz(n: int) -> list[str]` that returns the FizzBuzz
     sequence from 1 to n inclusive, as a list of strings. Output only the code.
   asserts:
-    - type: contains_all
-      values: ["def fizzbuzz", "Fizz", "Buzz"]
-    - type: regex
-      pattern: "return"
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        r = fizzbuzz(15)
+        assert isinstance(r, list) and all(isinstance(x, str) for x in r), r
+        assert r[:5] == ["1", "2", "Fizz", "4", "Buzz"], r[:5]
+        assert r[14] == "FizzBuzz", r[14]
+        assert fizzbuzz(0) == []
+  max_tokens: 1024
 
 - id: code_bugfix_off_by_one
   suite: coding
-  description: Fix an off-by-one bug
+  description: Fix an off-by-one bug (execution-graded)
   prompt: |
     This function should return the sum of numbers 1..n inclusive but has a bug:
     def total(n):
@@ -25,12 +40,18 @@
         return s
     Output the corrected function only.
   asserts:
-    - type: contains_all
-      values: ["range(1, n + 1)"]
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        assert total(5) == 15, total(5)
+        assert total(1) == 1, total(1)
+        assert total(100) == 5050, total(100)
+  max_tokens: 1024
 
 - id: code_bug_identify
   suite: coding
-  description: Identify the buggy variable (assert on the name)
+  description: Identify the buggy expression fragment (answer is text, not code)
   prompt: |
     def average(nums):
         return sum(nums) / len(nums) - 1
@@ -39,39 +60,49 @@
   asserts:
     - type: contains_all
       values: ["- 1"]
+      must_pass: true
+  max_tokens: 128
 
 - id: code_regex_parser
   suite: coding
-  description: Parse log lines with a regex, extract ERROR levels
+  description: Write a log-level extractor (execution-graded)
   prompt: |
-    Write a Python regex pattern that captures the log level word (e.g. INFO, ERROR, WARN)
-    from lines like: 2026-09-25 12:00:03 ERROR Something failed
-    Answer as: PATTERN: <regex using a named group 'level'>
+    Write a Python function `extract_level(line: str)` that returns the log level
+    word (INFO, ERROR, WARN, DEBUG) found in a line like:
+    2026-09-25 12:00:03 ERROR Something failed
+    Return None when no level word is present. Use the re module. Output only the code.
   asserts:
-    - type: contains_any
-      values: ["?P<level>", "(?P<level>"]
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        assert extract_level("2026-09-25 12:00:03 ERROR Something failed") == "ERROR"
+        assert extract_level("2026-09-25 12:00:04 WARN disk 92%") == "WARN"
+        assert extract_level("2026-09-25 12:00:05 INFO started") == "INFO"
+        assert extract_level("2026-09-25 12:00:06 nothing interesting") is None
+  max_tokens: 1024
 
 - id: code_json_transform
   suite: coding
-  description: Write a function transforming nested dicts
+  description: Write a function transforming nested dicts (execution-graded)
   prompt: |
     Write a Python function `flatten(d: dict) -> dict` that flattens one level of nested
-    dicts, joining keys with a dot: {"a": {"b": 1}} -> {"a.b": 1}. Output only the code.
+    dicts, joining keys with a dot: {"a": {"b": 1}} -> {"a.b": 1}.
+    Non-dict values stay as they are: {"c": 2} -> {"c": 2}.
+    Output only the code.
   asserts:
-    - type: contains_all
-      values: ["def flatten"]
-      weight: 1.0
+    - type: python_exec
+      weight: 3.0
       must_pass: true
-    - type: predicate
-      expr: "'.' in out"
-      weight: 1.0
-    - type: regex
-      pattern: "isinstance\\([^)]*dict\\)"
-      weight: 1.0
+      tests: |
+        assert flatten({"a": {"b": 1}}) == {"a.b": 1}
+        assert flatten({"a": {"b": 1}, "c": 2}) == {"a.b": 1, "c": 2}
+        assert flatten({}) == {}
+  max_tokens: 1024
 
 - id: code_swap_fix
   suite: coding
-  description: Classic pythonic swap bug (temp variable misuse)
+  description: Fix a broken swap (execution-graded)
   prompt: |
     This swap function corrupts data:
     def swap(a, b):
@@ -80,7 +111,83 @@
         return a, b
     Output the corrected function only.
   asserts:
-    - type: contains_any
-      values: ["a, b = b, a", "temp = a", "tmp = a", "return b, a"]
-      weight: 2.0
+    - type: python_exec
+      weight: 3.0
       must_pass: true
+      tests: |
+        assert swap(1, 2) == (2, 1), swap(1, 2)
+        assert swap("x", "y") == ("y", "x"), swap("x", "y")
+  max_tokens: 512
+
+- id: code_csv_quoted_field
+  suite: coding
+  description: Parse a CSV row that contains a quoted comma
+  prompt: |
+    Write a Python function `parse_row(line: str) -> list[str]` that splits one CSV
+    row on commas while respecting double-quoted fields: a comma inside quotes is
+    part of the field and the quotes are removed. Example:
+      'ada,42,"Lovelace, Ada",gold' -> ['ada', '42', 'Lovelace, Ada', 'gold']
+    Do not use the csv module. Output only the code.
+  asserts:
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        assert parse_row('ada,42,"Lovelace, Ada",gold') == ['ada', '42', 'Lovelace, Ada', 'gold']
+        assert parse_row('a,b,c') == ['a', 'b', 'c']
+        assert parse_row('x,"y,z"') == ['x', 'y,z']
+  max_tokens: 1024
+
+- id: code_retry_schedule
+  suite: coding
+  description: Implement an exponential backoff schedule with a cap
+  prompt: |
+    Write a Python function `delays(n: int, base: float = 1.0, cap: float = 30.0) -> list[float]`
+    that returns n retry delays: base, 2*base, 4*base ... each capped at `cap`.
+    delays(0) returns []. Output only the code.
+  asserts:
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        assert delays(3) == [1.0, 2.0, 4.0], delays(3)
+        assert delays(0) == []
+        assert delays(6, 1.0, 30.0) == [1.0, 2.0, 4.0, 8.0, 16.0, 30.0], delays(6, 1.0, 30.0)
+  max_tokens: 1024
+
+- id: code_dedupe_stable
+  suite: coding
+  description: Stable dedupe of records by key, keeping the first occurrence
+  prompt: |
+    Write a Python function `dedupe(rows: list[dict], key: str) -> list[dict]` that keeps
+    the FIRST row for each distinct value of `key`, in original order, dropping later
+    duplicates. Rows missing `key` are kept. Output only the code.
+  asserts:
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        rows = [{"id": 1, "v": "a"}, {"id": 2, "v": "b"}, {"id": 1, "v": "c"}]
+        out = dedupe(rows, "id")
+        assert out == [{"id": 1, "v": "a"}, {"id": 2, "v": "b"}], out
+        assert dedupe([{"x": 1}, {"x": 2}], "id") == [{"x": 1}, {"x": 2}]
+  max_tokens: 1024
+
+- id: code_parse_money
+  suite: coding
+  description: Parse messy currency strings safely
+  prompt: |
+    Write a Python function `parse_money(s: str) -> float | None` that turns strings like
+    "$1,234.50" or "1234.5" into a number, strips a leading $ and thousands separators,
+    and returns None for anything that cannot be parsed (including "" and "n/a").
+    Output only the code.
+  asserts:
+    - type: python_exec
+      weight: 3.0
+      must_pass: true
+      tests: |
+        assert parse_money("$1,234.50") == 1234.5, parse_money("$1,234.50")
+        assert parse_money("1234.5") == 1234.5
+        assert parse_money("n/a") is None
+        assert parse_money("") is None
+  max_tokens: 1024

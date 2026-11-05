@@ -11,6 +11,11 @@ paths. Supported assertion types (used in task YAML):
   predicate:      {type: predicate, expr: "<python bool expr on `out`>"}
                   -- expr is eval'd with `out` bound to parsed output;
                      only allowed if task YAML explicitly enables it.
+  python_exec:    {type: python_exec, tests: "<python asserts>", timeout: 10}
+                  -- takes the first ```python block (or the whole answer),
+                     runs it in a subprocess together with `tests`, and passes
+                     only if the process exits 0. Use for coding tasks: a
+                     regex can match broken code, an execution cannot.
 
 The JSON-Schema support is intentionally minimal (types, properties, required,
 items, enum) — enough for the gauntlet's structured-output suite without a
@@ -20,7 +25,11 @@ jsonschema dependency.
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
+import sys
+import tempfile
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -147,18 +156,83 @@ def json_schema_check(output: str, schema: dict) -> ScoreResult:
 
 def predicate_check(output: Any, expr: str) -> ScoreResult:
     """Evaluate a boolean expression with `out` bound. For trusted task YAML only.
-    `out` goes in GLOBALS so comprehension scopes (separate frames) can see it."""
+    `out` goes in GLOBALS so comprehension scopes (separate frames) can see it.
+
+    `data` is also bound: the answer's first JSON value (fence-tolerant), or None
+    when the answer is not JSON. Real-world tasks grade the parsed structure
+    (which bucket an email went to), not whether a keyword appeared."""
     import json as _json
+    # The builtin set must cover what a task author actually writes: a missing
+    # `sorted` turns every model's answer into "predicate error" (hif_exact_bullets
+    # scored 0% for 253 configurations for exactly that reason).
     safe_builtins = {
         "len": len, "abs": abs, "sum": sum, "round": round,
         "any": any, "all": all, "min": min, "max": max, "int": int, "float": float,
-        "str": str, "json": _json,
+        "str": str, "json": _json, "sorted": sorted, "list": list, "dict": dict,
+        "set": set, "tuple": tuple, "enumerate": enumerate, "zip": zip, "range": range,
+        "bool": bool, "isinstance": isinstance, "reversed": reversed,
+        # `re` so a task can parse amounts/ids out of prose instead of doing
+        # brittle substring matching ("$59.00" vs "59.00" vs "USD 59.00").
+        "re": re,
     }
     try:
-        ok = bool(eval(expr, {"__builtins__": safe_builtins, "out": output}))
+        data = _json.loads(_strip_code_fence(output))
+    except (ValueError, TypeError):
+        data = None
+    try:
+        ok = bool(eval(expr, {"__builtins__": safe_builtins, "out": output, "data": data}))
     except Exception as e:  # noqa: BLE001 — task authors get the error message
         return ScoreResult(False, failed=[f"predicate error: {e}"])
     return ScoreResult(ok, checks=[{"check": "predicate", "ok": ok, "expr": expr}])
+
+
+_CODE_FENCE = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
+
+
+def extract_python(output: str) -> str:
+    """The first fenced python block, else the whole answer (a model may just
+    paste code). Never invent code: an answer with no fence and no python-ish
+    line yields the raw text, which usually SyntaxErrors — a real failure."""
+    m = _CODE_FENCE.search(output)
+    if m:
+        return m.group(1)
+    return output
+
+
+def python_exec_check(output: str, tests: str, timeout: float = 10.0) -> ScoreResult:
+    """Execution grading: run the model's code plus `tests` in a subprocess.
+
+    A regex can be satisfied by a broken implementation ("def flatten" passes
+    even if the function returns None); execution cannot. The subprocess is
+    isolated (-I: no site/user site-packages, no PYTHONPATH), runs in a scratch
+    cwd, and is killed at `timeout` — a model that ships an infinite loop fails
+    the task instead of hanging the suite.
+    """
+    code = extract_python(output)
+    if not code.strip():
+        return ScoreResult(False, failed=["python_exec: no code in answer"])
+    with tempfile.TemporaryDirectory(prefix="gauntlet-exec-") as td:
+        path = os.path.join(td, "answer.py")
+        with open(path, "w") as f:
+            f.write(code)
+            f.write("\n\n")
+            f.write(tests)
+            f.write("\n")
+        try:
+            r = subprocess.run(
+                [sys.executable, "-I", path],
+                cwd=td,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            return ScoreResult(False, failed=[f"python_exec: timeout after {timeout}s"])
+    if r.returncode == 0:
+        return ScoreResult(True, checks=[{"check": "python_exec", "ok": True}])
+    tail = (r.stderr or r.stdout or "").strip().splitlines()
+    detail = tail[-1][:300] if tail else f"exit {r.returncode}"
+    return ScoreResult(False, failed=[f"python_exec failed: {detail}"])
 
 
 class Scorer:
@@ -197,6 +271,8 @@ class Scorer:
                 # predicates evaluate against the RAW output text — no JSON
                 # extraction (code/loose text tasks would mis-parse)
                 r = predicate_check(output, a["expr"])
+            elif kind == "python_exec":
+                r = python_exec_check(output, a["tests"], float(a.get("timeout", 10.0)))
             else:
                 if kind not in known:
                     raise ValueError(f"unknown assert type: {kind}")
@@ -209,6 +285,8 @@ class Scorer:
                 elif kind == "exact_match":
                     r = fn(norm_output, a["value"].replace(",", ""))
                 elif kind == "regex":
+                    # a pattern that cannot compile fails EVERY model silently;
+                    # raise at score time so the run surfaces it as a task bug
                     r = fn(output, a["pattern"])
                 else:
                     raise ValueError(f"unknown assert type: {kind}")
