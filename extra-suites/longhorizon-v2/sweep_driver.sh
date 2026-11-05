@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # LH v2r sweep driver — serves each manifest variant on PVE (GTX 1070 Ti),
 # benches it from AREO via the tunnel, enforces runbook health rules.
-# Thermal rule (Tyler, decided 2026-11-02): HARD abort at 84C, peaks >80C logged.
+# Thermal rule (Tyler, 2026-11-04): HARD abort at 89C (the 1070 Ti is rated to 94C);
+# peaks are logged every 5s to /tmp/lh2_therm.log. 84C was the pre-ruling value.
 set -u
 SUITE="${SUITE:-$HOME/TysAIs/slm-gauntlet/extra-suites/longhorizon-v2}"
 KEY="${KEY:-$HOME/migration-backup/dotfiles/.ssh/id_ed25519}"
@@ -21,10 +22,10 @@ if pve "pgrep -f 'llama-server.*--por[t] 8080' >/dev/null"; then
   log "FATAL: a port-8080 llama-server is already running on PVE; refusing to disturb it"; exit 1
 fi
 pve "rm -f /tmp/lh2_ABORT; : > /tmp/lh2_therm.log"
-# thermal watchdog on PVE: sample every 5s; at >=84C kill ONLY the port-8080 server + flag abort
-pve "setsid nohup bash -c 'while true; do t=\$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader); echo \"\$(date +%s) \$t\" >> /tmp/lh2_therm.log; if [ \"\$t\" -ge 84 ]; then touch /tmp/lh2_ABORT; pkill -f \"llama-server.*--por[t] 8080\"; fi; sleep 5; done' >/dev/null 2>&1 & echo \$!" > /tmp/lh2_watchdog.pid
+# thermal watchdog on PVE: sample every 5s; at >=89C kill ONLY the port-8080 server + flag abort
+pve "setsid nohup bash -c 'while true; do t=\$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader); echo \"\$(date +%s) \$t\" >> /tmp/lh2_therm.log; if [ \"\$t\" -ge 89 ]; then touch /tmp/lh2_ABORT; pkill -f \"llama-server.*--por[t] 8080\"; fi; sleep 5; done' >/dev/null 2>&1 & echo \$!" > /tmp/lh2_watchdog.pid
 WD=$(cat /tmp/lh2_watchdog.pid)
-log "watchdog started on PVE (pid $WD), abort threshold 84C"
+log "watchdog started on PVE (pid $WD), abort threshold 89C"
 cleanup(){ pve "kill $WD 2>/dev/null; pkill -f 'llama-server.*--por[t] 8080' 2>/dev/null; true"; }
 trap cleanup EXIT
 

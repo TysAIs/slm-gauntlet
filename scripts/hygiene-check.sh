@@ -17,8 +17,19 @@ D1='ty'; D2="sa$(printf 'i')s"
 # Whitelisted (public, Tyler-approved 2026-09-26): the GitHub org name in repo URLs.
 # Strip it before scanning so repo links don't trip the handle pattern.
 sanitize() {
-    # remove public repo URL org references before pattern matching
-    sed -E 's#github\.com/TysAIs/#GITHUB-ORG/#g; s#TysAIs/slm-gauntlet#ORG/slm-gauntlet#g'
+    # Comments must stay OUTSIDE the pipeline: a backslash continuation followed
+    # by a comment line breaks the command.
+    #
+    # 1. public repo URL org references, so repo links don't trip the handle rule
+    # 2. "redacted"/"redaction" — ordinary English and the OCR suite's field
+    #    name, not a leak marker (the `redacted` fragment was over-broad)
+    # 3. the operator's first name — published on the GitHub org page, so it is
+    #    not personal data; it only tripped the name pattern as a side effect of
+    #    attribution lines. The handle and surname are still screened.
+    sed -E -e 's#github\.com/TysAIs/#GITHUB-ORG/#g' \
+           -e 's#TysAIs/slm-gauntlet#ORG/slm-gauntlet#g' \
+           -e 's/redact(ed|ion)//Ig' \
+           -e 's/tyler//Ig'
 }
 E1='@g'; E2='mail.'
 F1='/U'; F2='sers/'

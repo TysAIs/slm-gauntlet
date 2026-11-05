@@ -89,7 +89,9 @@ const W = 1920, H = 1080;
 const labels = MODELS.map(m => {
   const d = document.createElement('div');
   d.className = 'label';
-  d.innerHTML = `<div class="n">${m.name}</div><div class="s" style="color:${m.color}">${m.score.toFixed(1)}%</div><div class="q">${m.quant}</div>`;
+  d.innerHTML = `<div class="n">${m.name}</div>`
+              + `<div class="s" style="color:${m.color}">${m.score.toFixed(1)}%</div>`
+              + `<div class="q">${m.quant}</div>`;
   hud.appendChild(d);
   return d;
 });
@@ -456,7 +458,7 @@ def main() -> int:
             "score": float(e["overall_pct"]),
             "quant": det.get("quant") or (e.get("sub", "").split("·")[0].strip()),
             "rgb": list(PALETTE[i % len(PALETTE)]),
-            "color": "#%02x%02x%02x" % PALETTE[i % len(PALETTE)],
+            "color": "#{:02x}{:02x}{:02x}".format(*PALETTE[i % len(PALETTE)]),
             "n": e.get("n"),
         })
 
@@ -482,7 +484,7 @@ def main() -> int:
         print(f"  #{i} {m['score']:5.1f}  n={m['n']}  {m['name']} / {m['quant']}"
               f"  <- {ents[m['id']].get('_src')}")
 
-    foot = f"measured on GTX 1070 Ti 8GB · scores from results/cards · seed 1 · temp 0"
+    foot = "measured on GTX 1070 Ti 8GB · scores from results/cards · seed 1 · temp 0"
     html = (HTML
             .replace("__MODELS__", json.dumps(models))
             .replace("__DURATION__", repr(a.seconds))

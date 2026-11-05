@@ -29,7 +29,13 @@ METHODOLOGY (single definition, used for every row)
   suite_weight = gauntlet/cli.py SUITE_WEIGHTS (tool .30, structured .15,
                  retrieval .15, coding .10, instruction .10, adversarial .10,
                  agent_chains .10) -- the figure `gauntlet run` reports.
-  task pass1 is the scorer's partial credit, as recorded per task in the run log.
+  task pass1 is the BINARY pass rate (all asserts passed, run terminated
+                cleanly), as recorded per task in the run log. It is NOT the
+                scorer's weighted partial credit: the rubric lives in the same
+                log as each attempt's `score`, and `pass1` ignores it. Re-scoring
+                the corpus on the rubric would raise rows by up to ~25 pp
+                (docs/AUDIT-LOGIC-v0.5.md, F1), so the published table is
+                deliberately the strict binary number.
   methodology key = "<task count> tasks, scorer <epoch>", epoch derived from the
   card timestamp and the commit that changed the scorer (v0.3.1 = 8244f05,
   2026-09-26: fixed structured-hard predicates). Rows below the current task
@@ -53,7 +59,6 @@ USAGE
 from __future__ import annotations
 
 import argparse
-import glob
 import json
 import os
 import re
@@ -236,7 +241,7 @@ def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]],
     """
     cands = [(ts, p, n) for ts, p, n in logs.get(card["model"], []) if n == card["n"]]
     if not cands:
-        return None, "no run log with %s tasks" % card.get("n")
+        return None, "no run log with {} tasks".format(card.get("n"))
     scored = []
     for ts, p, n in cands:
         try:
@@ -248,14 +253,14 @@ def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]],
         head_eq = card.get("overall_pct") is not None and abs(s["overall"] - card["overall_pct"]) <= TOL
         scored.append((suite_eq, head_eq, ts, p, n, s))
     if not scored:
-        return None, "no readable run log with %s tasks" % card.get("n")
+        return None, "no readable run log with {} tasks".format(card.get("n"))
     # preference: suite+headline match, suite match, headline match, then latest run
     order = sorted(scored, key=lambda t: (t[0] and t[1], t[0], t[1], t[2]))
     suite_eq, head_eq, ts, p, n, s = order[-1]
     if suite_eq or head_eq:
         which = ("suites" if suite_eq else "") + ("+headline" if suite_eq and head_eq else
                                                   ("headline" if head_eq else ""))
-        note = "published run matched by %s (%s)" % (which, os.path.basename(p))
+        note = f"published run matched by {which} ({os.path.basename(p)})"
         if len(cands) > 1:
             others = [x for x in scored if x[3] != p]
             if others:
@@ -273,7 +278,7 @@ def classify(card: dict, src: dict | None) -> tuple[bool, str]:
     epoch = scorer_epoch(card.get("ts", ""))
     n = card.get("n")
     if epoch != CURRENT_EPOCH:
-        return False, "scorer %s (pre-%s)" % (epoch, CURRENT_EPOCH)
+        return False, f"scorer {epoch} (pre-{CURRENT_EPOCH})"
     if n != FULL_TASKS:
         return False, "%s tasks (current methodology is %d)" % (n, FULL_TASKS)
     if src is None:
@@ -348,7 +353,7 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
                 "source_note": entry["source_note"],
             })
 
-    for fam, entries in families.items():
+    for _fam, entries in families.items():
         entries.sort(key=lambda e: -e["recomputed"])
         best = entries[0]
         best = dict(best)
@@ -394,14 +399,17 @@ def render_block(data: dict) -> str:
              "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)." % (
                  sum(r["variants"] for r in data["rows"] + data["offload"])))
     L.append("")
-    L.append("| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |")
+    L.append(
+        "| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | "
+        "Retr | Code | Instr | Method | Card |"
+    )
     L.append("|---|---|---|---|---|---|---|---|---|---|---|---|---|")
     for i, r in enumerate(data["rows"]):
         su = r["suites"]
         cells = [pct((su.get(k) or 0) * 100, 0) for k in
                  ("tooluse", "adversarial", "agent_chains", "structured", "retrieval", "coding", "instruction")]
         rank = MEDALS.get(i, str(i + 1))
-        card = "card_%s.png" % r["model"]
+        card = "card_{}.png".format(r["model"])
         L.append("| %s | %s | %s | **%s** | %s | %d t · %s | [png](results/cards/%s) |" % (
             rank, r["display_name"], r["config"], pct(r["recomputed"]),
             " | ".join(cells), FULL_TASKS, r["epoch"], card))
@@ -412,7 +420,7 @@ def render_block(data: dict) -> str:
         L.append("| Model | Configuration | Score | Why it is not comparable |")
         L.append("|---|---|---|---|")
         for r in data["legacy"]:
-            L.append("| %s | %s | %s | %s |" % (
+            L.append("| {} | {} | {} | {} |".format(
                 r["display_name"], r["config"], pct(r["published"]), r["not_rankable_because"]))
         L.append("")
     if data["offload"]:
@@ -438,8 +446,8 @@ def render_block(data: dict) -> str:
         gap = data["rows"][0]["recomputed"] - nxt["recomputed"]
         verdict = (" — inside the weight of a single task (0.7-1.6 pp here depending on the "
                    "suite), so a tie, not a win."
-                   if gap <= 1.5 else " — %.1f pp behind." % gap)
-        L.append("- Next: %s (%s) at %s%s" % (nxt["display_name"], nxt["config"],
+                   if gap <= 1.5 else f" — {gap:.1f} pp behind.")
+        L.append("- Next: {} ({}) at {}{}".format(nxt["display_name"], nxt["config"],
                                               pct(nxt["recomputed"]), verdict))
     if data["legacy"]:
         n_legacy = len(data["legacy"])
@@ -470,7 +478,7 @@ def publish_json(data: dict) -> str:
             "tasks": FULL_TASKS,
             "scorer": r["epoch"],
             "variants_scored": r["variants"],
-            "card_png": "results/cards/card_%s.png" % r["model"],
+            "card_png": "results/cards/card_{}.png".format(r["model"]),
             "source_log": os.path.relpath(r["source_log"]),
         })
     doc = {
@@ -576,7 +584,7 @@ def fix_cards(data: dict, cards_dir: Path, dry_run=False) -> list[dict]:
                 obj["n"] = src["n"]
                 obj["scorer"] = scorer_epoch(obj.get("ts", ""))
                 obj["score_weights"] = "cli-%dsuite" % len(
-                    (EPOCHS[_ep]["weights"] if _ep in EPOCHS else SUITE_WEIGHTS))
+                    EPOCHS[_ep]["weights"] if _ep in EPOCHS else SUITE_WEIGHTS)
                 obj["source_log"] = os.path.relpath(os.path.abspath(rep["source_log"]))
                 obj["tasks_per_suite"] = src["tasks"]
                 touched = True
@@ -605,7 +613,7 @@ def verify_weights() -> str | None:
     cover the full task set it claims to."""
     total = sum(SUITE_WEIGHTS.values())
     if abs(total - 1.0) > 1e-9:
-        return "SUITE_WEIGHTS sum to %.4f, not 1.0 — the score is not a percentage" % total
+        return f"SUITE_WEIGHTS sum to {total:.4f}, not 1.0 — the score is not a percentage"
     try:
         from gauntlet.cli import SUITE_WEIGHTS as SRC  # type: ignore
     except Exception:
@@ -613,9 +621,8 @@ def verify_weights() -> str | None:
     if SRC is not None and {k: round(v, 6) for k, v in SRC.items()} != {
         k: round(v, 6) for k, v in SUITE_WEIGHTS.items()
     }:
-        return ("gauntlet/cli.py SUITE_WEIGHTS %s != published weights %s — "
-                "methodology changed, update this script and the README method note"
-                % (SRC, SUITE_WEIGHTS))
+        return (f"gauntlet/cli.py SUITE_WEIGHTS {SRC} != published weights {SUITE_WEIGHTS} — "
+                "methodology changed, update this script and the README method note")
     return None
 
 
@@ -624,7 +631,7 @@ def task_inventory(root: Path) -> dict[str, int]:
     counts: dict[str, int] = {}
     for path in sorted((root / "tasks").glob("*.yaml")):
         text = path.read_text()
-        for m in re.finditer(r"^-\s+id:\s*\S+", text, re.M):
+        for _m in re.finditer(r"^-\s+id:\s*\S+", text, re.M):
             counts.setdefault("*", 0)
             counts["*"] += 1
         for suite in re.findall(r"^\s+suite:\s*(\w+)\s*$", text, re.M):
@@ -636,7 +643,11 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", default=str(Path(__file__).resolve().parent.parent))
     ap.add_argument("--readme", default=None)
-    ap.add_argument("--write", action="store_true", help="regenerate the README block + results/_published/leaderboard.json")
+    ap.add_argument(
+        "--write",
+        action="store_true",
+        help="regenerate the README block + results/_published/leaderboard.json",
+    )
     ap.add_argument("--fix-cards", action="store_true", help="repair card JSON that does not reproduce its run log")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--json-out", default=None)
@@ -648,7 +659,7 @@ def main(argv=None) -> int:
     readme = Path(a.readme) if a.readme else root / "README.md"
     lj = root / "results" / "_published" / "leaderboard.json"
     if not cards_dir.is_dir():
-        print("no cards dir at %s" % cards_dir, file=sys.stderr)
+        print(f"no cards dir at {cards_dir}", file=sys.stderr)
         return 2
 
     bad_weights = verify_weights()
@@ -663,7 +674,7 @@ def main(argv=None) -> int:
     try:
         set_epoch(newest_published_epoch({scorer_epoch(c.get("ts", "")) for c in cards}))
     except KeyError as e:
-        print("cannot pick a published epoch: %s" % e, file=sys.stderr)
+        print(f"cannot pick a published epoch: {e}", file=sys.stderr)
         return 2
     logs = index_logs(root / "results")
     data = build_rows(cards, logs, verbose=a.verbose)
@@ -675,7 +686,7 @@ def main(argv=None) -> int:
     for r in data["legacy"]:
         print("  legacy: %-28s n=%s published=%s — %s"
               % (r["display_name"], r["n"], pct(r["published"]), r["not_rankable_because"]))
-    print("methodology: %s (scorer %s)" % (WEIGHT_LABEL, CURRENT_EPOCH))
+    print(f"methodology: {WEIGHT_LABEL} (scorer {CURRENT_EPOCH})")
     print("card repairs needed: %d" % len(data["card_repairs"]))
     for r in data["card_repairs"]:
         print("  %-38s card %-52s published=%s recomputed=%s (suites_match=%s headline_match=%s)"
@@ -702,7 +713,7 @@ def main(argv=None) -> int:
         lines = [ln for ln in have_block.splitlines() if ln.startswith("|")]
         for name in known:
             if not any(name in ln for ln in lines):
-                out.append("README table is missing a row for %r" % name)
+                out.append(f"README table is missing a row for {name!r}")
         for ln in lines:
             cells = [c.strip() for c in ln.strip("|").split("|")]
             if not cells or set(cells[0]) <= set("-: ") or cells[0] in ("Rank", "Model", "#"):
@@ -746,9 +757,9 @@ def main(argv=None) -> int:
             out.append("%d card(s) do not reproduce their run log (run --fix-cards)"
                        % len(data["card_repairs"]))
         for r in data["rows"] + data["offload"]:
-            png = root / "results" / "cards" / ("card_%s.png" % r["model"])
+            png = root / "results" / "cards" / ("card_{}.png".format(r["model"]))
             if not png.exists():
-                out.append("card image missing for %r: %s" % (r["display_name"], os.path.relpath(png)))
+                out.append("card image missing for {!r}: {}".format(r["display_name"], os.path.relpath(png)))
         out += detail_problems()
         return out
 
@@ -760,7 +771,7 @@ def main(argv=None) -> int:
             gen = root / "gen-leaderboard.py"
             if gen.exists():  # detail table comes from the same corpus
                 subprocess.run([sys.executable, str(gen)], cwd=str(root), check=False)
-        print("%s README block and %s" % ("would write" if a.dry_run else "wrote",
+        print("{} README block and {}".format("would write" if a.dry_run else "wrote",
                                           os.path.relpath(lj)))
 
     problems = verify_all()

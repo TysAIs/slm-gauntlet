@@ -20,11 +20,14 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
     """Run one task `task.repeats` times; returns per-task record with pass^k."""
     scorer = Scorer()
     attempts = []
+    # Enrich ONCE per task: pass^k must compare repeats of the SAME instance.
+    # (It used to run inside the rep loop with a per-rep seed, so a repeated
+    # enriched task was a different catalog each time.)
+    enriched = enrich_task(task, seed=seed) if "{" in task.prompt else task
     for rep in range(task.repeats):
         sandbox = ToolSandbox(seed=seed + rep)
         for inj in task.fail_injections:
             sandbox.fail_next(inj.tool, inj.times)
-        enriched = enrich_task(task, seed=seed * 1000 + rep) if "{" in task.prompt else task
         try:
             outcome: LoopOutcome = await asyncio.wait_for(
                 run_agent_loop(
@@ -44,9 +47,13 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
         score = scorer.score(outcome.final_text, task.to_assert_dicts()) if outcome.final_text else None
         state = evaluate_state_asserts(sandbox, task.state_asserts) if task.state_asserts else None
 
-        # combine text rubric + state rubric (average when both present)
+        # combine text rubric + state rubric. A must_pass gate that failed forces
+        # the whole task to 0: averaging let a gated text assert still earn 0.5
+        # from a clean state half (all 23 state-assert tasks also carry text
+        # asserts, so that path was live on every one of them).
         if score is not None and state is not None:
-            rubric = (score.score + state["score"]) / 2
+            gated = getattr(score, "gated", False) or state.get("gated", False)
+            rubric = 0.0 if gated else (score.score + state["score"]) / 2
         elif state is not None:
             rubric = state["score"]
         elif score is not None:

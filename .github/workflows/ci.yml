@@ -22,7 +22,10 @@ jobs:
         run: bash scripts/hygiene-check.sh
 
       - name: Lint
-        run: ruff check .
+        # Scope: the shipped package and its tooling. `extra-suites/`, the
+        # top-level one-off helper scripts and the vendored llama.cpp tree are
+        # archival, not part of the installed package (see docs/AUDIT-LOGIC-v0.5.md).
+        run: ruff check gauntlet scripts tests
 
       - name: Tests
         run: pytest -q

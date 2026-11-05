@@ -51,8 +51,12 @@ def evaluate_state_asserts(sandbox: ToolSandbox, asserts: list[StateAssert]) -> 
             value = _resolve_path(sandbox.state, sa.path or "")
             if sa.equals is not None:
                 # missing key == empty default when expecting an empty container
-                # (e.g. reservations == [] when nothing was ever created)
-                if value is None and sa.equals in ([], {}, "", 0):
+                # (e.g. reservations == [] when nothing was ever created).
+                # NOTE: `False` is deliberately NOT in this set — `False == 0` in
+                # Python, so including 0 by value would make an absent boolean
+                # path "equal to False" and silently pass a negative assertion.
+                empty_defaults = ([], {}, "")
+                if value is None and isinstance(sa.equals, list | dict | str) and sa.equals in empty_defaults:
                     ok = True
                 else:
                     ok = value == sa.equals
@@ -87,4 +91,4 @@ def evaluate_state_asserts(sandbox: ToolSandbox, asserts: list[StateAssert]) -> 
         checks.append({"check": f"state:{sa.type}", "ok": ok, "detail": detail})
 
     score = 0.0 if must_pass_failed else (earned / total if total else 1.0)
-    return {"score": score, "passed": not failed, "failed": failed, "checks": checks}
+    return {"score": score, "passed": not failed, "failed": failed, "checks": checks, "gated": must_pass_failed}

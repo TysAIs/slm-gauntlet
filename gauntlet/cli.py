@@ -74,6 +74,14 @@ def load_tasks(suites: list[str] | None = None, tasks_dir: Path | None = None) -
 
 def cmd_run(args: argparse.Namespace) -> int:
     check_weights()
+    # Thermal preflight: Tyler's 89C rule (1070 Ti is rated to 94C). Refuse to
+    # start hot; a host without a readable sensor is a no-op, not a failure.
+    from gauntlet.thermal import THERMAL_LIMIT_C, assert_thermal_ok
+
+    limit = getattr(args, "thermal_limit", THERMAL_LIMIT_C)
+    temp = assert_thermal_ok(limit)
+    if temp is not None:
+        print(f"[gauntlet] GPU {temp:.0f}C (ceiling {limit:.0f}C)")
     suites = args.suite.split(",") if args.suite != "all" else None
     tasks_dir = Path(args.tasks_dir) if getattr(args, "tasks_dir", None) else TASKS_DIR
     tasks = load_tasks(suites, tasks_dir)
@@ -157,13 +165,24 @@ def main(argv: list[str] | None = None) -> int:
     run_p.add_argument("--endpoint", required=True, help="OpenAI-compatible base URL, e.g. http://host:8080/v1")
     run_p.add_argument("--model", required=True)
     run_p.add_argument("--suite", default="all", help="comma-separated suites or 'all'")
-    run_p.add_argument("--tasks-dir", default=None, help="task YAML directory (default: tasks/); extra suites MUST live outside tasks/ so --suite all never mixes them in")
+    run_p.add_argument(
+        "--tasks-dir",
+        default=None,
+        help="task YAML directory (default: tasks/); extra suites MUST live outside tasks/ "
+        "so --suite all never mixes them in",
+    )
     run_p.add_argument(
         "--concurrency", type=int, default=2,
         help="parallel tasks; keep low (1-2) for 8GB GPU endpoints",
     )
     run_p.add_argument("--timeout", type=float, default=600.0)
     run_p.add_argument("--seed", type=int, default=0)
+    run_p.add_argument(
+        "--thermal-limit",
+        type=float,
+        default=89.0,
+        help="refuse to start at or above this GPU temperature in C (default 89, Tyler's rule; 0 disables)",
+    )
     run_p.add_argument(
         "--repeats", type=int, default=1,
         help="run every task k times; pass^k = all-reps reliability (tau-bench style). 3 recommended",
