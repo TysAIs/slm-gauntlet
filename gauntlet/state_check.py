@@ -60,6 +60,15 @@ def evaluate_state_asserts(sandbox: ToolSandbox, asserts: list[StateAssert]) -> 
             else:
                 ok = value is not None
                 detail = f"{sa.path} exists (got {value!r})"
+        elif sa.type == "file_lines":
+            target = sandbox.root / (sa.path or "")
+            if not target.exists():
+                detail = f"file {sa.path} missing"
+            else:
+                got = [ln.strip() for ln in target.read_text().splitlines() if ln.strip()]
+                want = [ln.strip() for ln in (sa.lines or [])]
+                ok = got == want
+                detail = f"file {sa.path} lines {want!r} (got {got!r})"
         elif sa.type == "file_content":
             target = sandbox.root / (sa.path or "")
             if target.exists():
