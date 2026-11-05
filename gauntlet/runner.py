@@ -116,7 +116,7 @@ def write_results(results: list[dict], meta: dict, outdir: Path) -> Path:
         "meta": {
             **meta,
             "timestamp": stamp,
-            "gauntlet_version": "0.1.0",
+            "gauntlet_version": meta.get("methodology", "0.1.0"),
         },
         "results": results,
     }
