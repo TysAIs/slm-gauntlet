@@ -10,8 +10,17 @@ Determinism comes from window.__frame(t): every screenshot sets the animation
 clock explicitly, so the same input bytes always produce the same frames.
 
 Data comes from the card JSONs that make_cards.py/gen-leaderboard.py already
-produce (results/cards/*.json), so the animation can never drift from the
-leaderboard numbers.
+produce (results/cards/*.json) *and* from results/cards/manifest.json, which is
+where the published headline cards for older models live. Both are
+scripts/leaderboard_check.py sources, so the animation cannot drift from the
+published table. Model families are collapsed with the same display-name
+normalisation the published leaderboard uses, and each rendered model prints a
+selection receipt naming the JSON it came from.
+
+Self-checks that gate exit 0: geometry (in frame, spread, tower heights), ink
+density, subtitle actually inside the frame, the subtitle naming every model
+with its quantization, and a read-back of the MODELS payload from the written
+HTML (what renders == what was selected).
 
 Usage
   /usr/bin/python3 scripts/voxel_compare.py --top 5            # writes results/_published/voxel_compare/
@@ -24,10 +33,26 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+
+# `--top N` must select the same models the published leaderboard ranks, so the
+# family normaliser is imported from the leaderboard generator instead of being
+# re-invented here. The renderer stays usable standalone: if that module cannot
+# be imported (moved, renamed, dependency broken) we fall back to the same
+# regex and say so out loud rather than silently ranking differently.
+try:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from leaderboard_check import norm_name as _norm_name  # noqa: E402
+    _NORM_SRC = "scripts/leaderboard_check.py::norm_name"
+except Exception as _exc:  # pragma: no cover - only on a broken checkout
+    def _norm_name(s: str) -> str:
+        return re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).strip()
+
+    _NORM_SRC = f"local fallback ({_exc.__class__.__name__}: {_exc})"
 
 HTML = """<!DOCTYPE html>
 <html><head><meta charset="utf-8">
@@ -199,6 +224,77 @@ function draw(t){
 
 // Deterministic geometry self-check: proves the towers and their labels are
 // inside the frame without a human looking at the picture.
+//
+// Label auto-fit + overlap proof. Tower pitch on screen is fixed by SPACING and
+// PX_PER_UNIT (~220 px), so a wide model name ("MiniCPM-V 5 · 2B") runs into
+// its neighbour at the default 30 px font. Names are measured and the name font
+// is scaled down ONCE, uniformly, to the widest name that fits the pitch; then
+// every label box is replayed across the whole tail of the animation (labels
+// are only all-visible from t>=0.80) to prove zero overlaps and zero
+// out-of-frame labels. No vision model required.
+const LABEL_FONT = 30, LABEL_GAP = 16, LABEL_FROM = 0.80, LABEL_STEP = 0.02;
+
+function labelBoxes(t){
+  const cam = camAt(t);
+  return MODELS.map((m, i) => {
+    const p = projectWith(m._top, cam);
+    const buildT = 0.12 + 0.42 * (i / Math.max(1, MODELS.length - 1));
+    const grow = Math.max(0, Math.min(1, (t - buildT) / 0.26));
+    if (!p || grow <= 0.98) return null;
+    const w = labels[i].offsetWidth, h = labels[i].offsetHeight;
+    return {id: m.id, i, l: p[0] - w/2, r: p[0] + w/2, tp: p[1] - 14 - h, bt: p[1] - 14};
+  });
+}
+
+function labelPitch(){
+  let min = Infinity;
+  for(let t = LABEL_FROM; t <= DURATION + 1e-9; t += LABEL_STEP){
+    const cam = camAt(t);
+    const xs = MODELS.map(m => { const p = projectWith(m._top, cam); return p ? p[0] : null; });
+    for(let i = 1; i < xs.length; i++){
+      if(xs[i] === null || xs[i-1] === null) continue;
+      min = Math.min(min, Math.abs(xs[i] - xs[i-1]));
+    }
+  }
+  return isFinite(min) ? min : 220;
+}
+
+window.__fitlabels = function(){
+  const names = labels.map(L => L.querySelector('.n'));
+  names.forEach(n => { n.style.fontSize = LABEL_FONT + 'px'; });
+  const widths = names.map(n => n.offsetWidth);
+  const widest = Math.max(...widths);
+  const allowed = Math.max(72, labelPitch() - LABEL_GAP);
+  const scale = Math.min(1, allowed / widest);
+  const px = Math.round(LABEL_FONT * scale * 10) / 10;
+  names.forEach(n => { n.style.fontSize = px + 'px'; });
+  return {name_font_px: px, widest_name_at_default: widest, allowed_px: Math.round(allowed),
+          min_pitch_px: Math.round(labelPitch()), name_widths: widths};
+};
+
+window.__labelcheck = function(){
+  const overlaps = [], outside = [];
+  let samples = 0, minGap = Infinity;
+  for(let t = LABEL_FROM; t <= DURATION + 1e-9; t += LABEL_STEP){
+    samples++;
+    const boxes = labelBoxes(t).filter(Boolean);
+    for(const b of boxes){
+      if(b.l < 20 || b.r > W - 20 || b.tp < 20) outside.push({t: +t.toFixed(2), id: b.id});
+    }
+    for(let i = 0; i < boxes.length; i++) for(let j = i+1; j < boxes.length; j++){
+      const a = boxes[i], b = boxes[j];
+      const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l);
+      const oy = Math.min(a.bt, b.bt) - Math.max(a.tp, b.tp);
+      if(ox > 0 && oy > 0) overlaps.push({t: +t.toFixed(2), a: a.id, b: b.id, px: Math.round(Math.min(ox, oy))});
+      else if(ox > 0) minGap = Math.min(minGap, -oy);
+    }
+  }
+  return {samples, min_pitch_px: Math.round(labelPitch()),
+          name_font_px: parseFloat(labels[0].querySelector('.n').style.fontSize),
+          overlaps: overlaps.slice(0, 6), overlap_count: overlaps.length,
+          out_of_frame: outside.slice(0, 6), out_of_frame_count: outside.length};
+};
+
 window.__selfcheck = function(){
   const t = DURATION, cam = camAt(t);
   const rows = MODELS.map(m => {
@@ -222,7 +318,16 @@ window.__selfcheck = function(){
   }
   const xs = rows.map(r=>r.x).filter(v=>v!==null);
   const spread = xs.length ? Math.max(...xs) - Math.min(...xs) : 0;
-  return {rows, spread_px: spread, ink_fraction: +(ink/total).toFixed(4), orbit: +cam.orbit.toFixed(3)};
+  // the subtitle must name every tower it labels and must not run off the frame
+  const subEl = document.querySelector('.sub');
+  const subRect = subEl.getBoundingClientRect();
+  const sub = {
+    text: subEl.textContent,
+    width: Math.round(subRect.width),
+    in_frame: subRect.left >= 0 && subRect.right <= W - 40,
+  };
+  return {rows, spread_px: spread, ink_fraction: +(ink/total).toFixed(4),
+          orbit: +cam.orbit.toFixed(3), sub};
 };
 
 window.__frame = function(t){ draw(Math.max(0, Math.min(DURATION, t))); };
@@ -232,35 +337,84 @@ draw(0);
 
 
 def card_entries() -> dict[str, dict]:
-    """model id -> card entry, from the repo's own card JSONs (newest wins)."""
+    """model id -> card entry, from the repo's own card corpus.
+
+    Two card sources live in results/cards and BOTH are published leaderboard
+    sources, so both count:
+
+      * card_<config>.json  per-configuration cards (make_cards.py output; they
+        carry details.quant and source_log provenance);
+      * manifest.json       the 14 headline cards published for models that were
+        carded before per-configuration JSONs were kept -- Gemma 4 E4B,
+        MiniCPM-V 5 2B and 12 more, including the leaderboard's #2 and #3.
+
+    scripts/leaderboard_check.py reads every *.json in that directory (see its
+    card_files()), so skipping manifest.json here made the animation's "top N"
+    disagree with the published table: the 2026-11-03 cut dropped #2 and #3.
+
+    A per-configuration card always wins over a manifest row for the same model
+    id, so a model present in both can never be counted twice or shadowed by a
+    stale headline number. `_src` records the file each number came from.
+    """
     out: dict[str, dict] = {}
+    manifest = None
     for f in sorted(glob.glob("results/cards/*.json")):
         if f.endswith("manifest.json"):
+            manifest = f
             continue
-        try:
-            data = json.load(open(f))
-        except Exception:
-            continue
-        items = data if isinstance(data, list) else [data]
-        for it in items:
-            mid = it.get("model")
-            if not mid:
-                continue
+        for it in _card_items(f):
+            mid = it["model"]
             prev = out.get(mid)
             if prev is None or str(it.get("ts", "")) >= str(prev.get("ts", "")):
-                out[mid] = it
+                out[mid] = {**it, "_src": f}
+    if manifest:
+        for it in _card_items(manifest):
+            if it["model"] not in out:      # per-config card is authoritative
+                out[it["model"]] = {**it, "_src": manifest}
     return out
+
+
+def _card_items(path: str) -> list[dict]:
+    try:
+        data = json.load(open(path))
+    except Exception:
+        return []
+    items = data if isinstance(data, list) else [data]
+    return [it for it in items if isinstance(it, dict) and it.get("model")]
+
+
+def family_of(entry: dict) -> str:
+    """One tower per model family, normalised exactly like the published
+    leaderboard (scripts/leaderboard_check.py::family_of), so `--top N` selects
+    the published leaderboard's top N and not a second quantization of a model
+    that is already on the podium."""
+    return _norm_name(entry.get("display_name") or entry.get("model", ""))
+
+
+def comparable_n(ents: dict[str, dict]) -> int:
+    """Task count of the current methodology (mode of the corpus). Rows that ran
+    fewer tasks -- e.g. the 65-task Bonsai-2 row -- stay in the corpus for
+    provenance but are never ranked against full-count rows, which is the rule
+    the published table states in its "legacy rows" section."""
+    counts: dict[int, int] = {}
+    for e in ents.values():
+        n = e.get("n")
+        if isinstance(n, int):
+            counts[n] = counts.get(n, 0) + 1
+    return max(counts, key=lambda k: counts[k]) if counts else 0
 
 
 def top_models(n: int) -> list[str]:
     ents = card_entries()
-    ranked = sorted(ents.values(), key=lambda e: -float(e.get("overall_pct") or 0))
+    full = comparable_n(ents)
+    ranked = sorted((e for e in ents.values() if not full or e.get("n") == full),
+                    key=lambda e: -float(e.get("overall_pct") or 0))
     seen, picked = set(), []
     for e in ranked:
-        base = e["model"].split("-q")[0].split("-iq")[0].split("-ud")[0]
-        if base in seen:      # one quant per model family, like the leaderboard headline
+        fam = family_of(e)
+        if fam in seen:      # one configuration per model, like the leaderboard
             continue
-        seen.add(base)
+        seen.add(fam)
         picked.append(e["model"])
         if len(picked) >= n:
             break
@@ -318,7 +472,16 @@ def main() -> int:
     else:
         import datetime as _dt
         slug = f"voxel_top{len(models)}_{_dt.date.today():%Y%m%d}"
-    sub = " · ".join(f"{m['name']} {m['quant']}" for m in models[:4])
+    sub = " · ".join(f"{m['name']} {m['quant']}" for m in models)
+
+    # selection receipt: every rendered tower names the JSON its number came
+    # from, so a published frame can be traced without re-deriving anything.
+    print(f"selection ({'explicit --models' if a.models else f'--top {a.top}'}, "
+          f"family rule {_NORM_SRC}):")
+    for i, m in enumerate(models, 1):
+        print(f"  #{i} {m['score']:5.1f}  n={m['n']}  {m['name']} / {m['quant']}"
+              f"  <- {ents[m['id']].get('_src')}")
+
     foot = f"measured on GTX 1070 Ti 8GB · scores from results/cards · seed 1 · temp 0"
     html = (HTML
             .replace("__MODELS__", json.dumps(models))
@@ -329,6 +492,21 @@ def main() -> int:
     html_path = outdir / f"{slug}.html"
     html_path.write_text(html)
 
+    # read the payload back out of the file on disk: what the browser will
+    # render has to be the selection that was just printed, not a hope.
+    written = html_path.read_text()
+    m_models = re.search(r"const MODELS = (\[.*?\]);\n", written, re.S)
+    m_sub = re.search(r'<div class="sub">(.*?)</div>', written, re.S)
+    rendered = json.loads(m_models.group(1)) if m_models else []
+    rendered_sub = m_sub.group(1) if m_sub else ""
+    if ([r["id"] for r in rendered] != ids
+            or [r["score"] for r in rendered] != [m["score"] for m in models]):
+        print(f"HTML READ-BACK MISMATCH: wrote {[r['id'] for r in rendered]} / "
+              f"{[r['score'] for r in rendered]}, selected {ids} / "
+              f"{[m['score'] for m in models]}", file=sys.stderr)
+        return 1
+    print(f"html read-back ok: {len(rendered)} models, subtitle {len(rendered_sub)} chars")
+
     from playwright.sync_api import sync_playwright
 
     n_frames = int(round(a.seconds * a.fps))
@@ -337,6 +515,19 @@ def main() -> int:
         pg = b.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         pg.goto(html_path.resolve().as_uri(), wait_until="load")
         pg.wait_for_timeout(150)
+        # fit the tower labels once, before any frame is captured, then prove no
+        # label touches its neighbour anywhere in the tail of the animation
+        pg.evaluate("t => window.__frame(t)", a.seconds)
+        fit = pg.evaluate("() => window.__fitlabels()")
+        lcheck = pg.evaluate("() => window.__labelcheck()")
+        print("labelfit:", json.dumps(fit))
+        print("labelcheck:", json.dumps(lcheck))
+        if lcheck["overlap_count"] or lcheck["out_of_frame_count"]:
+            print(f"BAD LABELS: {lcheck['overlap_count']} overlapping pairs, "
+                  f"{lcheck['out_of_frame_count']} out-of-frame label samples",
+                  file=sys.stderr)
+            b.close()
+            return 1
         for i in range(n_frames):
             t = i / a.fps
             pg.evaluate("t => window.__frame(t)", t)
@@ -351,10 +542,16 @@ def main() -> int:
     frame_ok = all(r["in_frame"] and r["screen_h"] >= 120 for r in check["rows"]) and check["spread_px"] >= 450
     ink = check["ink_fraction"]
     ink_ok = 0.08 <= ink <= 0.65
+    # and the subtitle the viewer reads must name every tower, in frame
+    sub_live = check.get("sub") or {}
+    sub_text = sub_live.get("text") or ""
+    sub_missing = [f"{m['name']} {m['quant']}" for m in models if f"{m['name']} {m['quant']}" not in sub_text]
+    sub_ok = bool(sub_live.get("in_frame")) and not sub_missing
     print("selfcheck:", json.dumps(check))
-    if not (frame_ok and ink_ok):
-        print(f"BAD FRAME: in_frame+spread={frame_ok} ink_fraction={ink} (want 0.08-0.65)",
-              file=sys.stderr)
+    if not (frame_ok and ink_ok and sub_ok):
+        print(f"BAD FRAME: in_frame+spread={frame_ok} ink_fraction={ink} (want 0.08-0.65) "
+              f"subtitle_in_frame={sub_live.get('in_frame')} subtitle_width={sub_live.get('width')} "
+              f"subtitle_missing={sub_missing}", file=sys.stderr)
         return 1
 
     mp4 = outdir / f"{slug}.mp4"
@@ -379,9 +576,15 @@ def main() -> int:
         "frames": n_frames, "decoded_frames": st.get("nb_read_frames"),
         "size": st.get("width"), "height": st.get("height"),
         "fps": st.get("r_frame_rate"), "bytes": mp4.stat().st_size,
-        "models": [{"id": m["id"], "score": m["score"]} for m in models],
+        "models": [{"id": m["id"], "name": m["name"], "quant": m["quant"],
+                    "score": m["score"], "n": m["n"],
+                    "src": ents[m["id"]].get("_src")} for m in models],
+        "subtitle": sub_live.get("text"),
+        "labelfit": fit, "labelcheck": {k: lcheck[k] for k in
+                                        ("overlap_count", "out_of_frame_count",
+                                         "min_pitch_px", "name_font_px")},
         "ok": ok,
-    }, indent=1))
+    }, indent=1, ensure_ascii=False))
     if not a.keep_frames:
         shutil.rmtree(frames)
     return 0 if ok else 1

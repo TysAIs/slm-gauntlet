@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<style>
+ html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07090f;}
+ canvas{position:absolute;left:0;top:0;width:1920px;height:1080px;}
+ .hud{position:absolute;left:0;top:0;width:1920px;height:1080px;
+      font-family:'DejaVu Sans','Noto Sans',sans-serif;color:#e6edf3;}
+ .title{position:absolute;left:64px;top:48px;font-size:64px;font-weight:800;letter-spacing:-1px;}
+ .sub{position:absolute;left:64px;top:126px;font-size:26px;color:#8b949e;letter-spacing:1px;}
+ .src{position:absolute;right:64px;top:56px;font-size:22px;color:#8b949e;text-align:right;line-height:1.5;}
+ .label{position:absolute;transform:translate(-50%,-100%);text-align:center;opacity:0;
+        transition:none;}
+ .label .n{font-size:30px;font-weight:800;white-space:nowrap;}
+ .label .s{font-size:40px;font-weight:900;margin-top:2px;}
+ .label .q{font-size:20px;color:#8b949e;}
+ .foot{position:absolute;left:64px;bottom:44px;font-size:22px;color:#6e7681;}
+</style></head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div class="hud" id="hud">
+  <div class="title">SLM GAUNTLET</div>
+  <div class="sub">Spark-X2.6 4B IQ3_M · Gemma 4 · E4B Q4_K_M · MiniCPM-V 5 · 2B Q8_0 · Bolt E4B UD-IQ3_XXS · Dory 1.0 4B Q5_K_M</div>
+  <div class="src">voxel comparison · 5 models<br>height = weighted gauntlet score</div>
+  <div class="foot">measured on GTX 1070 Ti 8GB · scores from results/cards · seed 1 · temp 0</div>
+</div>
+<script>
+const MODELS = [{"id": "spark-x2.6-4b-iq3m-bartowski", "name": "Spark-X2.6 4B", "score": 91.5, "quant": "IQ3_M", "rgb": [255, 196, 61], "color": "#ffc43d", "n": 71}, {"id": "gemma4-e4b-q4_K_M", "name": "Gemma 4 \u00b7 E4B", "score": 90.5, "quant": "Q4_K_M", "rgb": [86, 196, 255], "color": "#56c4ff", "n": 71}, {"id": "minicpm5-2b-q8_0", "name": "MiniCPM-V 5 \u00b7 2B", "score": 90.0, "quant": "Q8_0", "rgb": [124, 220, 140], "color": "#7cdc8c", "n": 71}, {"id": "bolt-e4b-udiq3xxs-kvq4", "name": "Bolt E4B", "score": 89.1, "quant": "UD-IQ3_XXS", "rgb": [206, 140, 255], "color": "#ce8cff", "n": 71}, {"id": "dory-1.0-4b-q5km-kvq8", "name": "Dory 1.0 4B", "score": 88.7, "quant": "Q5_K_M", "rgb": [255, 122, 122], "color": "#ff7a7a", "n": 71}];
+const DURATION = 7.0;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const hud = document.getElementById('hud');
+const W = 1920, H = 1080;
+
+const labels = MODELS.map(m => {
+  const d = document.createElement('div');
+  d.className = 'label';
+  d.innerHTML = `<div class="n">${m.name}</div><div class="s" style="color:${m.color}">${m.score.toFixed(1)}%</div><div class="q">${m.quant}</div>`;
+  hud.appendChild(d);
+  return d;
+});
+
+function sub(a,b){return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function cross(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function norm(a){const l=Math.hypot(a[0],a[1],a[2])||1;return [a[0]/l,a[1]/l,a[2]/l];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+
+// ---- scene ----
+const VS = 1.0;               // voxel edge in world units
+const FLOOR = 9;              // floor grid radius
+const SPACING = 5.0;          // tower spacing along x
+const MAXH = 14;              // world height at 100%
+
+function scoreHeight(p){ return Math.max(1.0, (p/100) * MAXH); }
+
+function buildScene(t){
+  const cubes = [];
+  // floor: thin voxel slab grid
+  for(let x=-FLOOR;x<=FLOOR;x++) for(let z=-FLOOR;z<=FLOOR;z++){
+    const d = Math.hypot(x,z);
+    if(d > FLOOR+0.35) continue;
+    const shade = 0.62 + 0.16*((x+z)&1) + 0.10*(1-d/FLOOR);
+    cubes.push({x:x*VS,y:-0.5,z:z*VS,kind:'floor',shade});
+  }
+  // towers
+  const n = MODELS.length;
+  MODELS.forEach((m, i) => {
+    const cx = (i - (n-1)/2) * SPACING;
+    const hgt = scoreHeight(m.score) * VS;
+    const buildT = 0.12 + 0.42 * (i / Math.max(1,n-1));      // staggered build window
+    const grow = Math.max(0, Math.min(1, (t - buildT) / 0.26));
+    const visible = Math.ceil(grow * hgt);
+    for(let y=0;y<visible;y++){
+      // two-voxel footprint for mass, slight inward taper near the top
+      const inset = y > hgt-2 ? 0.5*VS : 0;
+      for(const dx of [-0.5*VS, 0.5*VS]) for(const dz of [-0.5*VS, 0.5*VS]){
+        cubes.push({x:cx+dx,y:y*VS,z:dz+inset*0, kind:'tower', color:m.rgb, seed:(i*31+y*7)});
+      }
+    }
+    m._top = [cx, hgt + 0.4, 0];
+    m._grow = grow;
+  });
+  return cubes;
+}
+
+function faceShade(nrm, base, light){
+  const k = Math.max(0, dot(norm(nrm), light));
+  return [base[0]*(0.52+0.48*k), base[1]*(0.52+0.48*k), base[2]*(0.52+0.48*k)];
+}
+function rgb(a){return `rgb(${Math.min(255,a[0])|0},${Math.min(255,a[1])|0},${Math.min(255,a[2])|0})`;}
+
+function camAt(t){
+  const orbit = -0.30 + 0.085*t;   // narrow orbit: keeps the row legible
+  const R = 30, CAMH = 12;
+  const pos = [R*Math.sin(orbit), CAMH, R*Math.cos(orbit)];
+  const target = [0, 7.5, 0];
+  const fwd = norm(sub(target,pos));
+  const right = norm(cross(fwd,[0,1,0]));
+  const up = cross(right,fwd);
+  return {pos,fwd,right,up,orbit};
+}
+// ORTHOGRAPHIC on purpose: a perspective divide makes a nearer tower look
+// taller than an equal-height tower further away, which is a lying chart.
+const PX_PER_UNIT = 46;
+
+function projectWith(p, cam){
+  const d = sub(p, cam.pos);
+  const xc = dot(d, cam.right), yc = dot(d, cam.up), zc = dot(d, cam.fwd);
+  if(zc <= 0.35) return null;
+  return [W/2 + PX_PER_UNIT*xc, H/2 + 40 - PX_PER_UNIT*yc, zc];
+}
+
+function draw(t){
+  ctx.fillStyle = '#07090f'; ctx.fillRect(0,0,W,H);
+  // sky wash
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0d1426'); g.addColorStop(0.62,'#080b13'); g.addColorStop(1,'#05070c');
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+  const cam = camAt(t);
+  const pos = cam.pos;
+  const light = norm([0.35,0.9,0.42]);
+
+  const cubes = buildScene(t);
+  // painter's algorithm: far -> near
+  for(const c of cubes) c._z = dot(sub([c.x,c.y,c.z],pos),cam.fwd);
+  cubes.sort((a,b)=>b._z-a._z);
+
+  const s = VS/2;
+  for(const c of cubes){
+    const base = c.kind==='floor'
+      ? [54,62,86].map(v=>v*(c.shade||1))
+      : c.color.map(v=>Math.min(255, v*1.18));
+    // 6 faces, drawn only when front-facing
+    const faces = [
+      {n:[0,1,0], q:[[-s,s,-s],[s,s,-s],[s,s,s],[-s,s,s]]},
+      {n:[0,-1,0],q:[[-s,-s,-s],[-s,-s,s],[s,-s,s],[s,-s,-s]]},
+      {n:[0,0,1], q:[[-s,-s,s],[s,-s,s],[s,s,s],[-s,s,s]]},
+      {n:[0,0,-1],q:[[s,-s,-s],[-s,-s,-s],[-s,s,-s],[s,s,-s]]},
+      {n:[1,0,0], q:[[s,-s,s],[s,-s,-s],[s,s,-s],[s,s,s]]},
+      {n:[-1,0,0],q:[[-s,-s,-s],[-s,-s,s],[-s,s,s],[-s,s,-s]]},
+    ];
+    for(const f of faces){
+      const fc = [c.x+f.n[0]*s, c.y+f.n[1]*s, c.z+f.n[2]*s];
+      if(dot(f.n, sub(pos,fc)) <= 0) continue;
+      const pts = f.q.map(v => projectWith([c.x+v[0], c.y+v[1], c.z+v[2]], cam));
+      if(pts.some(p=>!p)) continue;
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0],pts[0][1]);
+      for(let i=1;i<4;i++) ctx.lineTo(pts[i][0],pts[i][1]);
+      ctx.closePath();
+      const sh = faceShade(f.n, base, light);
+      ctx.fillStyle = rgb(sh); ctx.fill();
+      ctx.strokeStyle = rgb(sh.map(v=>v*0.86)); ctx.lineWidth = 0.6; ctx.stroke();
+    }
+  }
+
+  // labels
+  MODELS.forEach((m,i)=>{
+    const p = projectWith(m._top, cam);
+    const L = labels[i];
+    if(p && m._grow > 0.98){
+      L.style.left = p[0]+'px'; L.style.top = (p[1]-14)+'px';
+      L.style.opacity = Math.min(1, (m._grow-0.98)*14 + Math.min(1, Math.max(0,(t-0.78))*3));
+    } else {
+      L.style.opacity = Math.min(1, Math.max(0, m._grow*0.0));
+    }
+  });
+}
+
+// Deterministic geometry self-check: proves the towers and their labels are
+// inside the frame without a human looking at the picture.
+//
+// Label auto-fit + overlap proof. Tower pitch on screen is fixed by SPACING and
+// PX_PER_UNIT (~220 px), so a wide model name ("MiniCPM-V 5 · 2B") runs into
+// its neighbour at the default 30 px font. Names are measured and the name font
+// is scaled down ONCE, uniformly, to the widest name that fits the pitch; then
+// every label box is replayed across the whole tail of the animation (labels
+// are only all-visible from t>=0.80) to prove zero overlaps and zero
+// out-of-frame labels. No vision model required.
+const LABEL_FONT = 30, LABEL_GAP = 16, LABEL_FROM = 0.80, LABEL_STEP = 0.02;
+
+function labelBoxes(t){
+  const cam = camAt(t);
+  return MODELS.map((m, i) => {
+    const p = projectWith(m._top, cam);
+    const buildT = 0.12 + 0.42 * (i / Math.max(1, MODELS.length - 1));
+    const grow = Math.max(0, Math.min(1, (t - buildT) / 0.26));
+    if (!p || grow <= 0.98) return null;
+    const w = labels[i].offsetWidth, h = labels[i].offsetHeight;
+    return {id: m.id, i, l: p[0] - w/2, r: p[0] + w/2, tp: p[1] - 14 - h, bt: p[1] - 14};
+  });
+}
+
+function labelPitch(){
+  let min = Infinity;
+  for(let t = LABEL_FROM; t <= DURATION + 1e-9; t += LABEL_STEP){
+    const cam = camAt(t);
+    const xs = MODELS.map(m => { const p = projectWith(m._top, cam); return p ? p[0] : null; });
+    for(let i = 1; i < xs.length; i++){
+      if(xs[i] === null || xs[i-1] === null) continue;
+      min = Math.min(min, Math.abs(xs[i] - xs[i-1]));
+    }
+  }
+  return isFinite(min) ? min : 220;
+}
+
+window.__fitlabels = function(){
+  const names = labels.map(L => L.querySelector('.n'));
+  names.forEach(n => { n.style.fontSize = LABEL_FONT + 'px'; });
+  const widths = names.map(n => n.offsetWidth);
+  const widest = Math.max(...widths);
+  const allowed = Math.max(72, labelPitch() - LABEL_GAP);
+  const scale = Math.min(1, allowed / widest);
+  const px = Math.round(LABEL_FONT * scale * 10) / 10;
+  names.forEach(n => { n.style.fontSize = px + 'px'; });
+  return {name_font_px: px, widest_name_at_default: widest, allowed_px: Math.round(allowed),
+          min_pitch_px: Math.round(labelPitch()), name_widths: widths};
+};
+
+window.__labelcheck = function(){
+  const overlaps = [], outside = [];
+  let samples = 0, minGap = Infinity;
+  for(let t = LABEL_FROM; t <= DURATION + 1e-9; t += LABEL_STEP){
+    samples++;
+    const boxes = labelBoxes(t).filter(Boolean);
+    for(const b of boxes){
+      if(b.l < 20 || b.r > W - 20 || b.tp < 20) outside.push({t: +t.toFixed(2), id: b.id});
+    }
+    for(let i = 0; i < boxes.length; i++) for(let j = i+1; j < boxes.length; j++){
+      const a = boxes[i], b = boxes[j];
+      const ox = Math.min(a.r, b.r) - Math.max(a.l, b.l);
+      const oy = Math.min(a.bt, b.bt) - Math.max(a.tp, b.tp);
+      if(ox > 0 && oy > 0) overlaps.push({t: +t.toFixed(2), a: a.id, b: b.id, px: Math.round(Math.min(ox, oy))});
+      else if(ox > 0) minGap = Math.min(minGap, -oy);
+    }
+  }
+  return {samples, min_pitch_px: Math.round(labelPitch()),
+          name_font_px: parseFloat(labels[0].querySelector('.n').style.fontSize),
+          overlaps: overlaps.slice(0, 6), overlap_count: overlaps.length,
+          out_of_frame: outside.slice(0, 6), out_of_frame_count: outside.length};
+};
+
+window.__selfcheck = function(){
+  const t = DURATION, cam = camAt(t);
+  const rows = MODELS.map(m => {
+    const top = projectWith(m._top, cam);
+    const base = projectWith([m._top[0], 0, 0], cam);
+    return {
+      id: m.id,
+      top_y: top ? Math.round(top[1]) : null,
+      base_y: base ? Math.round(base[1]) : null,
+      x: top ? Math.round(top[0]) : null,
+      screen_h: (top && base) ? Math.round(base[1]-top[1]) : null,
+      in_frame: !!(top && base && top[1] > 150 && base[1] < 1045 && top[0] > 90 && top[0] < 1830),
+    };
+  });
+  const ctx2 = document.getElementById('c').getContext('2d');
+  const d = ctx2.getImageData(0,0,W,H).data;
+  let ink = 0, total = 0;
+  for(let i=0;i<d.length;i+=4*37){
+    total++;
+    if(d[i] > 32 || d[i+1] > 32 || d[i+2] > 46) ink++;
+  }
+  const xs = rows.map(r=>r.x).filter(v=>v!==null);
+  const spread = xs.length ? Math.max(...xs) - Math.min(...xs) : 0;
+  // the subtitle must name every tower it labels and must not run off the frame
+  const subEl = document.querySelector('.sub');
+  const subRect = subEl.getBoundingClientRect();
+  const sub = {
+    text: subEl.textContent,
+    width: Math.round(subRect.width),
+    in_frame: subRect.left >= 0 && subRect.right <= W - 40,
+  };
+  return {rows, spread_px: spread, ink_fraction: +(ink/total).toFixed(4),
+          orbit: +cam.orbit.toFixed(3), sub};
+};
+
+window.__frame = function(t){ draw(Math.max(0, Math.min(DURATION, t))); };
+draw(0);
+</script></body></html>
