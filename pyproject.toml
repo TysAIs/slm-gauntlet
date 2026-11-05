@@ -33,6 +33,10 @@ extend-exclude = ["llama.cpp"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B"]
+# UP031 (printf-style "%s" formatting) is a style preference: this repo has a lot of
+# multi-line %-format log lines, and rewriting them buys nothing. Without this the
+# gate also flips red whenever the unpinned ruff in CI adds a case.
+ignore = ["UP031"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
