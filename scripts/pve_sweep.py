@@ -114,7 +114,12 @@ def dropin_text(entry: dict) -> str:
         "[Service]\n"
         "ExecStart=\n"
         f"ExecStart={wrapped}\n"
-        "MemoryHigh=4096M\n"
+        # 4G is a performance trap, not a safety net: measured 2026-11-07 on
+        # provider grunt-pve, MemoryCurrent sat at 4.6G against a 4G cap with swap
+        # full, prompt eval collapsed to 1-5 tok/s and clients timed out with zero
+        # tokens (24/102 attempts in one 94-task run). Same process, cap raised:
+        # 1776-token prompt prefilled at 935.9 tok/s and decoded at 43.8 tok/s.
+        "MemoryHigh=8192M\n"
     )
 
 
