@@ -83,6 +83,12 @@ printed the reason in under a second. The driver now makes a failure self-explai
   `serve_exec_status`, `serve_active_state`, `serve_restarts`;
 * a unit that has already crashed is concluded in ~25 s instead of being polled for the full
   600 s (`FASTFAIL_RESTARTS`), and the unit is then stopped so it stops re-running the loader;
+* the driver stops the previous config's server, then waits (bounded, 45 s) for the PVE host to
+  report the card free before starting the next one, logging what it saw (`--no-vram-gate` keeps an
+  isolated probe usable when something else legitimately owns the GPU). Two configs whose
+  engine-accounted requirement fits the card (3703 MiB and 5576 MiB of 8106) failed their first
+  `cudaMalloc` 0.15-0.9 s after start, so a start that races the previous process's VRAM release is
+  not a model verdict;
 * the pre-flight probe sends `chat_template_kwargs.enable_thinking=false` and accepts a
   non-empty `reasoning_content` as proof of a live engine. Without that lever a healthy thinking
   model answers into the reasoning channel with `content: ''` at `max_tokens=8` and was being
