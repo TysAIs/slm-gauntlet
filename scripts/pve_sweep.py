@@ -92,6 +92,13 @@ FASTFAIL_MIN_S = 20
 UNIT_PROBE_INTERVAL_S = 6
 UNIT_STATE_PROPS = "ActiveState,SubState,NRestarts,ExecMainCode,ExecMainStatus,Result"
 
+# Free-VRAM gate before starting a config: 8 GiB card, configs need 2.5-5.6 GiB, and a config has
+# been seen to fail its first cudaMalloc 0.15 s after start while the previous config's server was
+# still releasing its memory. Wait (bounded) for the card to look empty, then proceed and log what
+# it looked like either way.
+VRAM_GATE_MIN_MIB = 4800
+VRAM_GATE_TIMEOUT_S = 45
+
 # Sustained-load pins for the box's GTX 1070 Ti. Measured 2026-11-07 on this card with
 # the identical 13-minute 4-stream thermal test (receipt:
 # invincible/missions/work/2026-11-07-1070ti-sustained-policy.md): at the default 180 W
@@ -306,7 +313,7 @@ def error_tail(text: str, n: int = 12) -> str:
 
 
 def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
-          unit: str = UNIT) -> dict:
+          unit: str = UNIT, vram_gate: bool = True) -> dict:
     """Bring the config's unit up and prove it answers. Always returns a diagnostics dict.
 
     Every attempt - success or failure - leaves results/_sweep_logs/<alias>-kv<ctk>.serve.log
@@ -355,7 +362,13 @@ def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
         fh.flush()
 
     try:
-        r = lane.run(["systemctl", "restart", unit], timeout=120)
+        # Stop, wait for the card, then start. A start that races the previous config's VRAM
+        # release is indistinguishable from a config that does not fit, and that ambiguity is what
+        # made `cudaMalloc failed` look like a model verdict twice on 2026-11-07.
+        lane.run(["systemctl", "stop", unit], timeout=120)
+        if vram_gate:
+            diag["gpu_before_start"] = wait_card_idle(lane, log)
+        r = lane.run(["systemctl", "start", unit], timeout=120)
         if r.returncode:
             diag.update(cause="restart_failed",
                         detail=(r.stderr or r.stdout or "").strip()[-300:])
@@ -548,6 +561,26 @@ def gpu_memory(lane: Lane) -> dict:
     return out
 
 
+def wait_card_idle(lane: Lane, log=print, timeout_s: int = VRAM_GATE_TIMEOUT_S) -> dict:
+    """Wait (bounded) for the card to actually be free after the previous config's server stops.
+
+    Measured need 2026-11-07: two configs whose engine-accounted requirement fits an idle 8106 MiB
+    card (`minicpm5-2b-q8_0` 3703 MiB, `gemma4-12b-ud-q2_K_XL` 5576 MiB) failed their first CUDA
+    allocation 0.15-0.9 s after start with `cudaMalloc failed: out of memory`, while the same
+    commands load fine minutes later. The variable left is the previous process's VRAM not being
+    released yet, so the driver measures the card instead of assuming the stop freed it instantly.
+    """
+    deadline = time.time() + max(0, timeout_s)
+    mem = gpu_memory(lane)
+    while mem and time.time() < deadline and mem.get("gpu_free_mib", 0) < VRAM_GATE_MIN_MIB:
+        time.sleep(2)
+        mem = gpu_memory(lane)
+    if mem:
+        log(f"    card before start: {mem.get('gpu_used_mib')} MiB used, "
+            f"{mem.get('gpu_free_mib')} MiB free")
+    return mem
+
+
 def read_manifest(path: Path) -> tuple[list[dict], dict[str, str]]:
     """Configs and explicit exclusions.
 
@@ -615,6 +648,9 @@ def main() -> int:
     ap.add_argument("--restore-on-exit", action="store_true")
     ap.add_argument("--no-gpu-pins", action="store_true",
                     help="skip the sustained-load pins (unattributable results; debugging only)")
+    ap.add_argument("--no-vram-gate", action="store_true",
+                    help="do not wait for the card to look idle before starting a config "
+                         "(use when something else legitimately owns the GPU, e.g. an isolated probe)")
     args = ap.parse_args()
 
     lane = Lane(args.ssh, args.ct)
@@ -669,7 +705,11 @@ def main() -> int:
         # engine's own output to results/_sweep_logs/<alias>-kv<ctk>.serve.log and comes back
         # with a named cause, so the 0.5.0 table can say *why* a row is missing.
         diag = serve(dict(e, host=args.host, port=args.port), lane,
-                     logs_dir=ROOT / "results" / "_sweep_logs", unit=args.unit)
+                     logs_dir=ROOT / "results" / "_sweep_logs", unit=args.unit,
+                     vram_gate=not args.no_vram_gate)
+        if diag.get("gpu_before_start"):
+            rec.update(gpu_start_used_mib=diag["gpu_before_start"].get("gpu_used_mib"),
+                       gpu_start_free_mib=diag["gpu_before_start"].get("gpu_free_mib"))
         if not diag.get("ok"):
             cause = diag.get("cause") or "unknown"
             detail = diag.get("detail") or ""
