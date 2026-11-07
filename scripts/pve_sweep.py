@@ -33,6 +33,27 @@ RESTORE
   `--restore` removes the drop-in, daemon-reloads, restarts the shipped unit and proves a
   real completion answers before returning 0. `--restore-on-exit` does that automatically
   at the end of a sweep (default when the sweep is not interrupted).
+
+FAILURE EVIDENCE (why this file now writes logs for failures too)
+  Measured 2026-11-07 on the lane: seven configs were recorded `serve_failed` after a
+  604-698 s wait and left *nothing* behind - no log, no engine error, no exit code - so the
+  0.5.0 table lost those rows and nobody could say why. The engine had in fact printed the
+  reason in under a second (`unknown model architecture: 'dory'`, `cudaMalloc failed: out of
+  memory`). Two defects, both fixed here:
+    * the attempt now streams the unit's own stdout/stderr into
+      results/_sweep_logs/<alias>-kv<ctk>.serve.log from before the restart, and a failed
+      config records a named cause (`serve_cause`) plus a tail in the state line;
+    * a unit that has already crashed is failed fast (a couple of restart attempts) instead
+      of being polled for the full HEALTH_TIMEOUT_S.
+  The pre-flight completion probe also sends `enable_thinking: false` and accepts a
+  reasoning-only answer, because a live thinking model answers into `reasoning_content` with
+  `content: ''` at max_tokens=8 and was being called dead (ornith-9b, qwen35-9b).
+
+EXCLUSIONS
+  A manifest line beginning with `!` is an exclusion, not a config:
+      !<alias><TAB><reason>
+  The matching config row is skipped with `skip (excluded)` and its reason, instead of being
+  retried forever. Use it for a GGUF the deployed engine cannot load at any context.
 """
 
 from __future__ import annotations
@@ -50,10 +71,26 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 UNIT = "llama-worker@8891"
-DROPIN_DIR = f"/etc/systemd/system/{UNIT}.service.d"
-DROPIN = f"{DROPIN_DIR}/50-sweep.conf"
+
+
+def dropin_paths(unit: str) -> tuple[str, str]:
+    """Drop-in directory and file for a unit instance. Keyed by unit, not hardcoded, so an
+    isolated probe can run on `llama-worker@8893` without touching the sweep's unit."""
+    d = f"/etc/systemd/system/{unit}.service.d"
+    return d, f"{d}/50-sweep.conf"
+
+
 DEFAULT_PORT = 8891
 HEALTH_TIMEOUT_S = 600
+
+# A crash-looping unit never serves, so waiting the full HEALTH_TIMEOUT_S for it is pure
+# loss. Measured 2026-11-07: `dory` and `lfm3` exit 166-259 ms after start with an
+# "unknown model architecture" error and each cost the sweep 604-605 s anyway. A unit that
+# has failed FASTFAIL_RESTARTS invocations without ever answering HTTP is concluded dead.
+FASTFAIL_RESTARTS = 2
+FASTFAIL_MIN_S = 20
+UNIT_PROBE_INTERVAL_S = 6
+UNIT_STATE_PROPS = "ActiveState,SubState,NRestarts,ExecMainCode,ExecMainStatus,Result"
 
 # Sustained-load pins for the box's GTX 1070 Ti. Measured 2026-11-07 on this card with
 # the identical 13-minute 4-stream thermal test (receipt:
@@ -106,8 +143,9 @@ class Lane:
             return json.loads(fh.read().decode())
 
 
-def dropin_text(entry: dict) -> str:
-    """A drop-in that replaces ExecStart outright (empty value first, then the real one)."""
+def serve_argv(entry: dict) -> list[str]:
+    """The exact ExecStart for a config. One function so the drop-in, the captured log
+    header and any isolated re-run all agree on the command."""
     argv = [
         "/opt/llama.cpp/build/bin/llama-server",
         "-m", entry["path"],
@@ -131,7 +169,12 @@ def dropin_text(entry: dict) -> str:
     extra = entry.get("extra") or ""
     if extra:
         argv += shlex.split(extra)
-    wrapped = " \\\n  ".join(shlex.quote(a) for a in argv)
+    return argv
+
+
+def dropin_text(entry: dict) -> str:
+    """A drop-in that replaces ExecStart outright (empty value first, then the real one)."""
+    wrapped = " \\\n  ".join(shlex.quote(a) for a in serve_argv(entry))
     return (
         "[Service]\n"
         "ExecStart=\n"
@@ -145,91 +188,299 @@ def dropin_text(entry: dict) -> str:
     )
 
 
-def serve(entry: dict, lane: Lane, log=print) -> bool:
-    lane.run(["mkdir", "-p", DROPIN_DIR])
-    lane.write_remote(DROPIN, dropin_text(entry))
+def unit_props(lane: Lane, unit: str) -> dict:
+    """systemd's own view of the unit - the only channel that survives a process that dies
+    before it can answer HTTP."""
+    try:
+        r = lane.run(["systemctl", "show", unit, "--no-pager", "-p", UNIT_STATE_PROPS], timeout=40)
+    except Exception:
+        return {}
+    out: dict = {}
+    for line in (r.stdout or "").splitlines():
+        if "=" in line:
+            k, v = line.split("=", 1)
+            out[k.strip()] = v.strip()
+    return out
+
+
+def classify_serve_failure(text: str, unit_state: dict | None = None) -> tuple[str, str]:
+    """Turn the engine's own output into a named cause.
+
+    A lost config has to be a *labelled* lost config: `unsupported_arch` is a permanent
+    exclusion, `vram_oom` is a config that does not fit, and `no_answer` is a driver defect
+    that must never be blamed on the model.
+    """
+    t = text or ""
+    m = re.search(r"unknown model architecture: '([^']+)'", t)
+    if m:
+        return "unsupported_arch", (
+            f"deployed llama.cpp does not know GGUF architecture '{m.group(1)}'; not "
+            "retryable at any context (needs a newer engine build, or a manifest exclusion)"
+        )
+    if "cudaMalloc failed" in t or "failed to allocate CUDA" in t or "out of memory" in t:
+        m = re.search(r"allocating ([\d.]+) MiB", t)
+        req = f" ({m.group(1)} MiB single request)" if m else ""
+        return "vram_oom", f"CUDA allocation failed{req}; weights+KV do not fit in the free card"
+    if "address already in use" in t:
+        return "port_busy", "port already bound - another server owns it"
+    if "error while handling argument" in t or "invalid argument" in t or "unknown argument" in t:
+        return "bad_flags", "engine rejected a command-line flag in this config"
+    if "failed to load model" in t:
+        return "load_error", "engine failed to load the GGUF (first error line is in the log)"
+    st = (unit_state or {}).get("ActiveState", "")
+    if st == "failed":
+        return "unit_failed", (
+            f"unit is failed (exit {unit_state.get('ExecMainStatus', '?')}) and never answered "
+            "HTTP; the log holds its own error"
+        )
+    return "no_answer", (
+        f"unit is {st or 'unknown'}/{(unit_state or {}).get('SubState', '?')} but never answered "
+        "HTTP - driver/probe defect, not a model verdict"
+    )
+
+
+def probe_completion(host: str, port: int, alias: str, timeout: int = 120) -> tuple[bool, dict]:
+    """One real completion as proof the engine answers.
+
+    Sends llama.cpp's per-request thinking lever (as `restore()` always did) and also accepts
+    a non-empty `reasoning_content`: at max_tokens=8 a thinking model spends the budget in the
+    reasoning channel, returns `content: ''` with finish_reason 'length', and *is* a live
+    engine. Rejecting exactly that is what made ornith-9b and qwen35-9b look dead on
+    2026-11-07 while their servers were healthy and named correctly.
+    """
+    msg = [{"role": "user", "content": "Reply with the single word: READY"}]
+    payloads = [
+        {"model": alias, "messages": msg, "max_tokens": 8, "temperature": 0,
+         "chat_template_kwargs": {"enable_thinking": False}},
+        {"model": alias, "messages": msg, "max_tokens": 8, "temperature": 0},
+    ]
+    for i, payload in enumerate(payloads):
+        try:
+            req = urllib.request.Request(
+                f"http://{host}:{port}/v1/chat/completions",
+                data=json.dumps(payload).encode(),
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as fh:
+                out = json.loads(fh.read().decode())
+            choice = (out.get("choices") or [{}])[0]
+            m = choice.get("message") or {}
+            content = (m.get("content") or "").strip()
+            reasoning = (m.get("reasoning_content") or m.get("reasoning") or "").strip()
+            if content or reasoning:
+                return True, {
+                    "payload": "think_off" if i == 0 else "plain",
+                    "answered_in": "content" if content else "reasoning_content",
+                    "content": content[:40], "reasoning": reasoning[:40],
+                    "finish_reason": choice.get("finish_reason"),
+                }
+        except Exception:
+            continue
+    return False, {}
+
+
+def journal_scrape(lane: Lane, unit: str, since: int, limit: int | None = None) -> str:
+    argv = ["journalctl", "-u", unit, "--no-pager", "-o", "cat", "--since", f"@{since}"]
+    try:
+        r = lane.run(argv, timeout=90)
+    except Exception:
+        return ""
+    lines = (r.stdout or "").splitlines()
+    if limit:
+        lines = lines[-limit:]
+    return "\n".join(lines)
+
+
+def attempt_section(text: str) -> str:
+    """Only the current attempt's lines: everything after the last restart boundary marker.
+    A journal window can carry the previous config's crash-loop output (measured: a stale
+    "unknown model architecture: 'dory'" line inside a minicpm5 log mislabelled a VRAM
+    problem as an unsupported architecture)."""
+    return (text or "").rsplit("# --- restarted", 1)[-1]
+
+
+def error_tail(text: str, n: int = 12) -> str:
+    """The lines a human needs from a 400-line engine log: errors first."""
+    hits = [ln for ln in (text or "").splitlines() if re.search(r"\bE\b|error|failed|abort", ln, re.I)]
+    return "\n".join((hits or (text or "").splitlines())[-n:])
+
+
+def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
+          unit: str = UNIT) -> dict:
+    """Bring the config's unit up and prove it answers. Always returns a diagnostics dict.
+
+    Every attempt - success or failure - leaves results/_sweep_logs/<alias>-kv<ctk>.serve.log
+    holding the engine's own stdout/stderr, captured by following the unit's journal from
+    *before* the restart (its first error line lands ~150 ms after start, so scraping after a
+    600 s wait can miss it entirely). A failure also comes back with a named cause.
+    """
+    logs_dir = logs_dir or (ROOT / "results" / "_sweep_logs")
+    logs_dir.mkdir(parents=True, exist_ok=True)
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", f"{entry['alias']}-kv{entry.get('ctk', 'f16')}")
+    log_path = logs_dir / f"{slug}.serve.log"
+    diag: dict = {
+        "ok": False, "alias": entry["alias"], "unit": unit,
+        "log": str(log_path.relative_to(ROOT)) if log_path.is_relative_to(ROOT) else str(log_path),
+    }
+    port = entry.get("port", DEFAULT_PORT)
+    host = entry.get("host") or ""
+    dropin_dir, dropin = dropin_paths(unit)
+
+    lane.run(["mkdir", "-p", dropin_dir])
+    lane.write_remote(dropin, dropin_text(entry))
     r = lane.run(["systemctl", "daemon-reload"], timeout=60)
     if r.returncode:
         log(f"    daemon-reload failed: {r.stderr[-200:]}")
-    lane.run(["systemctl", "reset-failed", UNIT], timeout=60)
-    r = lane.run(["systemctl", "restart", UNIT], timeout=120)
-    if r.returncode:
-        log(f"    restart failed: {r.stderr[-200:]}")
-        return False
-    port = entry.get("port", DEFAULT_PORT)
-    host = entry.get("host") or ""
-    if not host:
-        log("    no host for this entry (pass --host or set GRUNT_HOST)")
-        return False
-    deadline = time.time() + HEALTH_TIMEOUT_S
-    while time.time() < deadline:
-        time.sleep(3)
+    lane.run(["systemctl", "reset-failed", unit], timeout=60)
+
+    since = int(time.time()) - 2
+    started = time.time()
+    fh = log_path.open("w")
+    fh.write(
+        f"# sweep serve attempt {entry['alias']} ctx={entry.get('ctx')} "
+        f"kv={entry.get('ctk')}/{entry.get('ctv')} unit={unit} port={port}\n"
+        f"# ExecStart: {' '.join(shlex.quote(a) for a in serve_argv(entry))}\n"
+        f"# following `journalctl -u {unit}` (the engine's stdout/stderr) since @{since}\n\n"
+    )
+    fh.flush()
+    follower = None
+    try:
+        follower = subprocess.Popen(
+            lane.ssh + lane.ct_cmd(["journalctl", "-u", unit, "-f", "-o", "cat",
+                                    "--since", f"@{since}"]),
+            stdout=fh, stderr=subprocess.STDOUT,
+        )
+    except Exception as exc:  # noqa: BLE001 - capture failure must never kill the sweep
+        fh.write(f"# JOURNAL FOLLOW FAILED TO START: {exc}\n")
+        fh.flush()
+
+    try:
+        r = lane.run(["systemctl", "restart", unit], timeout=120)
+        if r.returncode:
+            diag.update(cause="restart_failed",
+                        detail=(r.stderr or r.stdout or "").strip()[-300:])
+            log(f"    restart failed: {diag['detail']}")
+            return diag
+        if not host:
+            diag.update(cause="no_host", detail="no --host/GRUNT_HOST for this entry")
+            log("    no host for this entry (pass --host or set GRUNT_HOST)")
+            return diag
+
+        # Everything the engine prints from here on belongs to THIS attempt. Without a
+        # boundary, a line from the previous config's crash loop inside the same journal
+        # window mislabels the cause (measured: a stale "unknown model architecture: 'dory'"
+        # line landed in a minicpm5 log and reported unsupported_arch for a VRAM problem).
+        fh.write(f"\n# --- restarted {time.strftime('%H:%M:%S')} - this attempt's output follows ---\n")
+        fh.flush()
+        base = unit_props(lane, unit)
         try:
-            props = lane.http_json(f"http://{host}:{port}/props", timeout=5)
-            models = lane.http_json(f"http://{host}:{port}/v1/models", timeout=5)
-        except Exception:
-            continue
-        got_path = str((props or {}).get("model_path") or "")
-        got_alias = ""
-        try:
-            got_alias = (models.get("data") or [{}])[0].get("id", "")
-        except Exception:
-            pass
-        if got_path == entry["path"] and got_alias == entry["alias"]:
-            # A served alias is not an engine. Require one real, non-empty completion:
-            # llama.cpp answers /props and /v1/models long before (and sometimes when)
-            # it cannot finish a request.
+            base_restarts = int(base.get("NRestarts") or 0)
+        except ValueError:
+            base_restarts = 0
+        state: dict = base
+        answered: dict = {}
+        fastfail = ""
+        deadline = started + HEALTH_TIMEOUT_S
+        last_state_check = 0.0
+        while time.time() < deadline:
+            time.sleep(3)
             try:
-                body = json.dumps({
-                    "model": entry["alias"],
-                    "messages": [{"role": "user", "content": "Reply with the single word: READY"}],
-                    "max_tokens": 8, "temperature": 0,
-                }).encode()
-                req = urllib.request.Request(
-                    f"http://{host}:{port}/v1/chat/completions", data=body,
-                    headers={"Content-Type": "application/json"},
-                )
-                with urllib.request.urlopen(req, timeout=120) as fh:
-                    out = json.loads(fh.read().decode())
-                txt = (out["choices"][0]["message"].get("content") or "").strip()
-                if txt:
-                    return True
+                props = lane.http_json(f"http://{host}:{port}/props", timeout=5)
+                models = lane.http_json(f"http://{host}:{port}/v1/models", timeout=5)
+            except Exception:
+                props, models = {}, {}
+            got_path = str((props or {}).get("model_path") or "")
+            got_alias = ""
+            try:
+                got_alias = str(((models or {}).get("data") or [{}])[0].get("id", ""))
             except Exception:
                 pass
+            if got_path == entry["path"] and got_alias == entry["alias"]:
+                # A served alias is not an engine. Require one real completion.
+                ok, meta = probe_completion(host, port, entry["alias"])
+                if ok:
+                    answered = meta
+                    break
+            if time.time() - last_state_check >= UNIT_PROBE_INTERVAL_S:
+                last_state_check = time.time()
+                state = unit_props(lane, unit)
+                try:
+                    n_restarts = int(state.get("NRestarts") or 0)
+                except ValueError:
+                    n_restarts = base_restarts
+                if state.get("ActiveState") == "failed":
+                    fastfail = "unit entered failed state"
+                    break
+                if (n_restarts - base_restarts >= FASTFAIL_RESTARTS
+                        and state.get("ExecMainStatus") not in ("0", "", None)
+                        and time.time() - started >= FASTFAIL_MIN_S):
+                    fastfail = (
+                        f"{n_restarts - base_restarts} failed restarts, last exit "
+                        f"{state.get('ExecMainStatus')}")
+                    break
+    finally:
+        if follower is not None:
+            follower.terminate()
+            try:
+                follower.wait(timeout=15)
+            except subprocess.TimeoutExpired:
+                follower.kill()
+        fh.flush()
+        body = fh.tell()
+        fh.close()
+
+    diag["seconds"] = round(time.time() - started, 1)
+    diag["unit_state"] = state
+    text = log_path.read_text(errors="replace")
+    if body < 400:  # follower caught nothing usable - scrape the journal definitively
+        extra = journal_scrape(lane, unit, since)
+        if extra.strip():
+            with log_path.open("a") as afh:
+                afh.write("\n# journal re-scrape (live follower produced no output)\n")
+                afh.write(extra + "\n")
+            text = log_path.read_text(errors="replace")
+    diag["log_lines"] = len(text.splitlines())
+    if answered:
+        diag.update(ok=True, probe=answered)
+        log(f"    served {entry['alias']}: probe answered via {answered.get('answered_in')} "
+            f"({answered.get('payload')}), {diag['seconds']}s")
+        return diag
+    # A crash-looping config retries every 5 s for up to 60 attempts, and each attempt re-runs
+    # the loader (a VRAM-OOM config grabs and drops a CUDA context every time). Stop it: the
+    # verdict is already made, and a stopped unit also releases VRAM before the next config.
+    lane.run(["systemctl", "stop", unit], timeout=60)
+    # Only this attempt's lines may name the cause.
+    attempt_text = attempt_section(text)
+    cause, detail = classify_serve_failure(attempt_text, state)
+    diag.update(cause=cause, detail=detail, tail=error_tail(attempt_text),
+                exec_status=state.get("ExecMainStatus"), active_state=state.get("ActiveState"),
+                restarts=state.get("NRestarts"), fastfail=fastfail)
     log(f"    server never came up as {entry['alias']} ({entry['path']})")
-    return False
+    log(f"    cause={cause}: {detail}")
+    if fastfail:
+        log(f"    fast-fail: {fastfail} after {diag['seconds']}s (was a fixed {HEALTH_TIMEOUT_S}s)")
+    log(f"    engine log: {diag['log']}")
+    return diag
 
 
-def restore(lane: Lane, host: str, port: int = DEFAULT_PORT, log=print) -> bool:
-    lane.run(["rm", "-f", DROPIN], timeout=60)
+def restore(lane: Lane, host: str, port: int = DEFAULT_PORT, log=print, unit: str = UNIT) -> bool:
+    _, dropin = dropin_paths(unit)
+    lane.run(["rm", "-f", dropin], timeout=60)
     lane.run(["systemctl", "daemon-reload"], timeout=60)
-    lane.run(["systemctl", "reset-failed", UNIT], timeout=60)
-    lane.run(["systemctl", "restart", UNIT], timeout=120)
+    lane.run(["systemctl", "reset-failed", unit], timeout=60)
+    lane.run(["systemctl", "restart", unit], timeout=120)
     deadline = time.time() + HEALTH_TIMEOUT_S
     while time.time() < deadline:
         time.sleep(3)
         try:
             lane.http_json(f"http://{host}:{port}/health", timeout=5)
-            body = json.dumps({
-                "model": "",
-                "messages": [{"role": "user", "content": "Reply with the single word: READY"}],
-                "max_tokens": 8,
-                "temperature": 0,
-                "chat_template_kwargs": {"enable_thinking": False},
-            }).encode()
-            req = urllib.request.Request(
-                f"http://{host}:{port}/v1/chat/completions",
-                data=body,
-                headers={"Content-Type": "application/json"},
-            )
-            with urllib.request.urlopen(req, timeout=60) as fh:
-                out = json.loads(fh.read().decode())
-            text = (out["choices"][0]["message"].get("content") or "").strip()
-            if text:
-                log(f"  restored shipped unit, completion answered: {text[:40]!r}")
-                return True
         except Exception:
             continue
+        ok, meta = probe_completion(host, port, "", timeout=60)
+        if ok:
+            said = (meta.get("content") or meta.get("reasoning") or "")[:40]
+            log(f"  restored shipped unit, completion answered: {said!r}")
+            return True
     log("  restored shipped unit but no real completion answered")
     return False
 
@@ -272,11 +523,25 @@ def gpu_pins(lane: Lane, log=print) -> dict:
     return out
 
 
-def read_manifest(path: Path) -> list[dict]:
+def read_manifest(path: Path) -> tuple[list[dict], dict[str, str]]:
+    """Configs and explicit exclusions.
+
+    A line starting with `!` is an exclusion, not a config: `!<alias><TAB><reason>`. The
+    config row stays visible in the manifest, is skipped with its printed reason, and is
+    never retried - the honest home for a GGUF the deployed engine cannot load at any ctx.
+    """
     entries = []
+    exclusions: dict[str, str] = {}
     for raw in path.read_text().splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
+            continue
+        if line.startswith("!"):
+            f = line[1:].split("\t")
+            alias = f[0].strip()
+            if not alias:
+                raise SystemExit(f"bad exclusion line (no alias): {raw!r}")
+            exclusions[alias] = "\t".join(f[1:]).strip() or "no reason given"
             continue
         f = line.split("\t")
         if len(f) < 6:
@@ -285,7 +550,7 @@ def read_manifest(path: Path) -> list[dict]:
             "alias": f[0], "path": f[1], "ctx": int(f[2]), "np": int(f[3]),
             "ctk": f[4], "ctv": f[5], "extra": f[6] if len(f) > 6 else "",
         })
-    return entries
+    return entries, exclusions
 
 
 def load_state(path: Path) -> dict[str, dict]:
@@ -311,6 +576,9 @@ def main() -> int:
     # operator's, so it arrives as --host or $GRUNT_HOST or the run refuses.
     ap.add_argument("--host", default=os.environ.get("GRUNT_HOST", ""))
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
+    ap.add_argument("--unit", default=UNIT,
+                    help="systemd unit instance to swap (default llama-worker@8891); a second "
+                         "instance such as llama-worker@8893 lets a probe run beside the sweep")
     ap.add_argument("--concurrency", type=int, default=1,
                     help="match the server slots: a queued second stream only adds latency")
     ap.add_argument("--timeout", type=int, default=600)
@@ -326,7 +594,7 @@ def main() -> int:
 
     lane = Lane(args.ssh, args.ct)
     if args.restore:
-        return 0 if restore(lane, args.host, args.port) else 1
+        return 0 if restore(lane, args.host, args.port, unit=args.unit) else 1
 
     # Pins first, before any config is served: a run on an unpinned card is not comparable
     # with a run on a pinned one, so refuse rather than mix them in one state file.
@@ -338,7 +606,7 @@ def main() -> int:
                   f"refusing to score configs on a throttling card", flush=True)
             return 3
 
-    entries = read_manifest(Path(args.manifest))
+    entries, exclusions = read_manifest(Path(args.manifest))
     if args.only:
         entries = [e for e in entries if args.only in e["alias"]]
     state_path = Path(args.state)
@@ -346,9 +614,15 @@ def main() -> int:
     started = time.time()
     ran = 0
     failures: list[str] = []
+    causes: dict[str, int] = {}
 
-    print(f"[sweep] {len(entries)} configs, state {state_path}", flush=True)
+    print(f"[sweep] {len(entries)} configs, {len(exclusions)} manifest exclusion(s), "
+          f"state {state_path}", flush=True)
     for i, e in enumerate(entries, 1):
+        if e["alias"] in exclusions:
+            print(f"[sweep] {i}/{len(entries)} skip (excluded) {e['alias']}: "
+                  f"{exclusions[e['alias']]}", flush=True)
+            continue
         key = f"{e['alias']}|{e['ctk']}|{e['path']}"
         prev = done.get(key)
         if prev and prev.get("status") == "done" and prev.get("result") and Path(prev["result"]).exists():
@@ -362,11 +636,26 @@ def main() -> int:
                    gpu_power_limit_w=pins.get("power_limit_w"),
                    gpu_persistence=pins.get("persistence_mode"),
                    gpu_pins_ok=pins.get("ok"))
-        if not serve(dict(e, host=args.host), lane):
-            rec.update(status="serve_failed", seconds=round(time.time() - t0, 1))
+        # A failed config is only useful if it is a labelled failure: the attempt streams the
+        # engine's own output to results/_sweep_logs/<alias>-kv<ctk>.serve.log and comes back
+        # with a named cause, so the 0.5.0 table can say *why* a row is missing.
+        diag = serve(dict(e, host=args.host, port=args.port), lane,
+                     logs_dir=ROOT / "results" / "_sweep_logs", unit=args.unit)
+        if not diag.get("ok"):
+            cause = diag.get("cause") or "unknown"
+            causes[cause] = causes.get(cause, 0) + 1
+            rec.update(status="serve_failed", seconds=diag.get("seconds") or round(time.time() - t0, 1),
+                       serve_cause=cause, serve_detail=diag.get("detail"),
+                       serve_log=diag.get("log"), serve_tail=diag.get("tail"),
+                       serve_exec_status=diag.get("exec_status"),
+                       serve_active_state=diag.get("active_state"),
+                       serve_restarts=diag.get("restarts"),
+                       serve_fastfail=diag.get("fastfail"))
             failures.append(e["alias"])
             with state_path.open("a") as fh:
                 fh.write(json.dumps(rec) + "\n")
+            print(f"    -> serve_failed cause={cause} ({rec['seconds']}s) log={rec['serve_log']}",
+                  flush=True)
             continue
         ran += 1
         cmd = [
@@ -416,8 +705,10 @@ def main() -> int:
         print(f"    -> {rec['status']} score={score} result={result} ({rec['seconds']}s)", flush=True)
 
     print(f"[sweep] finished {ran} run(s) in {round((time.time()-started)/60,1)} min; failures={failures}", flush=True)
+    if causes:
+        print(f"[sweep] serve failure causes: {causes}", flush=True)
     if args.restore_on_exit:
-        restore(lane, args.host, args.port)
+        restore(lane, args.host, args.port, unit=args.unit)
     return 0 if not failures else 2
 
 

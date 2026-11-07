@@ -37,6 +37,22 @@ KV_TYPES = {"q4_0", "q8_0", "f16"}
 EXTRA = "-fa on --reasoning-budget 0"
 QUANT_RE = re.compile(r"(UD-)?(IQ|Q)\d[_A-Za-z0-9]*")
 
+# EXCLUSIONS: a weights file the DEPLOYED engine cannot serve at any context. Measured on the
+# lane 2026-11-07 with llama.cpp a2878d3 (2026-09-11): both files load-fail in ~0.2 s with
+# "error loading model: unknown model architecture: 'dory' | 'lfm3'". They are not a ctx or
+# VRAM verdict, so they are excluded by name with a reason the driver prints, instead of
+# costing 600 s per row on every sweep. Keyed by gguf basename so every KV row of that file is
+# covered, and re-enable by deleting the entry once the CT100 engine build is advanced.
+ENGINE_UNSUPPORTED_REASON = (
+    "GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 "
+    "in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade "
+    "exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log"
+)
+EXCLUDE_GGUF = {
+    "NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf": ENGINE_UNSUPPORTED_REASON,
+    "LFM3-1.7B-IQ4_NL.gguf": ENGINE_UNSUPPORTED_REASON,
+}
+
 # Explicit model-id -> gguf filename facts. Not a guess and not a fuzzy match: these are
 # the rows whose two candidate files differ only by a size or generation token that the
 # scoring rule cannot separate (2.6B vs 1.2B, 4B vs 9B, Gemma 3n vs Gemma 4). Each was
@@ -60,15 +76,32 @@ def norm_kv(sub: str, details: dict) -> str:
 
 
 def load_inventory(path: Path) -> dict[str, str]:
+    """Map gguf basename -> absolute path from the box's inventory.
+
+    Two shapes are accepted, because both exist in this repo's history: one
+    `<bytes>TAB<path>` pair per line (the runbook's `find -printf`), and the box's own
+    single-line `bytes,path,bytes,path,...` dump (pve-gguf-inventory.txt). The second shape
+    used to be skipped silently by a tab-only parser, so regenerating the manifest from the
+    checked-in inventory refused every row.
+    """
     inv: dict[str, str] = {}
     for line in path.read_text().splitlines():
         line = line.strip()
         if not line:
             continue
-        parts = line.split("\t") if "\t" in line else line.split(None, 1)
-        if len(parts) != 2:
-            continue
-        inv[Path(parts[1].strip()).name] = parts[1].strip()
+        fields = line.split(",") if ("," in line and "\t" not in line) else [line]
+        for i, tok in enumerate(fields):
+            if i + 1 >= len(fields):
+                break
+            if "\t" in tok:
+                size, p = tok.split("\t", 1)
+            else:
+                size, p = tok, fields[i + 1]
+                if not size.strip().isdigit():
+                    continue
+            p = p.strip()
+            if p.lower().endswith(".gguf"):
+                inv[Path(p).name] = p
     return inv
 
 
@@ -191,8 +224,28 @@ def main() -> int:
             add(f"{stem}-kv{kv}", inv[name], 32768, 1, kv)
             block_b += 1
 
-    Path(args.out).write_text("\n".join(lines) + "\n")
-    print(f"wrote {len(lines)} configs -> {args.out}")
+    exclusions: list[str] = []
+    seen_excl: set[str] = set()
+    for line in lines:
+        f = line.split("\t")
+        reason = EXCLUDE_GGUF.get(Path(f[1]).name)
+        if reason and f[0] not in seen_excl:
+            seen_excl.add(f[0])
+            exclusions.append(f"!{f[0]}\t{reason}")
+
+    Path(args.out).write_text("\n".join([
+        "# v0.5.0 sweep manifest - consumed by scripts/pve_sweep.py",
+        "# config row: alias<TAB>gguf_path<TAB>ctx<TAB>np<TAB>ctk<TAB>ctv[<TAB>extra_flags]",
+        "# exclusion row: !<alias><TAB><reason> - the config row is skipped with that reason and",
+        "#   never retried (the deployed engine cannot load that GGUF at any ctx)",
+        "",
+        *lines,
+        "",
+        "# EXCLUSIONS - measured on the lane, not assumed. See docs/SWEEP-v050.md.",
+        *exclusions,
+        "",
+    ]) + "\n")
+    print(f"wrote {len(lines)} configs (+{len(exclusions)} exclusions) -> {args.out}")
     print(f"  ranked re-run entries: {block_a}")
     print(f"  nemotron matrix entries: {block_b}")
     if missing:
