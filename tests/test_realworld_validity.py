@@ -75,6 +75,22 @@ GOLD: dict[str, str] = {
         '{"email": "bo@example.com", "name": "Bo", "plan": "basic"}, '
         '{"email": "cy@example.com", "name": "Cy Nguyen", "plan": "pro"}]'
     ),
+    "rw_payroll_net": "GROSS: 1078.00\nTAX: 145.20\nNET: 847.80",
+    "rw_med_dose": '{"tablets_per_dose": 2, "max_safe_doses": 3, "daily_mg": 0.75}',
+    "rw_connection_legality": '{"B": 125}',
+    "rw_lease_proration": (
+        '{"prorated_rent": 1360.00, "late_fee": 120.00, '
+        '"max_deposit": 2400.00, "due_total": 1480.00}'
+    ),
+    "rw_ledger_recon": "NET: 4.25",
+    "rw_recipe_scale": "EGGS: 6\nFLOUR_G: 366\nMINUTES: 43",
+    "rw_retry_schedule": "[12, 16, 24, 40, 70, 100]",
+    "rw_allergy_swap": (
+        '{"choice": "sunflower-seed butter", "price": 4.99, '
+        '"rejected": ["almond butter", "cashew cream", "tahini"]}'
+    ),
+    "rw_room_conflicts": '[["B2", "B3"], ["B2", "B4"], ["B3", "B4"]]',
+    "rw_invoice_deadline": '{"deadline": "2026-03-06", "payment": 8247.00}',
 }
 
 # The mistake each task exists to catch.
@@ -115,6 +131,32 @@ NEAR_MISS: dict[str, str] = {
         '{"email": "bo@example.com", "name": "Bo", "plan": "basic"}, '
         '{"email": "cy@example.com", "name": "Cy", "plan": "free"}]'
     ),
+    # taxed the overtime hours at the regular 12% rate
+    "rw_payroll_net": "GROSS: 1078.00\nTAX: 129.36\nNET: 863.64",
+    # ignored the second drug's 0.2 mg against the 1 mg ceiling -> 4 doses
+    "rw_med_dose": '{"tablets_per_dose": 2, "max_safe_doses": 4, "daily_mg": 1.0}',
+    # treated the terminal-change itinerary A as legal (75 min vs the 110 it needs)
+    "rw_connection_legality": '{"A": 75, "B": 125}',
+    # excluded the move-in day -> 16 billable days
+    "rw_lease_proration": (
+        '{"prorated_rent": 1280.00, "late_fee": 120.00, '
+        '"max_deposit": 2400.00, "due_total": 1400.00}'
+    ),
+    # reported only the changed amount and dropped the row missing from L1
+    "rw_ledger_recon": "NET: 1.00",
+    # scaled the bake time linearly with area instead of by its square root
+    "rw_recipe_scale": "EGGS: 6\nFLOUR_G: 366\nMINUTES: 59",
+    # ignored Retry-After and started the backoff at 2 s
+    "rw_retry_schedule": "[2, 6, 14, 30, 60, 90]",
+    # took the cheapest option and ignored "may contain traces of tree nuts"
+    "rw_allergy_swap": (
+        '{"choice": "tahini", "price": 3.99, '
+        '"rejected": ["almond butter", "cashew cream", "sunflower-seed butter"]}'
+    ),
+    # checked only hard overlaps and missed the 10-minute buffer breach
+    "rw_room_conflicts": '[["B2", "B4"], ["B3", "B4"]]',
+    # kept the Saturday deadline instead of moving to the preceding business day
+    "rw_invoice_deadline": '{"deadline": "2026-03-07", "payment": 8247.00}',
 }
 
 # Files the GOLD answer must produce, for the tasks that write a work product.
@@ -126,7 +168,14 @@ GOLD_FILES: dict[str, dict[str, str]] = {
             "SKU-2,3,4.25,12.75\n"
             "SKU-3,1,99.99,99.99\n"
         )
-    }
+    },
+    "rw_ledger_recon": {
+        "out/recon.csv": (
+            "date,status,delta\n"
+            "2026-03-03,amount_diff,1.00\n"
+            "2026-03-05,missing_in_l1,3.25\n"
+        )
+    },
 }
 
 # What the near-miss wrote instead: right header, dump order and one bad total.
@@ -138,7 +187,13 @@ NEAR_MISS_FILES: dict[str, dict[str, str]] = {
             "SKU-1,10,0.50,5.00\n"
             "SKU-3,1,99.99,99.99\n"
         )
-    }
+    },
+    "rw_ledger_recon": {
+        "out/recon.csv": (
+            "date,status,delta\n"
+            "2026-03-03,amount_diff,1.00\n"
+        )
+    },
 }
 
 

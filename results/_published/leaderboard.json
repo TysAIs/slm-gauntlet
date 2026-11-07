@@ -1,5 +1,5 @@
 {
- "benchmark": "slm-gauntlet v0.3.1 (71 tasks: adversarial 8, agent_chains 6, coding 10, instruction 14, realworld 10, structured 10, tooluse 19)",
+ "benchmark": "slm-gauntlet v0.3.1 (71 tasks: adversarial 8, agent_chains 6, coding 10, instruction 14, realworld 20, structured 10, tooluse 19)",
  "hardware": "8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp",
  "settings": "temperature 0, seed 1, thinking disabled, pass@1",
  "weights": "7-suite weights (tool .30 / structured .15 / retrieval .15 / coding .10 / instruction .10 / adversarial .10 / chains .10), 71 tasks",
@@ -23,7 +23,7 @@
    },
    "tasks": 71,
    "scorer": "v0.3.1",
-   "variants_scored": 63,
+   "variants_scored": 62,
    "card_png": "results/cards/card_spark-x2.6-4b-iq3m-bartowski.png",
    "source_log": "results/spark-x2.6-4b-iq3m-bartowski_20261029T172423Z.json"
   },
@@ -418,6 +418,14 @@
   }
  ],
  "legacy_not_comparable": [
+  {
+   "model": "spark-x2.6-4b-q4ks-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 0.0,
+   "tasks": 71,
+   "reason": "transport failure: 79 of 79 attempts returned no tokens at all (100%) \u2014 the model was never reached"
+  },
   {
    "model": "bonsai2-ptq1_0",
    "display_name": "Ternary Bonsai-2 \u00b7 27B",

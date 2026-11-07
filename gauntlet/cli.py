@@ -118,6 +118,10 @@ def cmd_run(args: argparse.Namespace) -> int:
             await client.close()
 
     results = asyncio.run(go())
+    from gauntlet.run_health import transport_failure, zero_token_error_counts
+
+    failed, why = transport_failure(results)
+    zero, total = zero_token_error_counts(results)
     out = write_results(
         results,
         meta={
@@ -127,9 +131,15 @@ def cmd_run(args: argparse.Namespace) -> int:
             "methodology": METHODOLOGY_VERSION,
             "task_count": len(tasks),
             "context_ladder": list(RETRIEVAL_LADDER),
+            "transport_failure": failed,
+            "zero_token_errors": zero,
+            "attempts": total,
         },
         outdir=Path("results"),
     )
+    if failed:
+        print(f"[gauntlet] WARNING transport failure: {why}")
+        print("[gauntlet] this run is NOT a model score; check the endpoint and re-run")
     print(f"[gauntlet] results -> {out}")
 
     summary = aggregate_results(results, SUITE_WEIGHTS)

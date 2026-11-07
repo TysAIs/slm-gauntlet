@@ -4,6 +4,8 @@ Date: 2026-11-05 (MST)
 Auditor: invincible lane. Hardware for every live number below: PVE GTX 1070 Ti test box,
 provider `grunt-pve` (the PVE test box's `llama-server` on tailnet port 8891). No GB10 node was touched.
 Baseline commit audited: `cbf748e` (working tree clean, 90/90 tests green).
+Extended 2026-11-07 with F16 (transport failures published as scores) and the phase-2
+suite expansion; the original findings are unchanged.
 
 Suite re-read from disk at audit time (never from a summary):
 
@@ -40,6 +42,7 @@ lives in `results/_published/audit_v0.4/AUDIT.md`.
 | F13 | `contamination_risk` and `canary` are recorded and never read. A contamination claim with no enforcement. | S4 — metadata | KEEP-WITH-NOTE |
 | F14 | `validate_tasks` skips `json_schema` shape, weight ≤ 0, and `state_path` typo paths. | S4 — preflight gap | KEEP-WITH-NOTE |
 | F15 | Phase-0 repo gates were red before this audit touched anything: the hygiene gate failed on 9 tracked files and `ruff check .` on 87 errors, so "green CI" was not true. | S2 — publishability | FIX (applied) |
+| F16 | A run whose requests **never reached the model** was published as a score: 79 of 79 attempts terminated `error` with 0 prompt and 0 completion tokens, and the card read `0.0%`. Nothing in the pipeline distinguished "the model failed" from "the endpoint was dead". | S1 — false published number | FIX (applied: `gauntlet/run_health.py`, publisher refuses to rank it) |
 
 ---
 
@@ -243,6 +246,73 @@ rewriting history to satisfy a lint of the past is not worth it.
 Also fixed while verifying F15: `results/_published/leaderboard.json` disagreed with the corpus
 (the benchmark string omitted the new `realworld` suite), so `leaderboard_check.py` exited 1 on a
 clean tree. Regenerated with `--write`: **no score changed**, one metadata string did.
+
+### F16 — a dead endpoint published as a model score
+
+`results/spark-x2.6-4b-q4ks-xhtoken-kvq4_20261029T040626Z.json` holds 71 task results and
+79 attempts. Every attempt is `terminated: "error"` with `prompt_tokens: 0` and
+`completion_tokens: 0`, i.e. the request was never processed — the endpoint refused or
+died, three runs in a row (19/23, 19/19 and then 71/71 tasks affected across that day).
+The corpus card published **0.0%**, which reads as "this configuration is broken" when in
+fact **that configuration was never measured**.
+
+Detection is now one definition, `gauntlet/run_health.py`: a run is a transport failure
+when more than 50% of its attempts are `error` with zero prompt AND zero completion
+tokens. The runner stamps `transport_failure` / `zero_token_errors` / `attempts` into
+`meta`, prints a loud warning, and `scripts/leaderboard_check.py` refuses to rank a card
+whose source log fails the test — so the exclusion is visible in the published table
+("transport failure: 79 of 79 attempts returned no tokens") instead of hiding as a
+deleted row.
+
+Receipt (read-only):
+
+```
+$ python3 scripts/audit_corpus_transport.py
+scanned 524 scored run logs; 5 are transport failures (share > 50% zero-token attempts)
+  FAIL results/spark-x2.6-4b-q4ks-xhtoken-kvq4_20261029T040626Z.json  n=71 attempts=79 zero=79 (100%)
+  ... (4 more: 2 Bonsai n=8 legacy logs, and the two aborted 19-task runs of the same config)
+published cards sourced from a transport-failed run:
+  results/cards/card_spark-x2.6-4b-q4ks-xhtoken-kvq4.json  published=0.0  <- ...20261029T040626Z.json
+all transport-failed cards are excluded from the ranking (classify() refuses them)
+```
+
+Only one published card is affected, so no ranking moved. It stays in the corpus,
+labelled, and the configuration is re-run under 0.5.0.
+
+### The epoch is frozen where it is claimed
+
+Adding tasks to `tasks/` silently changed what the **0.4.0** epoch claimed to be: its
+`tasks` field was computed live (`_count_current_tasks()`), so a later suite expansion
+retroactively redefined an old epoch's denominator. 0.4.0 is now pinned at the 84 tasks
+it actually had, and 0.5.0 carries the live count (94: 87 YAML + 7 generated retrieval).
+No 0.4.0 row exists in the corpus, so nothing had to be re-scored.
+
+---
+
+## Phase 2 — the suite expansion (real work, not more keyword tasks)
+
+The audit's F6 said the partial-credit rubric barely exists because 58 of 77 tasks are
+single-assert. The fix is **more multi-constraint real-life tasks**, not re-weighting, so
+`tasks/realworld.yaml` gains ten:
+
+| task | what a person actually asks for | the mistake it exists to catch |
+|---|---|---|
+| `rw_payroll_net` | weekly pay: overtime, a different tax rate on the OT portion, flat deduction | taxing overtime at the regular rate |
+| `rw_med_dose` | mcg→mg conversion under a daily ceiling partially used by a second drug | ignoring the second drug's share of the ceiling |
+| `rw_connection_legality` | which flight connections satisfy minimum-time rules with a terminal penalty | treating a short connection as legal |
+| `rw_lease_proration` | prorated rent by billable days, greater-of late fee, statutory deposit cap | excluding the move-in day / ignoring the cap |
+| `rw_ledger_recon` | reconcile two ledgers and **write** the discrepancy file, including a missing row | reporting only changed amounts |
+| `rw_recipe_scale` | pan-size rescale: area ratio for ingredients, square-root bake time, whole eggs | scaling bake time linearly with area |
+| `rw_retry_schedule` | retry plan obeying Retry-After, exponential backoff, a wait cap and a retry limit | ignoring the server's Retry-After |
+| `rw_allergy_swap` | pick the cheapest substitution that is safe under an allergy | choosing the cheapest, ignoring "may contain traces" |
+| `rw_room_conflicts` | every conflicting booking under overlap-OR-buffer policy | checking overlaps only |
+| `rw_invoice_deadline` | 2/10 net 30 deadline that falls on a Saturday, plus a wire fee | keeping the weekend date |
+
+Validity is **proved, not asserted**: `tests/test_realworld_validity.py` runs an
+independently written GOLD answer (must score 1.0) and a NEAR_MISS answer carrying the
+exact mistake above (must score 0.0 through a `must_pass` gate) through the real scorer
+and the real sandbox. `44 passed` on that file, `129 passed` on the suite. Every new task
+is multi-assert and gated, and `rw_ledger_recon` grades a written file, not prose.
 
 ---
 

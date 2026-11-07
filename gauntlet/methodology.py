@@ -9,7 +9,7 @@ methodology version it was produced under.
 
 from __future__ import annotations
 
-METHODOLOGY_VERSION = "0.4.0"
+METHODOLOGY_VERSION = "0.5.0"
 
 # Published weights. They sum to 1.0 over the suites the gauntlet scores.
 # realworld is new in 0.4: multi-constraint everyday agent work, graded on
@@ -59,7 +59,7 @@ def methodology_line(task_count: int) -> str:
 # each row is recomputed with its own epoch's table, and rows from different
 # epochs are never ranked against each other.
 # ---------------------------------------------------------------------------
-EPOCH_ORDER = ("v0.3.1", "0.4.0")
+EPOCH_ORDER = ("v0.3.1", "0.4.0", "0.5.0")
 
 
 def _count_current_tasks() -> int:
@@ -100,6 +100,16 @@ EPOCHS: dict[str, dict] = {
         ),
     },
     "0.4.0": {
+        "weights": SUITE_WEIGHTS,
+        # FROZEN: 84 = 77 YAML tasks + 7 generated retrieval tasks as they were
+        # when this epoch was authored. A live-derived count let a later task
+        # addition retroactively change what an old epoch means.
+        "tasks": 84,
+        "label": "CLI 8-suite weights ("
+        + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
+        + "), 84 tasks",
+    },
+    "0.5.0": {
         "weights": SUITE_WEIGHTS,
         "tasks": CURRENT_TASK_COUNT,
         "label": "CLI 8-suite weights ("
