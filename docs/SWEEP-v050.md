@@ -112,6 +112,18 @@ Measured causes on this lane (llama.cpp `a2878d3`, 2026-09-11 build):
 emits them from `EXCLUDE_GGUF`, keyed by GGUF basename so every KV row of that file is covered,
 and they are re-enablement-gated on an engine upgrade — not on a retry.
 
+**The engine upgrade they were gated on now exists** (2026-11-07): `/opt/llama.cpp-dory`
+(pinned PR ggml-org/llama.cpp#30306, commit `1c3cdd2`, CUDA sm_61) loads **both** `dory` and
+`lfm3`. Verified as serving, not just as source support: Dory Q5_K_M answered a chat completion
+on 127.0.0.1:8892 (alias `dory-1.0-4b-q5km`, `system_fingerprint b1-1c3cdd2`) and
+LFM3-1.7B-IQ2_M answered too. Build/serve/VRAM notes: `/opt/llama.cpp-dory/README.fleet.md` on
+the 1070 Ti container. This does **not** retro-change the running campaign: its engine stays
+`a2878d3` so all 48 configs stay comparable. On the next sweep, point the worker at the dory
+build and drop the `dory`/`lfm3` rows from `EXCLUDE_GGUF` — that is a configuration change
+(new engine), so label those scores engine-vs-engine, never as a pure KV/quant comparison.
+Dory is also expensive on 8 GB: `dory.num_loops=4` with `per_loop` KV costs ~4x normal KV per
+token, so its 32K rows need q8_0/q4_0 KV.
+
 Note: the manifest is read once at driver start, so an edit to it (or to this driver) applies to
 the **next** sweep invocation, not to a sweep already running.
 
