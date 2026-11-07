@@ -177,7 +177,10 @@ def main() -> int:
                 print(f"  resolved {row['model']} {why}")
             kv = norm_kv(card.get("sub", ""), det)
             ctx = int(det.get("context_tokens") or 32768)
-            add(row["model"], path, ctx, 2 if ctx >= 16384 else 1, kv)
+            # np=1 for a large window: a measured np=2/32K/f16 slot pair did not finish a
+            # 22k-token prompt inside 420 s, while np=1 served the same prompt in 30 s at
+            # 675 tok/s prefill. Two slots halve the effective KV on an 8 GB card.
+            add(row["model"], path, ctx, 1 if ctx >= 16384 else 2, kv)
             block_a += 1
 
     block_b = 0
@@ -185,7 +188,7 @@ def main() -> int:
     for name in sorted(fam):
         stem = re.sub(r"[^a-z0-9.]+", "-", name.rsplit(".gguf", 1)[0].lower()).strip("-")
         for kv in ("f16", "q8_0", "q4_0"):
-            add(f"{stem}-kv{kv}", inv[name], 32768, 2, kv)
+            add(f"{stem}-kv{kv}", inv[name], 32768, 1, kv)
             block_b += 1
 
     Path(args.out).write_text("\n".join(lines) + "\n")

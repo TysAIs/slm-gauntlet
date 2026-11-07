@@ -70,6 +70,23 @@ A 48-config sweep is therefore an overnight job; it is detached (`setsid`), stre
 run to `results/_sweep_logs/<alias>-kv<type>.log`, and records one JSON line per config in
 `results/_sweep_state.jsonl`, so an interrupted sweep resumes instead of restarting.
 
+## Serving finding that changes the driver: one slot, not two
+
+The first driver version used `-np 2` at 32K with f16 KV (two slots). Measured on the lane:
+a 22K-token prompt did not finish inside the client's 420-second ceiling, and the server
+journal showed tasks being cancelled at the 240 s timeout (`stop: cancel task`). Isolating
+one variable at a time on the same weights and window:
+
+| slots | flash attention | 20K-token prompt | prefill | decode |
+|---|---|---|---|---|
+| 2 | on | **> 420 s, cancelled** | — | — |
+| 1 | on | 30.4 s | 675 tok/s | 40.7 tok/s |
+| 1 | off | 29.8 s | 672 tok/s | 40.6 tok/s |
+
+So the two-slot configuration was the defect (it halves the effective KV on an 8 GB card),
+not flash attention. The manifest now runs `-np 1` for every 32K config and the client
+timeout is 600 s. A config that cannot finish is recorded as a failure, not retried forever.
+
 ## Phase 4 — context: what the ladder can honestly claim
 
 The suite's long-context rungs top out at 24K because a 32K *target* tokenizes to ~35K real
