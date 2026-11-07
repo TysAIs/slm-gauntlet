@@ -149,7 +149,26 @@ def serve(entry: dict, lane: Lane, log=print) -> bool:
         except Exception:
             pass
         if got_path == entry["path"] and got_alias == entry["alias"]:
-            return True
+            # A served alias is not an engine. Require one real, non-empty completion:
+            # llama.cpp answers /props and /v1/models long before (and sometimes when)
+            # it cannot finish a request.
+            try:
+                body = json.dumps({
+                    "model": entry["alias"],
+                    "messages": [{"role": "user", "content": "Reply with the single word: READY"}],
+                    "max_tokens": 8, "temperature": 0,
+                }).encode()
+                req = urllib.request.Request(
+                    f"http://{host}:{port}/v1/chat/completions", data=body,
+                    headers={"Content-Type": "application/json"},
+                )
+                with urllib.request.urlopen(req, timeout=120) as fh:
+                    out = json.loads(fh.read().decode())
+                txt = (out["choices"][0]["message"].get("content") or "").strip()
+                if txt:
+                    return True
+            except Exception:
+                pass
     log(f"    server never came up as {entry['alias']} ({entry['path']})")
     return False
 
@@ -227,7 +246,8 @@ def main() -> int:
     # operator's, so it arrives as --host or $GRUNT_HOST or the run refuses.
     ap.add_argument("--host", default=os.environ.get("GRUNT_HOST", ""))
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
-    ap.add_argument("--concurrency", type=int, default=2)
+    ap.add_argument("--concurrency", type=int, default=1,
+                    help="match the server slots: a queued second stream only adds latency")
     ap.add_argument("--timeout", type=int, default=600)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--thermal-limit", type=int, default=89)
