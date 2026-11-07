@@ -347,3 +347,309 @@
       expr: "isinstance(data, list) and data and data[2].get('name') == 'Cy Nguyen' and data[2].get('plan') == 'pro' and data[2].get('email') == 'cy@example.com'"
   max_tokens: 768
   no_think: true
+
+- id: rw_payroll_net
+  suite: realworld
+  description: Weekly pay with overtime, a different tax rate on the overtime portion, and a flat deduction
+  prompt: |-
+    Payroll rules for this week:
+      - base rate 22.00/hour for the first 40 hours
+      - overtime hours (beyond 40) pay 1.5x the base rate
+      - tax is 12% of regular earnings and 20% of overtime earnings
+      - a flat health premium of 85.00 is deducted after tax
+    The employee worked 46 hours this week.
+
+    Reply with exactly three lines and nothing else, all amounts with two decimals:
+    GROSS: <amount>
+    TAX: <amount>
+    NET: <amount>
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [1078.0, 145.2, 847.8]"
+  max_tokens: 320
+  no_think: true
+
+- id: rw_med_dose
+  suite: realworld
+  description: Convert mcg to mg and respect a daily ceiling shared with a second drug
+  prompt: |-
+    A prescription says: 250 mcg per dose, up to 4 doses a day.
+    The tablets stocked are 0.125 mg each.
+    The label caps this drug at 1 mg per day.
+    The patient already takes another drug that is equivalent to 0.2 mg per day of
+    this same drug family, and that counts against the 1 mg per day ceiling.
+
+    Only whole tablets and only whole doses are allowed, and you must stay at or under
+    the ceiling.
+
+    Reply with a single JSON object only:
+    {"tablets_per_dose": <int>, "max_safe_doses": <int>, "daily_mg": <number>}
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and int(data.get('tablets_per_dose', -1)) == 2"
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and int(data.get('max_safe_doses', -1)) == 3"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('daily_mg', -1)) - 0.75) < 0.005"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_connection_legality
+  suite: realworld
+  description: Check flight connections against per-type minimum times and a terminal-change penalty
+  prompt: |-
+    Minimum connection times at the connecting airport:
+      - domestic to international: 90 minutes
+      - if the connection requires changing terminals, add 20 minutes
+
+    Itineraries (local times at the connecting airport):
+    A: arrive ORD 11:20, depart ORD 12:35, terminal change required
+    B: arrive DFW 09:40, depart DFW 11:45, same terminal
+    C: arrive JFK 12:10, depart JFK 13:20, terminal change required
+
+    Decide which itineraries satisfy the connection rule.
+
+    Reply with a single JSON object only, mapping each VALID itinerary id to its
+    connection time in minutes as an integer, e.g. {"X": 100}. Leave invalid
+    itineraries out.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and list(data.keys()) == ['B']"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and int(data.get('B', 0)) == 125"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_lease_proration
+  suite: realworld
+  description: Prorate rent by billable days, apply a late fee with a greater-of rule, cap a deposit
+  prompt: |-
+    Move-in: November 14, in a 30-day month. The move-in day itself counts as the
+    first billable day.
+    Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
+    Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
+    fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
+    Deposit: the landlord asked for 1.5 months of rent, but the state caps a security
+    deposit at one month's rent, so only the capped amount may be collected.
+
+    Reply with a single JSON object only, amounts as numbers with at most two decimals:
+    {"prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    where due_total = prorated_rent + late_fee.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('prorated_rent', -1)) - 1360.0) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('late_fee', -1)) - 120.0) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('max_deposit', -1)) - 2400.0) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('due_total', -1)) - 1480.0) < 0.005"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_ledger_recon
+  suite: realworld
+  description: Reconcile two ledgers and write the discrepancy file, including a row missing from one side
+  prompt: |-
+    Reconcile ledger L2 against ledger L1. For each date, compare the amount in L2 with
+    the amount in L1.
+
+    L1: 2026-03-01 coffee 4.50 | 2026-03-03 fuel 62.10 | 2026-03-04 parking 9.00
+    L2: 2026-03-01 coffee 4.50 | 2026-03-03 fuel 63.10 | 2026-03-04 parking 9.00 | 2026-03-05 toll 3.25
+
+    Use the write_file tool to create "out/recon.csv" with this exact header:
+    date,status,delta
+    Then one row per discrepant date, sorted by date ascending, where status is
+    "amount_diff" when L2 has a different amount than L1 and "missing_in_l1" when L2
+    has a row L1 does not, and delta is (L2 amount - L1 amount) with two decimals
+    (for a missing row, L1's amount counts as zero).
+    Do not add blank lines.
+
+    Then reply with exactly one line: "NET: <amount>", where amount is the sum of the
+    deltas with two decimals.
+  tools:
+    - name: write_file
+      description: Write a file in the workspace.
+      parameters:
+        type: object
+        properties:
+          path: {type: string}
+          content: {type: string}
+        required: [path, content]
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "any(abs(float(x) - 4.25) < 0.005 for x in re.findall(r'-?\\d+\\.\\d{2}', out))"
+  state_asserts:
+    - type: tool_called
+      tool: write_file
+      must_pass: true
+      weight: 2.0
+    - type: file_lines
+      path: out/recon.csv
+      must_pass: true
+      weight: 3.0
+      lines:
+        - "date,status,delta"
+        - "2026-03-03,amount_diff,1.00"
+        - "2026-03-05,missing_in_l1,3.25"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_recipe_scale
+  suite: realworld
+  description: Scale a recipe from an 8x8 pan to 9x13 using area, with a square-root bake time and whole eggs
+  prompt: |-
+    A recipe is written for an 8x8 inch pan and bakes 32 minutes at 350 F.
+    You are making it in a 9x13 inch pan instead.
+
+    Scaling rules:
+      - every ingredient scales by the ratio of the pan AREAS
+      - eggs must be whole numbers, rounded UP
+      - flour is rounded to the nearest whole gram
+      - bake time scales by the SQUARE ROOT of the area ratio, rounded to the
+        nearest whole minute
+
+    Original recipe: 3 eggs, 200 g flour, 32 minutes.
+
+    Reply with exactly three lines and nothing else:
+    EGGS: <integer>
+    FLOUR_G: <integer>
+    MINUTES: <integer>
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "[int(x) for x in re.findall(r'\\d+', out)][:3] == [6, 366, 43]"
+  max_tokens: 320
+  no_think: true
+
+- id: rw_retry_schedule
+  suite: realworld
+  description: Build a retry schedule obeying Retry-After, exponential backoff, a wait cap and a retry limit
+  prompt: |-
+    A request fails at time 0 with HTTP 429 and a Retry-After header of 12 seconds.
+
+    Client retry policy:
+      - the first retry waits 2 seconds, and each later wait doubles (2, 4, 8, 16, 32, 64 ...)
+      - no single wait may exceed 30 seconds (cap the wait, do not skip the retry)
+      - at most 6 retries total
+      - no retry may happen earlier than the Retry-After value
+
+    Assume every retry fails again with no new Retry-After.
+
+    Reply with a single JSON array only, the 6 retry times in seconds after time 0,
+    in ascending order.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, list) and [int(x) for x in data] == [12, 16, 24, 40, 70, 100]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_allergy_swap
+  suite: realworld
+  description: Substitute an ingredient under an allergy constraint where the cheapest option is banned by its label
+  prompt: |-
+    A recipe needs 2 tablespoons of peanut sauce, but the guest has a peanut AND tree
+    nut allergy. All four pantry options below can replace it one-for-one.
+
+    sunflower-seed butter | 4.99 | label: "nut-free facility"
+    almond butter         | 6.49 | label: "contains tree nuts"
+    cashew cream          | 5.99 | label: "contains tree nuts"
+    tahini                | 3.99 | label: "may contain traces of tree nuts"
+
+    Choose the cheapest option that is safe for this guest.
+
+    Reply with a single JSON object only:
+    {"choice": "<exact option name as written>", "price": <number>, "rejected": [<names, alphabetical, every option you did not choose>]}
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and data.get('choice') == 'sunflower-seed butter'"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('price', -1)) - 4.99) < 0.005"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and [str(x) for x in (data.get('rejected') or [])] == ['almond butter', 'cashew cream', 'tahini']"
+  max_tokens: 448
+  no_think: true
+
+- id: rw_room_conflicts
+  suite: realworld
+  description: Find every booking conflict in one room under an overlap OR minimum-buffer policy
+  prompt: |-
+    One room is booked (24-hour times, same day):
+    B1 09:00-10:00
+    B2 10:15-11:00
+    B3 11:10-12:00
+    B4 10:50-11:30
+
+    Conflict policy: two bookings conflict if they OVERLAP at all, or if the gap
+    between the end of the earlier one and the start of the later one is LESS THAN
+    15 minutes. A gap of exactly 15 minutes is fine.
+
+    Reply with a single JSON array only, listing every conflicting pair once, each pair
+    as [earlier_or_overlapping_id_first, other_id], the list sorted by the first id
+    then the second id.
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, list) and [[str(a) for a in p] for p in data] == [['B2', 'B3'], ['B2', 'B4'], ['B3', 'B4']]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_invoice_deadline
+  suite: realworld
+  description: Early-payment discount deadline that lands on a weekend, with a wire fee added on top
+  prompt: |-
+    Invoice issued 2026-02-25 for 8400.00, terms 2/10 net 30.
+
+    Rules:
+      - the 2% discount is available if payment is received on or before the 10th day
+        after the issue date
+      - if that 10th day falls on a Saturday or Sunday, the deadline moves to the
+        PRECEDING business day
+      - the discount applies to the invoice amount
+      - a wire fee of 15.00 is added to the payment after the discount
+
+    Reply with a single JSON object only:
+    {"deadline": "<YYYY-MM-DD>", "payment": <number with two decimals>}
+  asserts:
+    - type: predicate
+      must_pass: true
+      weight: 3.0
+      expr: "isinstance(data, dict) and str(data.get('deadline')) == '2026-03-06'"
+    - type: predicate
+      must_pass: true
+      weight: 2.0
+      expr: "isinstance(data, dict) and abs(float(data.get('payment', -1)) - 8247.0) < 0.005"
+  max_tokens: 384
+  no_think: true
