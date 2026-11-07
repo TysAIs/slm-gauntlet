@@ -228,7 +228,7 @@ def main() -> int:
     ap.add_argument("--host", default=os.environ.get("GRUNT_HOST", ""))
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
     ap.add_argument("--concurrency", type=int, default=2)
-    ap.add_argument("--timeout", type=int, default=240)
+    ap.add_argument("--timeout", type=int, default=600)
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--thermal-limit", type=int, default=89)
     ap.add_argument("--limit", type=int, default=0, help="stop after N configs (smoke)")
