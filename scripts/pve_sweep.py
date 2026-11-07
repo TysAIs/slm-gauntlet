@@ -40,6 +40,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -276,8 +277,17 @@ def main() -> int:
             "--seed", str(args.seed), "--thermal-limit", str(args.thermal_limit),
         ]
         print("    " + " ".join(cmd[1:]), flush=True)
-        p = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True)
-        out = (p.stdout or "") + (p.stderr or "")
+        # Stream to a per-config log instead of buffering: a 20-minute run with no visible
+        # output is indistinguishable from a hung one, and the log outlives this process.
+        logs_dir = ROOT / "results" / "_sweep_logs"
+        logs_dir.mkdir(parents=True, exist_ok=True)
+        log_name = re.sub(r"[^A-Za-z0-9._-]+", "-", f"{e['alias']}-kv{e['ctk']}") + ".log"
+        log_path = logs_dir / log_name
+        with log_path.open("w") as fh:
+            fh.write(" ".join(cmd) + "\n\n")
+            fh.flush()
+            p = subprocess.run(cmd, cwd=str(ROOT), stdout=fh, stderr=subprocess.STDOUT)
+        out = log_path.read_text(errors="replace")
         result = None
         for line in out.splitlines():
             if "results ->" in line:
@@ -296,6 +306,7 @@ def main() -> int:
             result=result,
             score=score,
             seconds=round(time.time() - t0, 1),
+            log=str(log_path.relative_to(ROOT)),
             tail="\n".join(out.splitlines()[-6:]) if p.returncode else "",
         )
         if rec["status"] != "done":
