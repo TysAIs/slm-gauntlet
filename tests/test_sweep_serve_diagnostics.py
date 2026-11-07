@@ -156,3 +156,25 @@ def test_probe_rejects_a_response_with_no_content_and_no_reasoning(monkeypatch):
     monkeypatch.setattr(pve.urllib.request, "urlopen", fake_urlopen)
     ok, meta = pve.probe_completion("127.0.0.1", 1, "dead")
     assert ok is False and meta == {}
+
+
+def test_vram_gate_waits_until_the_card_is_free(monkeypatch):
+    reads: list[int] = []
+
+    def fake_gpu(lane):
+        reads.append(1)
+        if len(reads) == 1:
+            return {"gpu_used_mib": 7713, "gpu_free_mib": 395}
+        return {"gpu_used_mib": 400, "gpu_free_mib": 7700}
+
+    monkeypatch.setattr(pve, "gpu_memory", fake_gpu)
+    monkeypatch.setattr(pve.time, "sleep", lambda s: None)
+    mem = pve.wait_card_idle(None, log=lambda *_: None, timeout_s=10)
+    assert mem["gpu_free_mib"] == 7700 and len(reads) == 2
+
+
+def test_vram_gate_is_bounded_and_reports_what_it_saw(monkeypatch):
+    monkeypatch.setattr(pve, "gpu_memory", lambda lane: {"gpu_used_mib": 7713, "gpu_free_mib": 395})
+    monkeypatch.setattr(pve.time, "sleep", lambda s: None)
+    mem = pve.wait_card_idle(None, log=lambda *_: None, timeout_s=0)
+    assert mem["gpu_free_mib"] == 395
