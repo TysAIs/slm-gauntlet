@@ -55,6 +55,23 @@ DROPIN = f"{DROPIN_DIR}/50-sweep.conf"
 DEFAULT_PORT = 8891
 HEALTH_TIMEOUT_S = 600
 
+# Sustained-load pins for the box's GTX 1070 Ti. Measured 2026-11-07 on this card with
+# the identical 13-minute 4-stream thermal test (receipt:
+# invincible/missions/work/2026-11-07-1070ti-sustained-policy.md): at the default 180 W
+# limit the card regulates to its own 83 C target temperature and SW thermal slowdown was
+# active on 29.1% of loaded samples, with SM clock wandering 1632-1835 MHz - so whichever
+# config landed in a throttled minute scored lower than the same config scored cool.
+# Locked GPU clocks (-lgc) and application clocks (-ac) are NOT supported on this GeForce
+# card (nvidia-smi: "Setting locked GPU clocks is not supported", exit 0 and silently
+# ignored), so persistence mode plus a power ceiling the cooling holds with margin is the
+# whole lever set. 120 W: 0 slowdown samples, plateau 74.8 C against an 83 C target, and
+# no measurable cost at the sweep's own load (one client stream never reaches the ceiling).
+GPU_POWER_LIMIT_W = 120
+GPU_PIN_QUERY = (
+    "persistence_mode,power.limit,power.draw,clocks.current.sm,temperature.gpu,"
+    "clocks_event_reasons.active"
+)
+
 
 def sh(cmd: list[str], timeout: int = 120, input_text: str | None = None):
     return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, input=input_text)
@@ -70,6 +87,11 @@ class Lane:
 
     def run(self, argv: list[str], timeout: int = 120, stdin: str | None = None):
         return sh(self.ssh + self.ct_cmd(argv), timeout=timeout, input_text=stdin)
+
+    def host_run(self, argv: list[str], timeout: int = 60):
+        """Run on the PVE HOST, not inside the CT: nvidia-smi settings live there
+        (inside the CT, temperature.gpu answers "Function Not Found")."""
+        return sh(self.ssh + argv, timeout=timeout)
 
     def ct_cmd(self, argv: list[str]) -> list[str]:
         return self.base + argv
@@ -212,6 +234,44 @@ def restore(lane: Lane, host: str, port: int = DEFAULT_PORT, log=print) -> bool:
     return False
 
 
+def gpu_pins(lane: Lane, log=print) -> dict:
+    """Apply and verify the sustained-load pins on the PVE host, then report what the
+    card actually says. Every sweep result is attributable only if this ran: without it
+    the same config scores differently depending on how warm the minute was."""
+    host = lane.host_run
+    out: dict = {"requested_power_limit_w": GPU_POWER_LIMIT_W, "ok": False}
+    r = host(["sudo", "-n", "nvidia-smi", "-pm", "1"])
+    out["set_persistence_rc"] = r.returncode
+    r = host(["sudo", "-n", "nvidia-smi", "-pl", str(GPU_POWER_LIMIT_W)])
+    out["set_power_limit_rc"] = r.returncode
+    out["set_power_limit_out"] = (r.stdout + r.stderr).strip()[-200:]
+    r = host(["nvidia-smi", f"--query-gpu={GPU_PIN_QUERY}", "--format=csv,noheader"])
+    out["readback"] = r.stdout.strip()
+    if r.returncode != 0:
+        out["error"] = (r.stderr or r.stdout).strip()[-200:]
+        log(f"[sweep] GPU pins FAILED to read back: {out['error']}")
+        return out
+    fields = [p.strip() for p in r.stdout.strip().split(",")]
+    try:
+        out["persistence_mode"] = fields[0]
+        out["power_limit_w"] = float(fields[1].split()[0])
+        out["clocks_sm_mhz"] = int(fields[3].split()[0])
+    except (IndexError, ValueError):
+        out["error"] = f"unparsable readback {r.stdout.strip()!r}"
+        log(f"[sweep] GPU pins {out['error']}")
+        return out
+    out["ok"] = (
+        out["persistence_mode"].lower().startswith("enabled")
+        and abs(out["power_limit_w"] - GPU_POWER_LIMIT_W) < 0.5
+    )
+    log(
+        f"[sweep] GPU pins: persistence={out['persistence_mode']} "
+        f"power_limit={out['power_limit_w']}W (requested {GPU_POWER_LIMIT_W}W) "
+        f"sm={out['clocks_sm_mhz']}MHz -> {'OK' if out['ok'] else 'NOT APPLIED'}"
+    )
+    return out
+
+
 def read_manifest(path: Path) -> list[dict]:
     entries = []
     for raw in path.read_text().splitlines():
@@ -260,11 +320,23 @@ def main() -> int:
     ap.add_argument("--only", default="", help="substring filter on alias")
     ap.add_argument("--restore", action="store_true", help="only restore the shipped unit and exit")
     ap.add_argument("--restore-on-exit", action="store_true")
+    ap.add_argument("--no-gpu-pins", action="store_true",
+                    help="skip the sustained-load pins (unattributable results; debugging only)")
     args = ap.parse_args()
 
     lane = Lane(args.ssh, args.ct)
     if args.restore:
         return 0 if restore(lane, args.host, args.port) else 1
+
+    # Pins first, before any config is served: a run on an unpinned card is not comparable
+    # with a run on a pinned one, so refuse rather than mix them in one state file.
+    pins: dict = {"ok": None, "skipped": True}
+    if not args.no_gpu_pins:
+        pins = gpu_pins(lane)
+        if not pins.get("ok"):
+            print(f"[sweep] GPU pins not applied ({pins.get('error') or pins}); "
+                  f"refusing to score configs on a throttling card", flush=True)
+            return 3
 
     entries = read_manifest(Path(args.manifest))
     if args.only:
@@ -286,7 +358,10 @@ def main() -> int:
             break
         print(f"[sweep] {i}/{len(entries)} serve {e['alias']} ctx={e['ctx']} kv={e['ctk']}/{e['ctv']}", flush=True)
         t0 = time.time()
-        rec = dict(e, started=time.strftime("%Y-%m-%dT%H:%M:%S"), status="serving")
+        rec = dict(e, started=time.strftime("%Y-%m-%dT%H:%M:%S"), status="serving",
+                   gpu_power_limit_w=pins.get("power_limit_w"),
+                   gpu_persistence=pins.get("persistence_mode"),
+                   gpu_pins_ok=pins.get("ok"))
         if not serve(dict(e, host=args.host), lane):
             rec.update(status="serve_failed", seconds=round(time.time() - t0, 1))
             failures.append(e["alias"])
