@@ -523,6 +523,31 @@ def gpu_pins(lane: Lane, log=print) -> dict:
     return out
 
 
+def gpu_memory(lane: Lane) -> dict:
+    """Host-side GPU memory right before an attempt.
+
+    Inside CT100 `nvidia-smi --query-compute-apps` only sees that container's processes, which
+    is how a config was once declared a VRAM wall while another server held 6 GiB of the card.
+    The PVE host is the only authority on this number, and it is what makes an OOM verdict
+    attributable to the config instead of to whatever else was resident.
+    """
+    try:
+        r = lane.host_run(["nvidia-smi", "--query-gpu=memory.used,memory.free",
+                           "--format=csv,noheader"])
+    except Exception:
+        return {}
+    if r.returncode != 0:
+        return {}
+    out: dict = {}
+    try:
+        used, free = [p.strip() for p in r.stdout.strip().split(",", 1)]
+        out["gpu_used_mib"] = int(used.split()[0])
+        out["gpu_free_mib"] = int(free.split()[0])
+    except (IndexError, ValueError):
+        return {}
+    return out
+
+
 def read_manifest(path: Path) -> tuple[list[dict], dict[str, str]]:
     """Configs and explicit exclusions.
 
@@ -632,10 +657,14 @@ def main() -> int:
             break
         print(f"[sweep] {i}/{len(entries)} serve {e['alias']} ctx={e['ctx']} kv={e['ctk']}/{e['ctv']}", flush=True)
         t0 = time.time()
+        mem = gpu_memory(lane)
+        if mem:
+            print(f"    host GPU before attempt: {mem['gpu_used_mib']} MiB used, "
+                  f"{mem['gpu_free_mib']} MiB free", flush=True)
         rec = dict(e, started=time.strftime("%Y-%m-%dT%H:%M:%S"), status="serving",
                    gpu_power_limit_w=pins.get("power_limit_w"),
                    gpu_persistence=pins.get("persistence_mode"),
-                   gpu_pins_ok=pins.get("ok"))
+                   gpu_pins_ok=pins.get("ok"), **mem)
         # A failed config is only useful if it is a labelled failure: the attempt streams the
         # engine's own output to results/_sweep_logs/<alias>-kv<ctk>.serve.log and comes back
         # with a named cause, so the 0.5.0 table can say *why* a row is missing.
@@ -643,9 +672,12 @@ def main() -> int:
                      logs_dir=ROOT / "results" / "_sweep_logs", unit=args.unit)
         if not diag.get("ok"):
             cause = diag.get("cause") or "unknown"
+            detail = diag.get("detail") or ""
+            if cause == "vram_oom" and mem.get("gpu_free_mib") is not None:
+                detail = f"{detail}; host free VRAM at attempt: {mem['gpu_free_mib']} MiB"
             causes[cause] = causes.get(cause, 0) + 1
             rec.update(status="serve_failed", seconds=diag.get("seconds") or round(time.time() - t0, 1),
-                       serve_cause=cause, serve_detail=diag.get("detail"),
+                       serve_cause=cause, serve_detail=detail,
                        serve_log=diag.get("log"), serve_tail=diag.get("tail"),
                        serve_exec_status=diag.get("exec_status"),
                        serve_active_state=diag.get("active_state"),
