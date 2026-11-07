@@ -70,6 +70,45 @@ A 48-config sweep is therefore an overnight job; it is detached (`setsid`), stre
 run to `results/_sweep_logs/<alias>-kv<type>.log`, and records one JSON line per config in
 `results/_sweep_state.jsonl`, so an interrupted sweep resumes instead of restarting.
 
+## When a config cannot serve: causes, logs, exclusions (measured 2026-11-07)
+
+Seven configs were recorded `serve_failed` in one day and left **nothing** behind to diagnose —
+no engine log, no exit code, only `server never came up as <alias>`. The engine had in fact
+printed the reason in under a second. The driver now makes a failure self-explaining:
+
+* every serve attempt, successful or not, streams the unit's own stdout/stderr into
+  `results/_sweep_logs/<alias>-kv<ctk>.serve.log` (captured by following the unit's journal
+  from *before* the restart, because the first error line lands ~150 ms after start);
+* the state line for a failure carries `serve_cause`, `serve_detail`, `serve_log`, `serve_tail`,
+  `serve_exec_status`, `serve_active_state`, `serve_restarts`;
+* a unit that has already crashed is concluded in ~25 s instead of being polled for the full
+  600 s (`FASTFAIL_RESTARTS`), and the unit is then stopped so it stops re-running the loader;
+* the pre-flight probe sends `chat_template_kwargs.enable_thinking=false` and accepts a
+  non-empty `reasoning_content` as proof of a live engine. Without that lever a healthy thinking
+  model answers into the reasoning channel with `content: ''` at `max_tokens=8` and was being
+  called dead (`ornith-9b-q4_K_M`, `qwen35-9b-q4km` on 2026-11-07).
+
+Cause taxonomy the driver can name: `unsupported_arch`, `vram_oom`, `load_error`, `bad_flags`,
+`port_busy`, `unit_failed`, `no_answer` (driver/probe defect — never a model verdict).
+
+Measured causes on this lane (llama.cpp `a2878d3`, 2026-09-11 build):
+
+| alias | cause | evidence |
+|---|---|---|
+| `dory-1.0-4b-q5km-kvq8` (+ its 3 KV rows) | `unsupported_arch`: `unknown model architecture: 'dory'`, exit 1 in 0.2 s | excluded in the manifest |
+| `lfm3-1.7b-iq4nl-bartowski` | `unsupported_arch`: `'lfm3'`, exit 1 in 0.2 s | excluded in the manifest |
+| `minicpm5-2b-q8_0` | `vram_oom` at 32K f16 KV **while another server held 6.4 GiB**: a single 2279.73 MiB weights buffer failed against 1.6-1.8 GiB free (`common_fit_params ... n_gpu_layers already set by user to 99, abort`) | needs ~4.3 GiB total (2550 MiB weights + 1344 MiB f16 KV at 32K + compute), so it is a **retry**, not an exclusion |
+| `ornith-9b-q4_K_M`, `qwen35-9b-q4km` | probe defect, servers were live and correctly named | fixed by the probe lever above |
+
+**Exclusions are manifest rows, not deletions.** A line beginning with `!` is
+`!<alias><TAB><reason>`: the config row stays visible, the driver prints
+`skip (excluded) <alias>: <reason>` and never spends 600 s on it again. `scripts/build_sweep_manifest.py`
+emits them from `EXCLUDE_GGUF`, keyed by GGUF basename so every KV row of that file is covered,
+and they are re-enablement-gated on an engine upgrade — not on a retry.
+
+Note: the manifest is read once at driver start, so an edit to it (or to this driver) applies to
+the **next** sweep invocation, not to a sweep already running.
+
 ## Serving finding that changes the driver: one slot, not two
 
 The first driver version used `-np 2` at 32K with f16 KV (two slots). Measured on the lane:
@@ -106,6 +145,8 @@ candidate, gated on a per-class context ceiling measured the same way for each s
 * The 30 Nemotron configs run at 32K ctx / 2 slots for comparability; that is a *standard*
   setting, not a per-model optimum, and the table must say so.
 * `np=2` at 32K f16 KV is close to the 8 GB card's limit for a 4B. Configs that fail to
-  serve are recorded as `serve_failed`, not dropped silently — a missing row is data.
+  serve are recorded as `serve_failed` **with a named cause and the engine's own log**
+  (`results/_sweep_logs/<alias>-kv<ctk>.serve.log`) — a missing row is data, but only if it
+  says why.
 * The sweep takes the test lane for hours. Nothing else may use `grunt-pve` meanwhile; the
   shipped unit is restored (and proven with a real completion) at the end.

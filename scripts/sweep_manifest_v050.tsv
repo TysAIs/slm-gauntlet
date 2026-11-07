@@ -1,3 +1,8 @@
+# v0.5.0 sweep manifest - consumed by scripts/pve_sweep.py
+# config row: alias<TAB>gguf_path<TAB>ctx<TAB>np<TAB>ctk<TAB>ctv[<TAB>extra_flags]
+# exclusion row: !<alias><TAB><reason> - the config row is skipped with that reason and
+#   never retried (the deployed engine cannot load that GGUF at any ctx)
+
 spark-x2.6-4b-iq3m-bartowski	/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
 gemma4-e4b-q4_K_M	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
 minicpm5-2b-q8_0	/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
@@ -46,3 +51,11 @@ nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq4_0	/mnt/data/models/dory-4b/NVIDIA-Ne
 nemotron-3.5-bolt-e4b-q4-k-m-kvf16	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
 nemotron-3.5-bolt-e4b-q4-k-m-kvq8_0	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
 nemotron-3.5-bolt-e4b-q4-k-m-kvq4_0	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+
+# EXCLUSIONS - measured on the lane, not assumed. See docs/SWEEP-v050.md.
+!dory-1.0-4b-q5km-kvq8	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!lfm3-1.7b-iq4nl-bartowski	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvf16	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq8_0	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq4_0	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+
