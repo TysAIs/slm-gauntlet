@@ -110,9 +110,32 @@ def make_needle_task(
         paragraphs.append(p)
         words += len(p.split())
 
-    # plant needle at a random depth (beginning/middle/end all occur)
-    pos = rng.randint(0, len(paragraphs))
-    paragraphs.insert(pos, needle)
+    if nolima:
+        # plant needle at a random depth (beginning/middle/end all occur)
+        pos = rng.randint(0, len(paragraphs))
+        paragraphs.insert(pos, needle)
+    else:
+        # 0.5.1: all three needle cells were passed by every configuration in the
+        # 0.5.0 corpus, so the ladder ranked nothing. Two changes make the lookup
+        # real work instead of a keyword hit:
+        #   * three DECOY codes appear earlier and later in the haystack ("previous"
+        #     and "backup"), so a model that grabs the first code it sees is wrong;
+        #   * the true needle is planted in the middle third, where long-context
+        #     recall is weakest, instead of anywhere including the first paragraph.
+        used = {code}
+        decoy_lines = []
+        for label in ("previous", "backup", "reserve"):
+            while True:
+                d = f"ZEBRA-{rng.randint(10000, 99999)}"
+                if d not in used:
+                    used.add(d)
+                    break
+            decoy_lines.append(f"The {label} access code for the vault is {d} (not the secret one).")
+        third = max(1, len(paragraphs) // 3)
+        paragraphs.insert(rng.randint(third, max(third, 2 * third)), needle)
+        for i, line in enumerate(decoy_lines):
+            at = min(len(paragraphs), (i + 1) * (len(paragraphs) // 4))
+            paragraphs.insert(at, line)
 
     context = "\n\n".join(paragraphs)
     prompt = f"{context}\n\nQuestion: {question}\nAnswer with only the answer itself."

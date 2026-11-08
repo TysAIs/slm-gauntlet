@@ -9,7 +9,7 @@ methodology version it was produced under.
 
 from __future__ import annotations
 
-METHODOLOGY_VERSION = "0.5.0"
+METHODOLOGY_VERSION = "0.5.1"
 
 # Published weights. They sum to 1.0 over the suites the gauntlet scores.
 # realworld is new in 0.4: multi-constraint everyday agent work, graded on
@@ -59,7 +59,7 @@ def methodology_line(task_count: int) -> str:
 # each row is recomputed with its own epoch's table, and rows from different
 # epochs are never ranked against each other.
 # ---------------------------------------------------------------------------
-EPOCH_ORDER = ("v0.3.1", "0.4.0", "0.5.0")
+EPOCH_ORDER = ("v0.3.1", "0.4.0", "0.5.0", "0.5.1")
 
 
 def _count_current_tasks() -> int:
@@ -111,10 +111,21 @@ EPOCHS: dict[str, dict] = {
     },
     "0.5.0": {
         "weights": SUITE_WEIGHTS,
+        # FROZEN at 94: the epoch was measured with 94 tasks. It used to read
+        # CURRENT_TASK_COUNT, which would have redefined a measured epoch the
+        # moment 0.5.1 added a task (the same defect 0.4.0 documents).
+        "tasks": 94,
+        "label": "CLI 8-suite weights ("
+        + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
+        + "), 94 tasks",
+    },
+    "0.5.1": {
+        "weights": SUITE_WEIGHTS,
         "tasks": CURRENT_TASK_COUNT,
         "label": "CLI 8-suite weights ("
         + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
-        + f"), {CURRENT_TASK_COUNT} tasks",
+        + f"), {CURRENT_TASK_COUNT} tasks (realworld multi-answer scenarios scored as "
+        "sub-answer units)",
     },
 }
 

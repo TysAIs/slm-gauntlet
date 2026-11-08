@@ -30,23 +30,26 @@
 
 - id: code_bugfix_off_by_one
   suite: coding
-  description: Fix an off-by-one bug (execution-graded)
+  description: Fix a function with two bugs (range bound and the parity test), execution-graded
   prompt: |
-    This function should return the sum of numbers 1..n inclusive but has a bug:
-    def total(n):
-        s = 0
+    This function should return the sum of the squares of every EVEN number from
+    1 to n inclusive. It has two bugs:
+    def sum_even_squares(n):
+        total = 0
         for i in range(1, n):
-            s += i
-        return s
+            if i % 3 == 0:
+                total += i * i
+        return total
     Output the corrected function only.
   asserts:
     - type: python_exec
       weight: 3.0
       must_pass: true
       tests: |
-        assert total(5) == 15, total(5)
-        assert total(1) == 1, total(1)
-        assert total(100) == 5050, total(100)
+        assert sum_even_squares(1) == 0, sum_even_squares(1)
+        assert sum_even_squares(2) == 4, sum_even_squares(2)
+        assert sum_even_squares(6) == 56, sum_even_squares(6)
+        assert sum_even_squares(10) == 220, sum_even_squares(10)
   max_tokens: 1024
 
 - id: code_bug_identify

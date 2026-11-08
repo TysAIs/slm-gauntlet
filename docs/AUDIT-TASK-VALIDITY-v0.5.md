@@ -91,3 +91,10 @@ a parenthetical to override the arithmetic a reader does naturally. Fix queued f
   3. replace or retire the 12 "everybody passes" items so the low end of the table can
      discriminate (they currently give a free floor to every row);
   4. re-derive the realworld suite size so 12 % weight is not 55 %-dead at the frontier.
+
+## Status: repaired in 0.5.1
+
+All four queued items are implemented in the 0.5.1 epoch (new task count, its own full
+re-run, its own table). What changed, how the repair was validated before any GPU time
+was spent, and what it measured: docs/AUDIT-TASK-VALIDITY-v0.5.1.md. The 0.5.0 numbers
+above stay exactly as measured; they are not restated under 0.5.1.

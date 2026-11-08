@@ -32,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from gauntlet.methodology import epoch_spec, newest_published_epoch  # noqa: E402
+from gauntlet.methodology import METHODOLOGY_VERSION, epoch_spec  # noqa: E402
 
 
 def run_logs_from_sweep(state: Path) -> list[Path]:
@@ -82,6 +82,10 @@ def main() -> int:
     ap.add_argument("--state", default=str(ROOT / "results/_sweep_state.jsonl"))
     ap.add_argument("--glob", default=None, help="run-log glob instead of the sweep state")
     ap.add_argument("--json", default=None, help="write the full result here")
+    ap.add_argument("--epoch", default=None,
+                    help="methodology epoch to audit against (default: the current one). "
+                         "Auditing an old corpus needs its own epoch: the task count and "
+                         "weights are what make a run comparable.")
     args = ap.parse_args()
 
     logs = [Path(p) for p in sorted(glob.glob(args.glob))] if args.glob else run_logs_from_sweep(Path(args.state))
@@ -89,7 +93,7 @@ def main() -> int:
         print("no run logs found", file=sys.stderr)
         return 2
 
-    epoch = newest_published_epoch({"0.5.0"}) or "0.5.0"
+    epoch = args.epoch or METHODOLOGY_VERSION
     spec = epoch_spec(epoch)
     full = spec["tasks"]
     per, used, skipped = collect(logs, full)

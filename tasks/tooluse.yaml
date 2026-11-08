@@ -325,11 +325,13 @@
 
 - id: tool_arith_no_tool
   suite: tooluse
-  description: Simple arithmetic without tools (baseline sanity)
-  prompt: What is 17 + 25? Answer with just the number.
+  description: Percentage arithmetic without tools (a raise then an equal cut does not return to the start)
+  prompt: |-
+    A $250.00 item is marked up by 12% and then marked down by 12% from the marked-up
+    price. What is the final price, to the nearest cent? Answer with just the number.
   asserts:
-    - type: contains_all
-      values: ["42"]
+    - type: predicate
+      expr: "any(abs(float(x.replace(',', '')) - 246.40) < 0.005 for x in re.findall(r'\\d+\\.?\\d*', out))"
       weight: 1.0
       must_pass: true
   max_turns: 2

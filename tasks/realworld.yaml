@@ -1,4 +1,4 @@
-# Real-world suite (v0.4): everyday agent work, graded on the OUTCOME.
+# Real-world suite: everyday agent work, graded on the OUTCOME.
 #
 # Why this suite exists: the 0.3 suites leaned on tool-calling puzzles. A model
 # that ranks well there can still get a real chore wrong — a split bill, a
@@ -20,14 +20,33 @@
 # pass, full score) and a NEAR-MISS answer (must fail) through the real scorer
 # for every task in this file. A task that a correct answer fails, or a
 # plausible wrong answer passes, fails the test suite.
+#
+# 0.5.1 — SUB-ANSWER UNITS (see docs/AUDIT-TASK-VALIDITY-v0.5.md for the 0.5.0
+# defect this repairs). A scenario that asks for several independent values used
+# to be ONE task graded by several `must_pass` asserts, so a model that got 2 of
+# 3 values right scored 0.00 and the scenario was a constant zero for every
+# configuration in the corpus. Each independent value is now its own task, id
+# `<scenario>__<unit>`, carrying the SAME prompt as the scenario so the model
+# still has to produce the complete answer; the unit decides only which part of
+# that answer it is graded on. Consequences, stated plainly:
+#   * these units are correlated by construction — they share one generation —
+#     so the suite's independent SCENARIO count is the number of distinct
+#     prompts, not the number of tasks. Both counts are published.
+#   * a unit carries exactly one assert, which therefore always gates its own
+#     score; `must_pass` is kept for tasks where a structural assert (a written
+#     file, a required tool call) makes the text asserts meaningless when it
+#     fails.
+#   * no task in this file is a composite "all of it correct" gate any more: a
+#     composite that nobody passes is a constant zero and ranks nothing.
 
-- id: rw_expense_split
+- id: rw_expense_split__subtotal
   suite: realworld
-  description: Split a bill where tax is included and tip is pre-tax (arithmetic trap)
+  description: Split a bill where tax is included and tip is pre-tax — unit pre-tax subtotal
   prompt: |-
     A team dinner receipt totals $216.00, and that total already includes 8% sales tax.
-    House policy: tip 18% of the PRE-TAX subtotal, and the total cost (subtotal + tip)
-    is split equally by 4 people.
+    House policy: tip 18% of the PRE-TAX subtotal. The guest pays the receipt and the
+    tip together, and that whole amount is split equally by 4 people, so each person's
+    share is (receipt + tip) / 4.
 
     Reply with exactly three lines and nothing else:
     SUBTOTAL: <amount>
@@ -35,16 +54,38 @@
     PER_PERSON: <amount>
     Write every amount with two decimals.
   asserts:
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [200.0, 36.0, 59.0]"
+    - type: line_value
+      weight: 1.0
+      label: SUBTOTAL
+      equals: 200.00
   max_tokens: 256
   no_think: true
 
-- id: rw_inbox_triage
+- id: rw_expense_split__tip
   suite: realworld
-  description: Route 5 emails by a precedence rule set (blocklist beats VIP beats billing)
+  description: Split a bill where tax is included and tip is pre-tax — unit tip
+  prompt: |-
+    A team dinner receipt totals $216.00, and that total already includes 8% sales tax.
+    House policy: tip 18% of the PRE-TAX subtotal. The guest pays the receipt and the
+    tip together, and that whole amount is split equally by 4 people, so each person's
+    share is (receipt + tip) / 4.
+
+    Reply with exactly three lines and nothing else:
+    SUBTOTAL: <amount>
+    TIP: <amount>
+    PER_PERSON: <amount>
+    Write every amount with two decimals.
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: TIP
+      equals: 36.00
+  max_tokens: 256
+  no_think: true
+
+- id: rw_inbox_triage__precedence
+  suite: realworld
+  description: Route 5 emails by a precedence rule set — unit blocklist and VIP rules
   prompt: |-
     Sort these emails into buckets using the policy below. Rules are applied in
     this precedence order, first match wins:
@@ -68,19 +109,45 @@
     Each list holds the email ids (e1..e5) in ascending order.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and data.get('spam') == ['e3'] and data.get('urgent') == ['e2']"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_inbox_triage__vendor
+  suite: realworld
+  description: Route 5 emails by a precedence rule set — unit vendor/billing and other rules
+  prompt: |-
+    Sort these emails into buckets using the policy below. Rules are applied in
+    this precedence order, first match wins:
+
+    R1. Sender domain is on the blocklist: spam.example.net  -> bucket "spam"
+    R2. Sender is a VIP contact and the body contains the word "cancel" -> bucket "urgent"
+    R3. Sender is a known vendor (acme-supply.com) AND an amount is due -> bucket "billing"
+    R4. Everything else -> bucket "other"
+
+    VIP contacts: ceo@bigclient.com
+
+    Emails:
+    e1 | from: billing@acme-supply.com | "Invoice 2291 for $412.90 is due March 3"
+    e2 | from: ceo@bigclient.com | "Please cancel our four seats. Invoice attached."
+    e3 | from: deals@spam.example.net | "Your invoice is ready — 70% off everything"
+    e4 | from: news@industry-weekly.com | "This week in logistics: five stories"
+    e5 | from: vendor@acme-supply.com | "Invoice 2298, $88.00 due Friday"
+
+    Reply with a single JSON object only:
+    {"spam": [...], "billing": [...], "urgent": [...], "other": [...]}
+    Each list holds the email ids (e1..e5) in ascending order.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and data.get('billing') == ['e1', 'e5'] and data.get('other') == ['e4']"
   max_tokens: 512
   no_think: true
 
-- id: rw_refund_eligibility
+- id: rw_refund_eligibility__a
   suite: realworld
-  description: Apply a refund policy with an exception to four orders (money, not words)
+  description: Apply a refund policy with an exception — unit order A
   prompt: |-
     Refund policy:
     - Within 30 days and unopened: full refund.
@@ -99,27 +166,92 @@
     Amount is the refund in dollars with at most two decimals.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and data.get('A',{}).get('decision') == 'full' and abs(float(data.get('A',{}).get('amount',-1)) - 84.99) < 0.005"
-    - type: predicate
-      must_pass: true
-      weight: 2.0
-      expr: "isinstance(data, dict) and data.get('B',{}).get('decision') == 'half' and abs(float(data.get('B',{}).get('amount',-1)) - 64.75) < 0.005"
-    - type: predicate
-      must_pass: true
-      weight: 2.0
-      expr: "isinstance(data, dict) and data.get('C',{}).get('decision') == 'full' and abs(float(data.get('C',{}).get('amount',-1)) - 39.99) < 0.005"
-    - type: predicate
-      must_pass: true
-      weight: 2.0
-      expr: "isinstance(data, dict) and data.get('D',{}).get('decision') == 'none' and abs(float(data.get('D',{}).get('amount',-1))) < 0.005"
   max_tokens: 768
   no_think: true
 
-- id: rw_timezone_meeting
+- id: rw_refund_eligibility__b
   suite: realworld
-  description: Convert one meeting time into three timezones (ISO 8601, explicit offsets)
+  description: Apply a refund policy with an exception — unit order B
+  prompt: |-
+    Refund policy:
+    - Within 30 days and unopened: full refund.
+    - Within 30 days and opened: 50% refund.
+    - After 30 days: no refund, UNLESS the item arrived damaged (a photo was supplied).
+    - Damaged items always get a full refund regardless of age.
+
+    Orders:
+    A: $84.99, delivered 12 days ago, unopened, not damaged
+    B: $129.50, delivered 21 days ago, opened, not damaged
+    C: $39.99, delivered 45 days ago, opened, arrived damaged (photo supplied)
+    D: $59.00, delivered 45 days ago, unopened, not damaged
+
+    Reply with a single JSON object only, keyed A..D, e.g.
+    {"A": {"decision": "full|half|none", "amount": <number>}}
+    Amount is the refund in dollars with at most two decimals.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, dict) and data.get('B',{}).get('decision') == 'half' and abs(float(data.get('B',{}).get('amount',-1)) - 64.75) < 0.005"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_refund_eligibility__c
+  suite: realworld
+  description: Apply a refund policy with an exception — unit order C (damaged exception)
+  prompt: |-
+    Refund policy:
+    - Within 30 days and unopened: full refund.
+    - Within 30 days and opened: 50% refund.
+    - After 30 days: no refund, UNLESS the item arrived damaged (a photo was supplied).
+    - Damaged items always get a full refund regardless of age.
+
+    Orders:
+    A: $84.99, delivered 12 days ago, unopened, not damaged
+    B: $129.50, delivered 21 days ago, opened, not damaged
+    C: $39.99, delivered 45 days ago, opened, arrived damaged (photo supplied)
+    D: $59.00, delivered 45 days ago, unopened, not damaged
+
+    Reply with a single JSON object only, keyed A..D, e.g.
+    {"A": {"decision": "full|half|none", "amount": <number>}}
+    Amount is the refund in dollars with at most two decimals.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, dict) and data.get('C',{}).get('decision') == 'full' and abs(float(data.get('C',{}).get('amount',-1)) - 39.99) < 0.005"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_refund_eligibility__d
+  suite: realworld
+  description: Apply a refund policy with an exception — unit order D (expired)
+  prompt: |-
+    Refund policy:
+    - Within 30 days and unopened: full refund.
+    - Within 30 days and opened: 50% refund.
+    - After 30 days: no refund, UNLESS the item arrived damaged (a photo was supplied).
+    - Damaged items always get a full refund regardless of age.
+
+    Orders:
+    A: $84.99, delivered 12 days ago, unopened, not damaged
+    B: $129.50, delivered 21 days ago, opened, not damaged
+    C: $39.99, delivered 45 days ago, opened, arrived damaged (photo supplied)
+    D: $59.00, delivered 45 days ago, unopened, not damaged
+
+    Reply with a single JSON object only, keyed A..D, e.g.
+    {"A": {"decision": "full|half|none", "amount": <number>}}
+    Amount is the refund in dollars with at most two decimals.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, dict) and data.get('D',{}).get('decision') == 'none' and abs(float(data.get('D',{}).get('amount',0))) < 0.005"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_timezone_meeting__utc
+  suite: realworld
+  description: Convert one meeting time into three timezones — unit UTC
   prompt: |-
     A meeting is booked for 2026-01-20 09:30 in America/Denver. Offsets on that
     date (standard time, no DST in play):
@@ -132,29 +264,61 @@
     offset, e.g. 2025-03-04T08:15:00+00:00.
   asserts:
     - type: contains_all
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       values: ["2026-01-20T16:30:00+00:00"]
+  max_tokens: 640
+  no_think: true
+
+- id: rw_timezone_meeting__berlin
+  suite: realworld
+  description: Convert one meeting time into three timezones — unit Europe/Berlin
+  prompt: |-
+    A meeting is booked for 2026-01-20 09:30 in America/Denver. Offsets on that
+    date (standard time, no DST in play):
+      America/Denver = UTC-07:00
+      Europe/Berlin  = UTC+01:00
+      Asia/Tokyo     = UTC+09:00
+
+    Give the same instant in three lines, each "<city>: <ISO 8601 timestamp with offset>",
+    in this order: UTC, Europe/Berlin, Asia/Tokyo. Use date T time with a colon in the
+    offset, e.g. 2025-03-04T08:15:00+00:00.
+  asserts:
     - type: contains_all
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       values: ["2026-01-20T17:30:00+01:00"]
+  max_tokens: 640
+  no_think: true
+
+- id: rw_timezone_meeting__tokyo
+  suite: realworld
+  description: Convert one meeting time into three timezones — unit Asia/Tokyo
+  prompt: |-
+    A meeting is booked for 2026-01-20 09:30 in America/Denver. Offsets on that
+    date (standard time, no DST in play):
+      America/Denver = UTC-07:00
+      Europe/Berlin  = UTC+01:00
+      Asia/Tokyo     = UTC+09:00
+
+    Give the same instant in three lines, each "<city>: <ISO 8601 timestamp with offset>",
+    in this order: UTC, Europe/Berlin, Asia/Tokyo. Use date T time with a colon in the
+    offset, e.g. 2025-03-04T08:15:00+00:00.
+  asserts:
     - type: contains_all
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       values: ["2026-01-21T01:30:00+09:00"]
   max_tokens: 640
   no_think: true
 
-- id: rw_shipping_quote
+- id: rw_shipping_quote__o1
   suite: realworld
-  description: Tiered shipping rate card applied to three orders (min charge, surcharges)
+  description: Tiered shipping rate card applied to three orders — unit O1
   prompt: |-
     Shipping rate card:
       base = 5.00 + 1.50 per kg
       remote address surcharge: +4.00 flat
       express handling: +9.00 flat
       minimum charge: 6.00 (apply AFTER surcharges; never charge less)
+    Worked example: 1 kg, domestic, standard = 5.00 + 1.50 = 6.50.
 
     Quote these three orders and then the grand total:
     O1: 2 kg, domestic, standard
@@ -167,10 +331,97 @@
     O3: <amount>
     TOTAL: <amount>
   asserts:
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [8.0, 19.5, 36.0, 63.5]"
+    - type: line_value
+      weight: 1.0
+      label: O1
+      equals: 8.00
+  max_tokens: 384
+  no_think: true
+
+- id: rw_shipping_quote__o2
+  suite: realworld
+  description: Tiered shipping rate card applied to three orders — unit O2
+  prompt: |-
+    Shipping rate card:
+      base = 5.00 + 1.50 per kg
+      remote address surcharge: +4.00 flat
+      express handling: +9.00 flat
+      minimum charge: 6.00 (apply AFTER surcharges; never charge less)
+    Worked example: 1 kg, domestic, standard = 5.00 + 1.50 = 6.50.
+
+    Quote these three orders and then the grand total:
+    O1: 2 kg, domestic, standard
+    O2: 7 kg, remote, standard
+    O3: 12 kg, remote, express
+
+    Reply with exactly four lines, nothing else:
+    O1: <amount>
+    O2: <amount>
+    O3: <amount>
+    TOTAL: <amount>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: O2
+      equals: 19.50
+  max_tokens: 384
+  no_think: true
+
+- id: rw_shipping_quote__o3
+  suite: realworld
+  description: Tiered shipping rate card applied to three orders — unit O3
+  prompt: |-
+    Shipping rate card:
+      base = 5.00 + 1.50 per kg
+      remote address surcharge: +4.00 flat
+      express handling: +9.00 flat
+      minimum charge: 6.00 (apply AFTER surcharges; never charge less)
+    Worked example: 1 kg, domestic, standard = 5.00 + 1.50 = 6.50.
+
+    Quote these three orders and then the grand total:
+    O1: 2 kg, domestic, standard
+    O2: 7 kg, remote, standard
+    O3: 12 kg, remote, express
+
+    Reply with exactly four lines, nothing else:
+    O1: <amount>
+    O2: <amount>
+    O3: <amount>
+    TOTAL: <amount>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: O3
+      equals: 36.00
+  max_tokens: 384
+  no_think: true
+
+- id: rw_shipping_quote__total
+  suite: realworld
+  description: Tiered shipping rate card applied to three orders — unit grand total
+  prompt: |-
+    Shipping rate card:
+      base = 5.00 + 1.50 per kg
+      remote address surcharge: +4.00 flat
+      express handling: +9.00 flat
+      minimum charge: 6.00 (apply AFTER surcharges; never charge less)
+    Worked example: 1 kg, domestic, standard = 5.00 + 1.50 = 6.50.
+
+    Quote these three orders and then the grand total:
+    O1: 2 kg, domestic, standard
+    O2: 7 kg, remote, standard
+    O3: 12 kg, remote, express
+
+    Reply with exactly four lines, nothing else:
+    O1: <amount>
+    O2: <amount>
+    O3: <amount>
+    TOTAL: <amount>
+  asserts:
+    - type: line_sum
+      weight: 1.0
+      label: TOTAL
+      of: [O1, O2, O3]
   max_tokens: 384
   no_think: true
 
@@ -239,9 +490,9 @@
   max_tokens: 768
   no_think: true
 
-- id: rw_budget_plan
+- id: rw_budget_plan__choices
   suite: realworld
-  description: Buy one item per required category at the lowest cost (not cheapest overall)
+  description: Buy one item per required category at the lowest cost — unit item choices
   prompt: |-
     You must buy exactly one item from each category. Prices:
 
@@ -253,22 +504,39 @@
     only: {"food": "<item>", "tools": "<item>", "clean": "<item>", "total": <number>}
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and data.get('food') == 'beans' and data.get('tools') == 'tape' and data.get('clean') == 'soap'"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_budget_plan__total
+  suite: realworld
+  description: Buy one item per required category at the lowest cost — unit total
+  prompt: |-
+    You must buy exactly one item from each category. Prices:
+
+    food:  rice 8.50 | beans 4.25
+    tools: tape 3.10 | knife 12.00
+    clean: soap 2.75 | spray 6.40
+
+    Choose the cheapest option in each category. Reply with a single JSON object
+    only: {"food": "<item>", "tools": "<item>", "clean": "<item>", "total": <number>}
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('total', -1)) - 10.10) < 0.005"
   max_tokens: 384
   no_think: true
 
-- id: rw_ticket_priority
+- id: rw_ticket_priority__ids
   suite: realworld
-  description: Order a support queue by severity, then age, then id (tie-break matters)
+  description: Order a support queue by severity, then age, then id — unit every id present once
   prompt: |-
-    Sort this support queue. Order by: severity number ASCENDING (1 is most severe),
-    then age in days DESCENDING (oldest first), then ticket id ASCENDING.
+    Sort this support queue. Sort keys, applied in this order:
+      1. severity number ASCENDING (1 is most severe, so it is handled first)
+      2. for equal severity, age in days DESCENDING (the ticket that is MORE days old
+         is handled first)
+      3. for equal severity and age, ticket id ASCENDING
 
     T-4 | severity 3 | 2 days old
     T-1 | severity 1 | 1 day old
@@ -276,22 +544,101 @@
     T-2 | severity 1 | 4 days old
     T-9 | severity 2 | 9 days old
 
-    Reply with a single JSON array of the ticket ids in order, nothing else.
+    Reply with a single JSON array of the five ticket ids in order, nothing else,
+    for example ["T-3", "T-1", "T-8", "T-5", "T-6"].
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "data == ['T-2', 'T-1', 'T-7', 'T-9', 'T-4']"
-  max_tokens: 256
+      weight: 1.0
+      expr: "isinstance(data, list) and sorted(str(x) for x in data) == ['T-1', 'T-2', 'T-4', 'T-7', 'T-9']"
+  max_tokens: 320
   no_think: true
 
-- id: rw_warranty_expiry
+- id: rw_ticket_priority__severity_last
   suite: realworld
-  description: Month arithmetic with a missing day (leap-year month end)
+  description: Order a support queue by severity, then age, then id — unit severity-3 ticket last
+  prompt: |-
+    Sort this support queue. Sort keys, applied in this order:
+      1. severity number ASCENDING (1 is most severe, so it is handled first)
+      2. for equal severity, age in days DESCENDING (the ticket that is MORE days old
+         is handled first)
+      3. for equal severity and age, ticket id ASCENDING
+
+    T-4 | severity 3 | 2 days old
+    T-1 | severity 1 | 1 day old
+    T-7 | severity 2 | 9 days old
+    T-2 | severity 1 | 4 days old
+    T-9 | severity 2 | 9 days old
+
+    Reply with a single JSON array of the five ticket ids in order, nothing else,
+    for example ["T-3", "T-1", "T-8", "T-5", "T-6"].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) == 5 and str(data[-1]) == 'T-4'"
+  max_tokens: 320
+  no_think: true
+
+- id: rw_ticket_priority__tie_id
+  suite: realworld
+  description: Order a support queue by severity, then age, then id — unit id tie-break inside severity 2
+  prompt: |-
+    Sort this support queue. Sort keys, applied in this order:
+      1. severity number ASCENDING (1 is most severe, so it is handled first)
+      2. for equal severity, age in days DESCENDING (the ticket that is MORE days old
+         is handled first)
+      3. for equal severity and age, ticket id ASCENDING
+
+    T-4 | severity 3 | 2 days old
+    T-1 | severity 1 | 1 day old
+    T-7 | severity 2 | 9 days old
+    T-2 | severity 1 | 4 days old
+    T-9 | severity 2 | 9 days old
+
+    Reply with a single JSON array of the five ticket ids in order, nothing else,
+    for example ["T-3", "T-1", "T-8", "T-5", "T-6"].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: >-
+        isinstance(data, list) and 'T-7' in [str(x) for x in data] and 'T-9' in [str(x) for x in data]
+        and [str(x) for x in data].index('T-7') < [str(x) for x in data].index('T-9')
+  max_tokens: 320
+  no_think: true
+
+- id: rw_ticket_priority__age_key
+  suite: realworld
+  description: Order a support queue by severity, then age, then id — unit age tie-break inside severity 1
+  prompt: |-
+    Sort this support queue. Sort keys, applied in this order:
+      1. severity number ASCENDING (1 is most severe, so it is handled first)
+      2. for equal severity, age in days DESCENDING (the ticket that is MORE days old
+         is handled first)
+      3. for equal severity and age, ticket id ASCENDING
+
+    T-4 | severity 3 | 2 days old
+    T-1 | severity 1 | 1 day old
+    T-7 | severity 2 | 9 days old
+    T-2 | severity 1 | 4 days old
+    T-9 | severity 2 | 9 days old
+
+    Reply with a single JSON array of the five ticket ids in order, nothing else,
+    for example ["T-3", "T-1", "T-8", "T-5", "T-6"].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: >-
+        isinstance(data, list) and 'T-1' in [str(x) for x in data] and 'T-2' in [str(x) for x in data]
+        and [str(x) for x in data].index('T-2') < [str(x) for x in data].index('T-1')
+  max_tokens: 320
+  no_think: true
+
+- id: rw_warranty_expiry__w1
+  suite: realworld
+  description: Month arithmetic with a missing day — unit W1 leap-year month end
   prompt: |-
     Warranty rule: coverage runs through the last day of the month that is N months
     after the purchase month. If the purchase day does not exist in that later month,
-    coverage still ends on that month's last day.
+    coverage still ends on that month's last day. (2028 is a leap year.)
 
     Compute the coverage end date (YYYY-MM-DD) for:
     W1: purchased 2026-08-31, 18 months of coverage
@@ -300,19 +647,34 @@
     Reply with exactly two lines: "W1: <date>" and "W2: <date>", nothing else.
   asserts:
     - type: contains_all
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       values: ["W1: 2028-02-29"]
+  max_tokens: 384
+  no_think: true
+
+- id: rw_warranty_expiry__w2
+  suite: realworld
+  description: Month arithmetic with a missing day — unit W2 month end
+  prompt: |-
+    Warranty rule: coverage runs through the last day of the month that is N months
+    after the purchase month. If the purchase day does not exist in that later month,
+    coverage still ends on that month's last day. (2028 is a leap year.)
+
+    Compute the coverage end date (YYYY-MM-DD) for:
+    W1: purchased 2026-08-31, 18 months of coverage
+    W2: purchased 2025-01-31, 13 months of coverage
+
+    Reply with exactly two lines: "W1: <date>" and "W2: <date>", nothing else.
+  asserts:
     - type: contains_all
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       values: ["W2: 2026-02-28"]
   max_tokens: 384
   no_think: true
 
-- id: rw_data_cleanup
+- id: rw_data_cleanup__count
   suite: realworld
-  description: Deduplicate contact records keeping the most recently updated row
+  description: Deduplicate contact records — unit survivor count
   prompt: |-
     Clean this contact export. Drop any record with an empty email. For duplicate
     emails keep only the record with the LATEST updated date. Return the survivors
@@ -330,53 +692,217 @@
     Reply with the JSON array only.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, list) and len(data) == 3"
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "isinstance(data, list) and data and data[0].get('email') == 'ana@example.com' and data[0].get('name') == 'Ana Lopez' and data[0].get('plan') == 'pro'"
-    - type: predicate
-      must_pass: true
-      weight: 2.0
-      expr: "isinstance(data, list) and data and data[1] == {'email': 'bo@example.com', 'name': 'Bo', 'plan': 'basic'}"
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "isinstance(data, list) and data and data[2].get('name') == 'Cy Nguyen' and data[2].get('plan') == 'pro' and data[2].get('email') == 'cy@example.com'"
   max_tokens: 768
   no_think: true
 
-- id: rw_payroll_net
+- id: rw_data_cleanup__ana
   suite: realworld
-  description: Weekly pay with overtime, a different tax rate on the overtime portion, and a flat deduction
+  description: Deduplicate contact records — unit ana survivor is the latest
+  prompt: |-
+    Clean this contact export. Drop any record with an empty email. For duplicate
+    emails keep only the record with the LATEST updated date. Return the survivors
+    as a JSON array sorted by email ascending, each object with exactly the keys
+    email, name, plan.
+
+    Records:
+    ana@example.com | Ana | pro | updated 2026-05-02
+    ana@example.com | Ana Lopez | pro | updated 2026-07-19
+    (empty) | Ghost | free | updated 2026-06-01
+    bo@example.com | Bo | basic | updated 2026-01-04
+    cy@example.com | Cy | free | updated 2026-03-09
+    cy@example.com | Cy Nguyen | pro | updated 2026-09-30
+
+    Reply with the JSON array only.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) == 3 and data[0].get('email') == 'ana@example.com' and data[0].get('name') == 'Ana Lopez' and data[0].get('plan') == 'pro'"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_data_cleanup__bo
+  suite: realworld
+  description: Deduplicate contact records — unit bo survivor
+  prompt: |-
+    Clean this contact export. Drop any record with an empty email. For duplicate
+    emails keep only the record with the LATEST updated date. Return the survivors
+    as a JSON array sorted by email ascending, each object with exactly the keys
+    email, name, plan.
+
+    Records:
+    ana@example.com | Ana | pro | updated 2026-05-02
+    ana@example.com | Ana Lopez | pro | updated 2026-07-19
+    (empty) | Ghost | free | updated 2026-06-01
+    bo@example.com | Bo | basic | updated 2026-01-04
+    cy@example.com | Cy | free | updated 2026-03-09
+    cy@example.com | Cy Nguyen | pro | updated 2026-09-30
+
+    Reply with the JSON array only.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) == 3 and data[1] == {'email': 'bo@example.com', 'name': 'Bo', 'plan': 'basic'}"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_data_cleanup__cy
+  suite: realworld
+  description: Deduplicate contact records — unit cy survivor is the latest
+  prompt: |-
+    Clean this contact export. Drop any record with an empty email. For duplicate
+    emails keep only the record with the LATEST updated date. Return the survivors
+    as a JSON array sorted by email ascending, each object with exactly the keys
+    email, name, plan.
+
+    Records:
+    ana@example.com | Ana | pro | updated 2026-05-02
+    ana@example.com | Ana Lopez | pro | updated 2026-07-19
+    (empty) | Ghost | free | updated 2026-06-01
+    bo@example.com | Bo | basic | updated 2026-01-04
+    cy@example.com | Cy | free | updated 2026-03-09
+    cy@example.com | Cy Nguyen | pro | updated 2026-09-30
+
+    Reply with the JSON array only.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) == 3 and data[2].get('name') == 'Cy Nguyen' and data[2].get('plan') == 'pro' and data[2].get('email') == 'cy@example.com'"
+  max_tokens: 768
+  no_think: true
+
+- id: rw_payroll_net__regular
+  suite: realworld
+  description: Weekly pay with overtime and split tax rates — unit regular earnings
   prompt: |-
     Payroll rules for this week:
-      - base rate 22.00/hour for the first 40 hours
-      - overtime hours (beyond 40) pay 1.5x the base rate
+      - regular rate 22.00/hour for the first 40 hours
+      - overtime rate = 1.5 x the regular rate = 33.00/hour for hours beyond 40
       - tax is 12% of regular earnings and 20% of overtime earnings
       - a flat health premium of 85.00 is deducted after tax
     The employee worked 46 hours this week.
 
-    Reply with exactly three lines and nothing else, all amounts with two decimals:
-    GROSS: <amount>
-    TAX: <amount>
-    NET: <amount>
+    Reply with exactly five lines and nothing else, all amounts with two decimals:
+    REGULAR: <40 hours x regular rate>
+    OVERTIME: <overtime hours x overtime rate>
+    GROSS: <regular + overtime>
+    TAX: <12% of regular + 20% of overtime>
+    NET: <gross - tax - 85.00>
   asserts:
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "[round(float(x.replace(',','')),2) for x in re.findall(r'[\\d,]+\\.\\d{2}', out)] == [1078.0, 145.2, 847.8]"
+    - type: line_value
+      weight: 1.0
+      label: REGULAR
+      equals: 880.00
   max_tokens: 320
   no_think: true
 
-- id: rw_med_dose
+- id: rw_payroll_net__overtime
   suite: realworld
-  description: Convert mcg to mg and respect a daily ceiling shared with a second drug
+  description: Weekly pay with overtime and split tax rates — unit overtime earnings
+  prompt: |-
+    Payroll rules for this week:
+      - regular rate 22.00/hour for the first 40 hours
+      - overtime rate = 1.5 x the regular rate = 33.00/hour for hours beyond 40
+      - tax is 12% of regular earnings and 20% of overtime earnings
+      - a flat health premium of 85.00 is deducted after tax
+    The employee worked 46 hours this week.
+
+    Reply with exactly five lines and nothing else, all amounts with two decimals:
+    REGULAR: <40 hours x regular rate>
+    OVERTIME: <overtime hours x overtime rate>
+    GROSS: <regular + overtime>
+    TAX: <12% of regular + 20% of overtime>
+    NET: <gross - tax - 85.00>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: OVERTIME
+      equals: 198.00
+  max_tokens: 320
+  no_think: true
+
+- id: rw_payroll_net__gross
+  suite: realworld
+  description: Weekly pay with overtime and split tax rates — unit gross
+  prompt: |-
+    Payroll rules for this week:
+      - regular rate 22.00/hour for the first 40 hours
+      - overtime rate = 1.5 x the regular rate = 33.00/hour for hours beyond 40
+      - tax is 12% of regular earnings and 20% of overtime earnings
+      - a flat health premium of 85.00 is deducted after tax
+    The employee worked 46 hours this week.
+
+    Reply with exactly five lines and nothing else, all amounts with two decimals:
+    REGULAR: <40 hours x regular rate>
+    OVERTIME: <overtime hours x overtime rate>
+    GROSS: <regular + overtime>
+    TAX: <12% of regular + 20% of overtime>
+    NET: <gross - tax - 85.00>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: GROSS
+      equals: 1078.00
+  max_tokens: 320
+  no_think: true
+
+- id: rw_payroll_net__tax
+  suite: realworld
+  description: Weekly pay with overtime and split tax rates — unit tax
+  prompt: |-
+    Payroll rules for this week:
+      - regular rate 22.00/hour for the first 40 hours
+      - overtime rate = 1.5 x the regular rate = 33.00/hour for hours beyond 40
+      - tax is 12% of regular earnings and 20% of overtime earnings
+      - a flat health premium of 85.00 is deducted after tax
+    The employee worked 46 hours this week.
+
+    Reply with exactly five lines and nothing else, all amounts with two decimals:
+    REGULAR: <40 hours x regular rate>
+    OVERTIME: <overtime hours x overtime rate>
+    GROSS: <regular + overtime>
+    TAX: <12% of regular + 20% of overtime>
+    NET: <gross - tax - 85.00>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: TAX
+      equals: 145.20
+  max_tokens: 320
+  no_think: true
+
+- id: rw_payroll_net__net
+  suite: realworld
+  description: Weekly pay with overtime and split tax rates — unit net
+  prompt: |-
+    Payroll rules for this week:
+      - regular rate 22.00/hour for the first 40 hours
+      - overtime rate = 1.5 x the regular rate = 33.00/hour for hours beyond 40
+      - tax is 12% of regular earnings and 20% of overtime earnings
+      - a flat health premium of 85.00 is deducted after tax
+    The employee worked 46 hours this week.
+
+    Reply with exactly five lines and nothing else, all amounts with two decimals:
+    REGULAR: <40 hours x regular rate>
+    OVERTIME: <overtime hours x overtime rate>
+    GROSS: <regular + overtime>
+    TAX: <12% of regular + 20% of overtime>
+    NET: <gross - tax - 85.00>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: NET
+      equals: 847.80
+  max_tokens: 320
+  no_think: true
+
+- id: rw_med_dose__tablets
+  suite: realworld
+  description: Convert mcg to mg and respect a shared daily ceiling — unit tablets per dose
   prompt: |-
     A prescription says: 250 mcg per dose, up to 4 doses a day.
-    The tablets stocked are 0.125 mg each.
+    The tablets stocked are 0.125 mg each, and each 0.125 mg tablet contains 125 mcg.
     The label caps this drug at 1 mg per day.
     The patient already takes another drug that is equivalent to 0.2 mg per day of
     this same drug family, and that counts against the 1 mg per day ceiling.
@@ -388,23 +914,58 @@
     {"tablets_per_dose": <int>, "max_safe_doses": <int>, "daily_mg": <number>}
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and int(data.get('tablets_per_dose', -1)) == 2"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_med_dose__doses
+  suite: realworld
+  description: Convert mcg to mg and respect a shared daily ceiling — unit max safe doses
+  prompt: |-
+    A prescription says: 250 mcg per dose, up to 4 doses a day.
+    The tablets stocked are 0.125 mg each, and each 0.125 mg tablet contains 125 mcg.
+    The label caps this drug at 1 mg per day.
+    The patient already takes another drug that is equivalent to 0.2 mg per day of
+    this same drug family, and that counts against the 1 mg per day ceiling.
+
+    Only whole tablets and only whole doses are allowed, and you must stay at or under
+    the ceiling.
+
+    Reply with a single JSON object only:
+    {"tablets_per_dose": <int>, "max_safe_doses": <int>, "daily_mg": <number>}
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and int(data.get('max_safe_doses', -1)) == 3"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_med_dose__daily_mg
+  suite: realworld
+  description: Convert mcg to mg and respect a shared daily ceiling — unit daily mg
+  prompt: |-
+    A prescription says: 250 mcg per dose, up to 4 doses a day.
+    The tablets stocked are 0.125 mg each, and each 0.125 mg tablet contains 125 mcg.
+    The label caps this drug at 1 mg per day.
+    The patient already takes another drug that is equivalent to 0.2 mg per day of
+    this same drug family, and that counts against the 1 mg per day ceiling.
+
+    Only whole tablets and only whole doses are allowed, and you must stay at or under
+    the ceiling.
+
+    Reply with a single JSON object only:
+    {"tablets_per_dose": <int>, "max_safe_doses": <int>, "daily_mg": <number>}
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('daily_mg', -1)) - 0.75) < 0.005"
   max_tokens: 384
   no_think: true
 
-- id: rw_connection_legality
+- id: rw_connection_legality__valid_set
   suite: realworld
-  description: Check flight connections against per-type minimum times and a terminal-change penalty
+  description: Check flight connections against minimum times — unit which itineraries are valid
   prompt: |-
     Minimum connection times at the connecting airport:
       - domestic to international: 90 minutes
@@ -422,22 +983,42 @@
     itineraries out.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and list(data.keys()) == ['B']"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_connection_legality__minutes
+  suite: realworld
+  description: Check flight connections against minimum times — unit connection minutes
+  prompt: |-
+    Minimum connection times at the connecting airport:
+      - domestic to international: 90 minutes
+      - if the connection requires changing terminals, add 20 minutes
+
+    Itineraries (local times at the connecting airport):
+    A: arrive ORD 11:20, depart ORD 12:35, terminal change required
+    B: arrive DFW 09:40, depart DFW 11:45, same terminal
+    C: arrive JFK 12:10, depart JFK 13:20, terminal change required
+
+    Decide which itineraries satisfy the connection rule.
+
+    Reply with a single JSON object only, mapping each VALID itinerary id to its
+    connection time in minutes as an integer, e.g. {"X": 100}. Leave invalid
+    itineraries out.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and int(data.get('B', 0)) == 125"
   max_tokens: 384
   no_think: true
 
-- id: rw_lease_proration
+- id: rw_lease_proration__billable_days
   suite: realworld
-  description: Prorate rent by billable days, apply a late fee with a greater-of rule, cap a deposit
+  description: Prorate rent, apply a late fee, cap a deposit — unit billable days
   prompt: |-
     Move-in: November 14, in a 30-day month. The move-in day itself counts as the
-    first billable day.
+    first billable day, so billable days = 30 - 14 + 1.
     Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
     Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
     fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
@@ -445,24 +1026,99 @@
     deposit at one month's rent, so only the capped amount may be collected.
 
     Reply with a single JSON object only, amounts as numbers with at most two decimals:
-    {"prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    {"billable_days": <int>, "prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
     where due_total = prorated_rent + late_fee.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
+      expr: "isinstance(data, dict) and int(data.get('billable_days', -1)) == 17"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_lease_proration__prorated
+  suite: realworld
+  description: Prorate rent, apply a late fee, cap a deposit — unit prorated rent
+  prompt: |-
+    Move-in: November 14, in a 30-day month. The move-in day itself counts as the
+    first billable day, so billable days = 30 - 14 + 1.
+    Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
+    Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
+    fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
+    Deposit: the landlord asked for 1.5 months of rent, but the state caps a security
+    deposit at one month's rent, so only the capped amount may be collected.
+
+    Reply with a single JSON object only, amounts as numbers with at most two decimals:
+    {"billable_days": <int>, "prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    where due_total = prorated_rent + late_fee.
+  asserts:
+    - type: predicate
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('prorated_rent', -1)) - 1360.0) < 0.005"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_lease_proration__late_fee
+  suite: realworld
+  description: Prorate rent, apply a late fee, cap a deposit — unit late fee
+  prompt: |-
+    Move-in: November 14, in a 30-day month. The move-in day itself counts as the
+    first billable day, so billable days = 30 - 14 + 1.
+    Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
+    Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
+    fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
+    Deposit: the landlord asked for 1.5 months of rent, but the state caps a security
+    deposit at one month's rent, so only the capped amount may be collected.
+
+    Reply with a single JSON object only, amounts as numbers with at most two decimals:
+    {"billable_days": <int>, "prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    where due_total = prorated_rent + late_fee.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('late_fee', -1)) - 120.0) < 0.005"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_lease_proration__deposit
+  suite: realworld
+  description: Prorate rent, apply a late fee, cap a deposit — unit capped deposit
+  prompt: |-
+    Move-in: November 14, in a 30-day month. The move-in day itself counts as the
+    first billable day, so billable days = 30 - 14 + 1.
+    Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
+    Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
+    fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
+    Deposit: the landlord asked for 1.5 months of rent, but the state caps a security
+    deposit at one month's rent, so only the capped amount may be collected.
+
+    Reply with a single JSON object only, amounts as numbers with at most two decimals:
+    {"billable_days": <int>, "prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    where due_total = prorated_rent + late_fee.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('max_deposit', -1)) - 2400.0) < 0.005"
+  max_tokens: 512
+  no_think: true
+
+- id: rw_lease_proration__due_total
+  suite: realworld
+  description: Prorate rent, apply a late fee, cap a deposit — unit due total
+  prompt: |-
+    Move-in: November 14, in a 30-day month. The move-in day itself counts as the
+    first billable day, so billable days = 30 - 14 + 1.
+    Monthly rent: 2400.00. Prorated rent = rent x billable days / 30.
+    Late fee: rent was paid on November 9, after the grace date of the 8th, so a late
+    fee applies. The fee is the GREATER of 75.00 and 5% of the monthly rent.
+    Deposit: the landlord asked for 1.5 months of rent, but the state caps a security
+    deposit at one month's rent, so only the capped amount may be collected.
+
+    Reply with a single JSON object only, amounts as numbers with at most two decimals:
+    {"billable_days": <int>, "prorated_rent": <n>, "late_fee": <n>, "max_deposit": <n>, "due_total": <n>}
+    where due_total = prorated_rent + late_fee.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('due_total', -1)) - 1480.0) < 0.005"
   max_tokens: 512
   no_think: true
@@ -517,9 +1173,9 @@
   max_tokens: 768
   no_think: true
 
-- id: rw_recipe_scale
+- id: rw_recipe_scale__eggs
   suite: realworld
-  description: Scale a recipe from an 8x8 pan to 9x13 using area, with a square-root bake time and whole eggs
+  description: Scale a recipe by pan area with rounding rules — unit whole eggs
   prompt: |-
     A recipe is written for an 8x8 inch pan and bakes 32 minutes at 350 F.
     You are making it in a 9x13 inch pan instead.
@@ -538,16 +1194,72 @@
     FLOUR_G: <integer>
     MINUTES: <integer>
   asserts:
-    - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "[int(x) for x in re.findall(r'\\d+', out)][:3] == [6, 366, 43]"
+    - type: line_value
+      weight: 1.0
+      label: EGGS
+      equals: 6
   max_tokens: 320
   no_think: true
 
-- id: rw_retry_schedule
+- id: rw_recipe_scale__flour
   suite: realworld
-  description: Build a retry schedule obeying Retry-After, exponential backoff, a wait cap and a retry limit
+  description: Scale a recipe by pan area with rounding rules — unit flour grams
+  prompt: |-
+    A recipe is written for an 8x8 inch pan and bakes 32 minutes at 350 F.
+    You are making it in a 9x13 inch pan instead.
+
+    Scaling rules:
+      - every ingredient scales by the ratio of the pan AREAS
+      - eggs must be whole numbers, rounded UP
+      - flour is rounded to the nearest whole gram
+      - bake time scales by the SQUARE ROOT of the area ratio, rounded to the
+        nearest whole minute
+
+    Original recipe: 3 eggs, 200 g flour, 32 minutes.
+
+    Reply with exactly three lines and nothing else:
+    EGGS: <integer>
+    FLOUR_G: <integer>
+    MINUTES: <integer>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: FLOUR_G
+      equals: 366
+  max_tokens: 320
+  no_think: true
+
+- id: rw_recipe_scale__minutes
+  suite: realworld
+  description: Scale a recipe by pan area with rounding rules — unit bake minutes
+  prompt: |-
+    A recipe is written for an 8x8 inch pan and bakes 32 minutes at 350 F.
+    You are making it in a 9x13 inch pan instead.
+
+    Scaling rules:
+      - every ingredient scales by the ratio of the pan AREAS
+      - eggs must be whole numbers, rounded UP
+      - flour is rounded to the nearest whole gram
+      - bake time scales by the SQUARE ROOT of the area ratio, rounded to the
+        nearest whole minute
+
+    Original recipe: 3 eggs, 200 g flour, 32 minutes.
+
+    Reply with exactly three lines and nothing else:
+    EGGS: <integer>
+    FLOUR_G: <integer>
+    MINUTES: <integer>
+  asserts:
+    - type: line_value
+      weight: 1.0
+      label: MINUTES
+      equals: 43
+  max_tokens: 320
+  no_think: true
+
+- id: rw_retry_schedule__retry_after
+  suite: realworld
+  description: Build a retry schedule obeying policy — unit Retry-After floor on the first retry
   prompt: |-
     A request fails at time 0 with HTTP 429 and a Retry-After header of 12 seconds.
 
@@ -563,15 +1275,62 @@
     in ascending order.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "isinstance(data, list) and [int(x) for x in data] == [12, 16, 24, 40, 70, 100]"
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) >= 1 and 12 <= float(data[0]) <= 30"
   max_tokens: 384
   no_think: true
 
-- id: rw_allergy_swap
+- id: rw_retry_schedule__cap
   suite: realworld
-  description: Substitute an ingredient under an allergy constraint where the cheapest option is banned by its label
+  description: Build a retry schedule obeying policy — unit 30 second wait cap
+  prompt: |-
+    A request fails at time 0 with HTTP 429 and a Retry-After header of 12 seconds.
+
+    Client retry policy:
+      - the first retry waits 2 seconds, and each later wait doubles (2, 4, 8, 16, 32, 64 ...)
+      - no single wait may exceed 30 seconds (cap the wait, do not skip the retry)
+      - at most 6 retries total
+      - no retry may happen earlier than the Retry-After value
+
+    Assume every retry fails again with no new Retry-After.
+
+    Reply with a single JSON array only, the 6 retry times in seconds after time 0,
+    in ascending order.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: >-
+        isinstance(data, list) and len(data) >= 3
+        and max(b - a for a, b in zip([float(x) for x in data], [float(x) for x in data][1:])) <= 30
+  max_tokens: 384
+  no_think: true
+
+- id: rw_retry_schedule__count
+  suite: realworld
+  description: Build a retry schedule obeying policy — unit six retries, non-decreasing
+  prompt: |-
+    A request fails at time 0 with HTTP 429 and a Retry-After header of 12 seconds.
+
+    Client retry policy:
+      - the first retry waits 2 seconds, and each later wait doubles (2, 4, 8, 16, 32, 64 ...)
+      - no single wait may exceed 30 seconds (cap the wait, do not skip the retry)
+      - at most 6 retries total
+      - no retry may happen earlier than the Retry-After value
+
+    Assume every retry fails again with no new Retry-After.
+
+    Reply with a single JSON array only, the 6 retry times in seconds after time 0,
+    in ascending order.
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and len(data) == 6 and [float(x) for x in data] == sorted(float(x) for x in data)"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_allergy_swap__choice
+  suite: realworld
+  description: Substitute an ingredient under an allergy constraint — unit safe choice
   prompt: |-
     A recipe needs 2 tablespoons of peanut sauce, but the guest has a peanut AND tree
     nut allergy. All four pantry options below can replace it one-for-one.
@@ -587,23 +1346,60 @@
     {"choice": "<exact option name as written>", "price": <number>, "rejected": [<names, alphabetical, every option you did not choose>]}
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
+      weight: 1.0
       expr: "isinstance(data, dict) and data.get('choice') == 'sunflower-seed butter'"
+  max_tokens: 448
+  no_think: true
+
+- id: rw_allergy_swap__price
+  suite: realworld
+  description: Substitute an ingredient under an allergy constraint — unit price
+  prompt: |-
+    A recipe needs 2 tablespoons of peanut sauce, but the guest has a peanut AND tree
+    nut allergy. All four pantry options below can replace it one-for-one.
+
+    sunflower-seed butter | 4.99 | label: "nut-free facility"
+    almond butter         | 6.49 | label: "contains tree nuts"
+    cashew cream          | 5.99 | label: "contains tree nuts"
+    tahini                | 3.99 | label: "may contain traces of tree nuts"
+
+    Choose the cheapest option that is safe for this guest.
+
+    Reply with a single JSON object only:
+    {"choice": "<exact option name as written>", "price": <number>, "rejected": [<names, alphabetical, every option you did not choose>]}
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('price', -1)) - 4.99) < 0.005"
+  max_tokens: 448
+  no_think: true
+
+- id: rw_allergy_swap__rejected
+  suite: realworld
+  description: Substitute an ingredient under an allergy constraint — unit rejected list
+  prompt: |-
+    A recipe needs 2 tablespoons of peanut sauce, but the guest has a peanut AND tree
+    nut allergy. All four pantry options below can replace it one-for-one.
+
+    sunflower-seed butter | 4.99 | label: "nut-free facility"
+    almond butter         | 6.49 | label: "contains tree nuts"
+    cashew cream          | 5.99 | label: "contains tree nuts"
+    tahini                | 3.99 | label: "may contain traces of tree nuts"
+
+    Choose the cheapest option that is safe for this guest.
+
+    Reply with a single JSON object only:
+    {"choice": "<exact option name as written>", "price": <number>, "rejected": [<names, alphabetical, every option you did not choose>]}
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
       expr: "isinstance(data, dict) and [str(x) for x in (data.get('rejected') or [])] == ['almond butter', 'cashew cream', 'tahini']"
   max_tokens: 448
   no_think: true
 
-- id: rw_room_conflicts
+- id: rw_room_conflicts__overlap_b24
   suite: realworld
-  description: Find every booking conflict in one room under an overlap OR minimum-buffer policy
+  description: Find every booking conflict under overlap-or-buffer policy — unit B2/B4 overlap
   prompt: |-
     One room is booked (24-hour times, same day):
     B1 09:00-10:00
@@ -616,19 +1412,94 @@
     15 minutes. A gap of exactly 15 minutes is fine.
 
     Reply with a single JSON array only, listing every conflicting pair once, each pair
-    as [earlier_or_overlapping_id_first, other_id], the list sorted by the first id
-    then the second id.
+    as ["earlier_or_overlapping_id_first", "other_id"] with both ids as JSON strings,
+    the list sorted by the first id then the second id. Use double quotes around the
+    ids, for example [["B1", "B2"], ["B3", "B4"]].
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "isinstance(data, list) and [[str(a) for a in p] for p in data] == [['B2', 'B3'], ['B2', 'B4'], ['B3', 'B4']]"
+      weight: 1.0
+      expr: "isinstance(data, list) and {'B2', 'B4'} in [set(str(x) for x in p) for p in data if isinstance(p, list) and len(p) == 2]"
   max_tokens: 384
   no_think: true
 
-- id: rw_invoice_deadline
+- id: rw_room_conflicts__overlap_b34
   suite: realworld
-  description: Early-payment discount deadline that lands on a weekend, with a wire fee added on top
+  description: Find every booking conflict under overlap-or-buffer policy — unit B3/B4 overlap
+  prompt: |-
+    One room is booked (24-hour times, same day):
+    B1 09:00-10:00
+    B2 10:15-11:00
+    B3 11:10-12:00
+    B4 10:50-11:30
+
+    Conflict policy: two bookings conflict if they OVERLAP at all, or if the gap
+    between the end of the earlier one and the start of the later one is LESS THAN
+    15 minutes. A gap of exactly 15 minutes is fine.
+
+    Reply with a single JSON array only, listing every conflicting pair once, each pair
+    as ["earlier_or_overlapping_id_first", "other_id"] with both ids as JSON strings,
+    the list sorted by the first id then the second id. Use double quotes around the
+    ids, for example [["B1", "B2"], ["B3", "B4"]].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and {'B3', 'B4'} in [set(str(x) for x in p) for p in data if isinstance(p, list) and len(p) == 2]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_room_conflicts__buffer_b23
+  suite: realworld
+  description: Find every booking conflict under overlap-or-buffer policy — unit B2/B3 ten-minute buffer
+  prompt: |-
+    One room is booked (24-hour times, same day):
+    B1 09:00-10:00
+    B2 10:15-11:00
+    B3 11:10-12:00
+    B4 10:50-11:30
+
+    Conflict policy: two bookings conflict if they OVERLAP at all, or if the gap
+    between the end of the earlier one and the start of the later one is LESS THAN
+    15 minutes. A gap of exactly 15 minutes is fine.
+
+    Reply with a single JSON array only, listing every conflicting pair once, each pair
+    as ["earlier_or_overlapping_id_first", "other_id"] with both ids as JSON strings,
+    the list sorted by the first id then the second id. Use double quotes around the
+    ids, for example [["B1", "B2"], ["B3", "B4"]].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and {'B2', 'B3'} in [set(str(x) for x in p) for p in data if isinstance(p, list) and len(p) == 2]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_room_conflicts__boundary_b12
+  suite: realworld
+  description: Find every booking conflict under overlap-or-buffer policy — unit exact-15-minute gap is allowed
+  prompt: |-
+    One room is booked (24-hour times, same day):
+    B1 09:00-10:00
+    B2 10:15-11:00
+    B3 11:10-12:00
+    B4 10:50-11:30
+
+    Conflict policy: two bookings conflict if they OVERLAP at all, or if the gap
+    between the end of the earlier one and the start of the later one is LESS THAN
+    15 minutes. A gap of exactly 15 minutes is fine.
+
+    Reply with a single JSON array only, listing every conflicting pair once, each pair
+    as ["earlier_or_overlapping_id_first", "other_id"] with both ids as JSON strings,
+    the list sorted by the first id then the second id. Use double quotes around the
+    ids, for example [["B1", "B2"], ["B3", "B4"]].
+  asserts:
+    - type: predicate
+      weight: 1.0
+      expr: "isinstance(data, list) and {'B1', 'B2'} not in [set(str(x) for x in p) for p in data if isinstance(p, list) and len(p) == 2]"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_invoice_deadline__discounted
+  suite: realworld
+  description: Early-payment discount deadline on a weekend — unit discounted amount
   prompt: |-
     Invoice issued 2026-02-25 for 8400.00, terms 2/10 net 30.
 
@@ -641,15 +1512,62 @@
       - a wire fee of 15.00 is added to the payment after the discount
 
     Reply with a single JSON object only:
-    {"deadline": "<YYYY-MM-DD>", "payment": <number with two decimals>}
+    {"deadline": "<YYYY-MM-DD>", "discounted": <number with two decimals>, "payment": <number with two decimals>}
+    where discounted is the invoice amount after the 2% discount and payment is the
+    discounted amount plus the 15.00 wire fee.
   asserts:
     - type: predicate
-      must_pass: true
-      weight: 3.0
-      expr: "isinstance(data, dict) and str(data.get('deadline')) == '2026-03-06'"
+      weight: 1.0
+      expr: "isinstance(data, dict) and abs(float(data.get('discounted', -1)) - 8232.0) < 0.005"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_invoice_deadline__deadline
+  suite: realworld
+  description: Early-payment discount deadline on a weekend — unit deadline date
+  prompt: |-
+    Invoice issued 2026-02-25 for 8400.00, terms 2/10 net 30.
+
+    Rules:
+      - the 2% discount is available if payment is received on or before the 10th day
+        after the issue date
+      - if that 10th day falls on a Saturday or Sunday, the deadline moves to the
+        PRECEDING business day
+      - the discount applies to the invoice amount
+      - a wire fee of 15.00 is added to the payment after the discount
+
+    Reply with a single JSON object only:
+    {"deadline": "<YYYY-MM-DD>", "discounted": <number with two decimals>, "payment": <number with two decimals>}
+    where discounted is the invoice amount after the 2% discount and payment is the
+    discounted amount plus the 15.00 wire fee.
+  asserts:
     - type: predicate
-      must_pass: true
-      weight: 2.0
+      weight: 1.0
+      expr: "isinstance(data, dict) and str(data.get('deadline')) == '2026-03-06'"
+  max_tokens: 384
+  no_think: true
+
+- id: rw_invoice_deadline__payment
+  suite: realworld
+  description: Early-payment discount deadline on a weekend — unit payment amount
+  prompt: |-
+    Invoice issued 2026-02-25 for 8400.00, terms 2/10 net 30.
+
+    Rules:
+      - the 2% discount is available if payment is received on or before the 10th day
+        after the issue date
+      - if that 10th day falls on a Saturday or Sunday, the deadline moves to the
+        PRECEDING business day
+      - the discount applies to the invoice amount
+      - a wire fee of 15.00 is added to the payment after the discount
+
+    Reply with a single JSON object only:
+    {"deadline": "<YYYY-MM-DD>", "discounted": <number with two decimals>, "payment": <number with two decimals>}
+    where discounted is the invoice amount after the 2% discount and payment is the
+    discounted amount plus the 15.00 wire fee.
+  asserts:
+    - type: predicate
+      weight: 1.0
       expr: "isinstance(data, dict) and abs(float(data.get('payment', -1)) - 8247.0) < 0.005"
   max_tokens: 384
   no_think: true

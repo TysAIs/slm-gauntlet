@@ -138,7 +138,7 @@ pip install -e .
 llama-server -m /path/to/model-Q4_K_M.gguf --host 0.0.0.0 --port 8080 \
   -c 32768 -np 8 --kv-unified -fa --jinja --temp 0.0
 
-# 2. Run the full gauntlet (71 tasks, ~5-15 min on an 8GB GPU)
+# 2. Run the full gauntlet (every task in tasks/, ~5-15 min on an 8GB GPU)
 gauntlet run --endpoint http://localhost:8080/v1 --model my-model --suite all
 
 # Single suite instead:
