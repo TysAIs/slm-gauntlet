@@ -5,7 +5,7 @@ Perf as measured; cache-flagged baselines (completion_tokens < 50 AND
 TTFT < 1.0s) get a dagger. Separate sections (classifier/routing/OCR/LH) use
 verified result files, never merged into the generative headline.
 """
-import glob, json, re, sys
+import glob, importlib.util, json, re, sys
 from pathlib import Path
 
 ROOT = Path("results")
@@ -19,22 +19,65 @@ FAM_LABEL = {"spark-x2.6-4b": "Spark-X2.6-4B", "spark-x2.6-1.7b": "Spark-X2.6-1.
              "minicpm": "MiniCPM-V 4.7 1B",
              "dory-4b": "Dory 1.0 4B", "dory-1.0-4b": "Dory 1.0 4B",
              "qwen35-9b": "Qwen3.5-9B", "lfm25-8b-a1b": "LFM2.5-8B-A1B",
-             "lfm25-1.2b": "LFM2.5-1.2B", "lfm25-24b-a2b": "LFM2.5-24B-A2B (offload)"}
+             "lfm25-1.2b": "LFM2.5-1.2B", "lfm25-24b-a2b": "LFM2.5-24B-A2B (offload)",
+             "gemma-e4b": "Gemma 3n · E4B", "gemma4-e4b": "Gemma 4 · E4B",
+             "gemma4-12b": "Gemma 4 · 12B", "mimo-9b": "MiMo V2.6 · 9B",
+             "ornith-9b": "Ornith 1.5 · 9B", "sharp-spark-4b": "Sharp-Spark · 4B",
+             "qwen3.5": "Qwen3.5 · 4B", "qwen3.5-4b": "Qwen3.5 · 4B",
+             "lfm2.5-2.6b": "LFM2.5 · 2.6B"}
+
+# Same model, two card naming conventions (the 0.5.0 intake writes the vendor prefix the
+# GGUF carries). One model must not get two sections.
+FAM_ALIAS = {"nvidia-nemotron-3.5-bolt-e4b": "bolt-e4b",
+             "nemotron-3.5-bolt-e4b": "bolt-e4b",
+             "nvidia-nemotron-labs-dory1.0-4b": "dory-1.0-4b"}
 
 
 def fam_of(mid):
+    mid = (mid or "").lower()  # card ids mix cases (Qwen3.5-4B-Q4_K_M); grouping is by identity
     if mid.startswith("minicpm"):
         return "minicpm"
+    for p in sorted(FAM_ALIAS):
+        if mid.startswith(p):
+            return FAM_ALIAS[p]
     for p in FAM_ORDER:
         if mid.startswith(p):
             return p
-    # old-repo cards: prefix before first quant-ish token
-    m = re.match(r"^([a-z0-9]+(?:-[a-z0-9.]+)*?)-(q|iq|ud)", mid)
+    # old-repo cards: prefix before first quant-ish token (dots allowed: "qwen3.5", "lfm2.5")
+    m = re.match(r"^([a-z0-9][a-z0-9.]*(?:-[a-z0-9.]+)*?)-(q[0-9a-z_]|iq|ud)", mid)
     return m.group(1) if m else "other"
+
 
 
 def pct(x):
     return f"{x * 100:.1f}" if x is not None else "—"
+
+
+# --- epoch honesty ---------------------------------------------------------
+# This document carries rows from more than one methodology (the 0.5.0 epoch re-ran
+# 42 configurations at 94 tasks; the corpus still holds 225 pre-0.5.0 configurations
+# at 71 tasks). The epoch of a row is derived from that card's own timestamp by the
+# SAME function the published README table uses, so a row cannot claim an epoch it
+# was not measured under, and two epochs never share a ranked table.
+_spec = importlib.util.spec_from_file_location(
+    "leaderboard_check", Path(__file__).resolve().parent / "scripts" / "leaderboard_check.py")
+_lb = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_lb)
+CURRENT_EPOCH = _lb.CURRENT_EPOCH
+FULL_TASKS = _lb.FULL_TASKS
+scorer_epoch = _lb.scorer_epoch
+
+
+def epoch_of(card):
+    return scorer_epoch(card.get("ts", ""))
+
+
+def method_label(card):
+    """The row's own task count and scorer - never inferred from a document header."""
+    ep = epoch_of(card)
+    n = card.get("n")
+    tag = "current" if ep == CURRENT_EPOCH else f"pre-{CURRENT_EPOCH}"
+    return f"{n if n is not None else '?'} t · {ep} ({tag})"
 
 
 def main():
@@ -63,10 +106,16 @@ def main():
         g.sort(key=lambda m: -m["overall_pct"])
 
     lines = []
-    lines.append("# SLM Gauntlet — Leaderboard (updated Oct 31, 2026)")
+    newest = max((str(m.get("ts", "")) for m in cards), default="")
+    stamp = f"{newest[:4]}-{newest[4:6]}-{newest[6:8]}" if len(newest) >= 8 else "unknown"
+    lines.append(f"# SLM Gauntlet — Leaderboard (generated {stamp} from the card corpus)")
     lines.append("")
     lines.append("All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, "
-                 "71 tasks / 7 suites, 32K primary unless noted. "
+                 f"32K primary unless noted. This document holds **two methodologies**: the current "
+                 f"epoch ({FULL_TASKS} tasks, scorer {CURRENT_EPOCH}) and the pre-{CURRENT_EPOCH} corpus "
+                 "(71 tasks, scorer 0.3.1). Every row carries its own **Method** column, and the two "
+                 "epochs are printed as separate tables — a 94-task percentage and a 71-task "
+                 "percentage are never ranked against each other. "
                  "KV labels are exact: q8_0 is NOT FP8, q4_0 is NOT FP4. "
                  "FP8/FP4 KV cache is NOT supported by the llama.cpp builds used (blocked, recorded).")
     lines.append("")
@@ -80,8 +129,10 @@ def main():
                  "vs 87.9% under report.py weights. Unifying the weighting is an open decision; "
                  "no score below was recomputed to hide the gap.")
     lines.append("- **Ties:** scores within one task of each other are ties, stated plainly. "
-                 "A winner must win on the full 71-task suite with per-suite breakdown — never "
-                 "from a smoke test, perf alone, or a single run.")
+                 f"A winner must win on the full current suite ({FULL_TASKS} tasks at scorer "
+                 f"{CURRENT_EPOCH}; 71 before it) with per-suite breakdown — never from a smoke test, "
+                 "perf alone, or a single run.")
+
     lines.append("- **Perf:** TTFT + tok/s as measured. † = baseline looks prefix-cache-affected "
                  "(completion_tokens < 50 AND TTFT < 1.0s); those baselines are NOT comparable "
                  "for ranking — see the run log per-variant notes. `decode_tok_s` fields are a "
@@ -104,13 +155,28 @@ def main():
     # BEST-OF
     lines.append("## BEST-OF")
     lines.append("")
+    # BEST-OF is scoped to the current epoch: a pre-0.5.0 71-task number can never
+    # headline a table that now contains 94-task rows.
     ongpu = [m for m in cards if (m.get("details") or {}).get("category") != "offload"]
-    best = max(ongpu, key=lambda m: m["overall_pct"])
+    cur_ongpu = [m for m in ongpu if epoch_of(m) == CURRENT_EPOCH]
+    best = max(cur_ongpu or ongpu, key=lambda m: m["overall_pct"])
+    best_ep = epoch_of(best)
+    best_scope = (f"{FULL_TASKS}-task scorer {CURRENT_EPOCH}" if best_ep == CURRENT_EPOCH
+                  else f"pre-{CURRENT_EPOCH} {best.get('n')}-task scorer {best_ep} (no current-epoch row yet)")
     lines.append(f"- **Best on-GPU overall: {best['display_name']} "
                  f"({best['details'].get('quant')}, KV {best['details'].get('kv_type')}) — "
-                 f"{best['overall_pct']:.1f}%** — card `cards/card_{best['model']}.png`. "
+                 f"{best['overall_pct']:.1f}%** — measured {best_scope}; card `cards/card_{best['model']}.png`. "
                  f"Ties within one task are listed per family below; no single winner is declared "
                  f"from a one-task gap.")
+    legacy_ongpu = [m for m in ongpu if epoch_of(m) != CURRENT_EPOCH]
+    if cur_ongpu and legacy_ongpu:
+        lb_best = max(legacy_ongpu, key=lambda m: m["overall_pct"])
+        lines.append(f"- **Best pre-{CURRENT_EPOCH} on-GPU (NOT comparable with the line above): "
+                     f"{lb_best['display_name']} ({lb_best['details'].get('quant')}, KV "
+                     f"{lb_best['details'].get('kv_type')}) — {lb_best['overall_pct']:.1f}%** at "
+                     f"{lb_best.get('n')} tasks / scorer {epoch_of(lb_best)}; "
+                     f"card `cards/card_{lb_best['model']}.png`.")
+
     lines.append("- **Best offload (generative): LFM2.5-24B-A2B UD-Q4_K_XL, 8K cap — 59.2%** "
                  "(retrieval 0% is an 8K-cap artifact, not a model score). Flint IQ2_XXS has no "
                  "full score (aborted on swap; smoke 89.5% only, NOT a score).")
@@ -122,36 +188,52 @@ def main():
                  "(both hard aggregation tasks exact). 32K rank does NOT predict 100K rank: "
                  "Spark best-at-32K falls to 0.50 at 100K, MiniCPM best to 0.19. "
                  "See the long-horizon section.")
-    lines.append("- **Best KV per family** (best variant per KV type; full per-variant rows below):")
+    lines.append("- **Best KV per family** (best variant per KV type; full per-variant rows below). "
+                 f"Current-epoch line only — pre-{CURRENT_EPOCH} numbers are named separately so a "
+                 "71-task figure never stands in for a 94-task one:")
     for fam in FAM_ORDER:
         ms = groups.get(fam, [])
         if not ms:
             continue
-        bykv = {}
-        for m in ms:
-            kv = (m.get("details") or {}).get("kv_type") or "?"
-            if kv not in bykv or m["overall_pct"] > bykv[kv]["overall_pct"]:
-                bykv[kv] = m
-        parts = [f"{kv}: {m['details'].get('quant')} {m['overall_pct']:.1f}%"
-                 for kv, m in sorted(bykv.items())]
-        lines.append(f"  - {FAM_LABEL.get(fam, fam)} — " + "; ".join(parts))
+        cur = [m for m in ms if epoch_of(m) == CURRENT_EPOCH]
+        if cur:
+            bykv = {}
+            for m in cur:
+                kv = (m.get("details") or {}).get("kv_type") or "?"
+                if kv not in bykv or m["overall_pct"] > bykv[kv]["overall_pct"]:
+                    bykv[kv] = m
+            parts = [f"{kv}: {m['details'].get('quant')} {m['overall_pct']:.1f}%"
+                     for kv, m in sorted(bykv.items())]
+            lines.append(f"  - {FAM_LABEL.get(fam, fam)} — " + "; ".join(parts))
+        else:
+            bykv = {}
+            for m in ms:
+                kv = (m.get("details") or {}).get("kv_type") or "?"
+                if kv not in bykv or m["overall_pct"] > bykv[kv]["overall_pct"]:
+                    bykv[kv] = m
+            parts = [f"{kv}: {m['details'].get('quant')} {m['overall_pct']:.1f}%"
+                     for kv, m in sorted(bykv.items())]
+            lines.append(f"  - {FAM_LABEL.get(fam, fam)} — pre-{CURRENT_EPOCH} only: "
+                         + "; ".join(parts))
+
     lines.append("")
 
-    # Generative table, grouped by family
-    lines.append("## Generative leaderboard (71 tasks, 32K primary)")
+    # Generative table, grouped by family. Current-epoch rows and pre-0.5.0 rows are
+    # SEPARATE tables inside each family: one ranked table mixing a 94-task score with
+    # a 71-task score is the defect this layout removes.
+    lines.append(f"## Generative leaderboard (32K primary; current epoch is {FULL_TASKS} tasks / "
+                 f"scorer {CURRENT_EPOCH})")
     lines.append("")
-    hdr = ("| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | "
+    lines.append(f"Each family lists its **current-epoch** rows first, then its **pre-{CURRENT_EPOCH}** "
+                 "rows in their own table, in descending order. The Method column states the task count "
+                 "and scorer the row was measured under: compare rows only inside the same Method.")
+    lines.append("")
+    hdr = ("| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | "
            "KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | "
            "TTFT | tok/s 1/4/8 | Failure modes | Card | Category |")
-    sep = ("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
-    for fam in FAM_ORDER + sorted(set(groups) - set(FAM_ORDER)):
-        ms = groups.get(fam)
-        if not ms:
-            continue
-        lines.append(f"### {FAM_LABEL.get(fam, fam)}")
-        lines.append("")
-        lines.append(hdr)
-        lines.append(sep)
+    sep = "|" + "---|" * 23
+
+    def emit_rows(ms):
         for m in ms:
             d = m.get("details") or {}
             s = m.get("suites") or {}
@@ -177,7 +259,7 @@ def main():
             fm = m.get("failure_modes") or {}
             fm_s = "none" if not fm else " · ".join(f"{k} {v}" for k, v in sorted(fm.items()))
             lines.append(
-                f"| {m['display_name']} | {d.get('release_date') or '—'} | {gg} | "
+                f"| {m['display_name']} | {method_label(m)} | {d.get('release_date') or '—'} | {gg} | "
                 f"{d.get('quant') or '—'} | {d.get('kv_type') or '—'} | "
                 f"{d.get('context_tokens', 32768):,} | {vram} | "
                 f"{d.get('kv_pool_tokens', 32768):,} | {d.get('max_subagents', 4)} | "
@@ -185,7 +267,30 @@ def main():
                 f"{pct(s.get('retrieval'))} | {pct(s.get('coding'))} | {pct(s.get('instruction'))} | "
                 f"{pct(s.get('adversarial'))} | {pct(s.get('agent_chains'))} | {ttft} | {tps} | "
                 f"{fm_s} | `cards/card_{m['model']}.png` | {d.get('category') or '—'} |")
+
+    for fam in FAM_ORDER + sorted(set(groups) - set(FAM_ORDER)):
+        ms = groups.get(fam)
+        if not ms:
+            continue
+        cur = [m for m in ms if epoch_of(m) == CURRENT_EPOCH]
+        old = [m for m in ms if epoch_of(m) != CURRENT_EPOCH]
+        lines.append(f"### {FAM_LABEL.get(fam, fam)}")
         lines.append("")
+        if cur:
+            lines.append(f"**Current epoch — {FULL_TASKS} tasks, scorer {CURRENT_EPOCH}**")
+            lines.append("")
+            lines.append(hdr)
+            lines.append(sep)
+            emit_rows(cur)
+            lines.append("")
+        if old:
+            lines.append(f"**Pre-{CURRENT_EPOCH} — 71-task rows, NOT comparable with the table above**")
+            lines.append("")
+            lines.append(hdr)
+            lines.append(sep)
+            emit_rows(old)
+            lines.append("")
+
 
     # Separate sections (verified numbers, hardcoded from result files)
     lines.append("## Classifier leaderboard (SEPARATE — never merged into generative %)")
@@ -285,13 +390,13 @@ def main():
                  "offload rows get a real context cap instead of an artifact. No AREO 3090 testing "
                  "was done in this run (PVE 1070 Ti only, per directive).")
     lines.append("")
-    lines.append("## Pre-existing repo results (v0.3.1, NOT re-scored this run)")
+    lines.append("## Historical v0.3.1 table (NOT re-scored, kept for provenance)")
     lines.append("")
-    lines.append("The v0.3.1 leaderboard below is reproduced verbatim from the previous "
-                 "LEADERBOARD.md (backed up as `LEADERBOARD.md.bak-v031`). These models were "
-                 "already tested before this run and were NOT re-run, re-carded, or merged into "
-                 "the rows above; their legacy card images remain in `results/cards/`. "
-                 "Scores here used the v0.3.1 methodology (Bonsai-2: 65 merged tasks).")
+    lines.append("The v0.3.1 leaderboard is reproduced below from the previous LEADERBOARD.md. Every "
+                 "model with a current-epoch row appears ABOVE at its 0.5.0 score; this table is the "
+                 "older number and is never ranked against them. Scores here used the v0.3.1 "
+                 "methodology (Bonsai-2: 65 merged tasks).")
+
     lines.append("")
     lines.append("| # | Model | Quant | Gauntlet % | Tests | tok/s (1 stream) |")
     lines.append("|---|-------|-------|-----------:|------:|-----------------:|")
