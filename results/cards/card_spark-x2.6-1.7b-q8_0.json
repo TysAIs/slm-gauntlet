@@ -2,41 +2,47 @@
  {
   "model": "spark-x2.6-1.7b-q8_0",
   "display_name": "Spark-X2.6-1.7B",
-  "sub": "Q8_0 \u00b7 FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026",
-  "overall_pct": 82.3,
+  "sub": "Q8_0 \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 75.3,
   "suites": {
    "adversarial": 0.875,
-   "agent_chains": 0.833,
-   "coding": 0.667,
+   "agent_chains": 1.0,
+   "coding": 0.4,
    "instruction": 0.571,
+   "realworld": 0.25,
    "structured": 1.0,
-   "tooluse": 0.825,
-   "retrieval": 0.875
+   "tooluse": 0.877,
+   "retrieval": 1.0
   },
-  "n": 71,
+  "n": 94,
   "rank": "",
-  "ts": "20261028",
+  "ts": "20261108",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia",
   "failure_modes": {
-   "max_turns": 1,
-   "looped": 1,
-   "error": 1
+   "max_turns": 1
   },
   "details": {
-   "release_date": "Oct 2026",
+   "release_date": "",
    "gguf_file": "Spark-X2.6-1.7B-Q8_0.gguf",
    "gguf_size_bytes": 1820113440,
    "quant": "Q8_0",
    "kv_type": "FP16",
    "context_tokens": 32768,
-   "vram_used_mb": 2575,
    "vram_total_mb": 8192,
    "kv_pool_tokens": 32768,
    "max_subagents": 4,
-   "server_build": "Sep 11 \u00b7 0.4.0-dev",
-   "category": "on-GPU \u226412B"
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/spark-x2.6-1.7b-q8_0_20261108T080140Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
   }
  }
 ]

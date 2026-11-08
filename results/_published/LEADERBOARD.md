@@ -13,20 +13,20 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 ## BEST-OF
 
-- **Best on-GPU overall: Spark-X2.6 4B (IQ3_M, KV FP16) — 91.5%** — card `cards/card_spark-x2.6-4b-iq3m-bartowski.png`. Ties within one task are listed per family below; no single winner is declared from a one-task gap.
+- **Best on-GPU overall: Spark-X2.6 4B (Q4_K_L, KV q8_0) — 90.2%** — card `cards/card_spark-x2.6-4b-q4kl-bartowski-kvq8.png`. Ties within one task are listed per family below; no single winner is declared from a one-task gap.
 - **Best offload (generative): LFM2.5-24B-A2B UD-Q4_K_XL, 8K cap — 59.2%** (retrieval 0% is an 8K-cap artifact, not a model score). Flint IQ2_XXS has no full score (aborted on swap; smoke 89.5% only, NOT a score).
 - **Best classifier:** no single winner — Clef 27B Q4 for accuracy/calibration (choice 100%, score 100%, ECE 0.029, 2.4s), Clef-flash Q4 for on-GPU accuracy (choice 100%, 346ms), d1-2B Q4 for speed + score-MAE (56ms, MAE 0.083). See the classifier section.
 - **Best long-horizon (100K+): Qwen3.5-9B Q4_K_M q4_0 KV — 0.875 (7/8)** (both hard aggregation tasks exact). 32K rank does NOT predict 100K rank: Spark best-at-32K falls to 0.50 at 100K, MiniCPM best to 0.19. See the long-horizon section.
 - **Best KV per family** (best variant per KV type; full per-variant rows below):
-  - Spark-X2.6-4B — FP16: IQ3_M 91.5%; q4_0: Q5_K_S 89.9%; q8_0: Q4_K_L 90.2%
-  - Spark-X2.6-1.7B — FP16: Q8_0 82.3%; q4_0: Q8_0 81.0%; q8_0: Q5_K_S 79.8%
-  - Bolt E4B — FP16: UD-Q5_K_XL 88.2%; q4_0: UD-IQ3_XXS 89.1%; q8_0: UD-Q4_K_XL 89.1%
+  - Spark-X2.6-4B — FP16: IQ4_NL 87.8%; q4_0: Q5_K_S 89.9%; q8_0: Q4_K_L 90.2%
+  - Spark-X2.6-1.7B — FP16: Q6_K 81.3%; q4_0: Q8_0 81.0%; q8_0: Q5_K_S 79.8%
+  - Bolt E4B — FP16: UD-Q5_K_XL 88.2%; q4_0: UD-Q4_K_XL 88.6%; q8_0: UD-Q4_K_XL 89.1%
   - LFM3-1.7B — FP16: IQ4_NL 86.3%; q4_0: Q5_K_M 85.1%; q8_0: Q5_K_S 84.4%
-  - MiniCPM-V 4.7 1B — FP16: IQ4_XS 74.5%; q4_0: Q5_K_M 72.7%; q8_0: IQ4_XS 72.9%
+  - MiniCPM-V 4.7 1B — FP16: Q8_0 82.1%; q4_0: Q5_K_M 72.7%; q8_0: IQ4_XS 72.9%
   - Dory 1.0 4B — q4_0: Q5_K_M 87.5%; q8_0: Q5_K_M 88.7%
-  - Qwen3.5-9B — FP16: Q4_K_M 86.7%
-  - LFM2.5-8B-A1B — FP16: UD-Q4_K_M 56.1%
-  - LFM2.5-1.2B — FP16: Q8_0 65.2%
+  - Qwen3.5-9B — FP16: Q4_K_M 81.8%
+  - LFM2.5-8B-A1B — FP16: UD-Q4_K_M 52.8%
+  - LFM2.5-1.2B — FP16: Q4_K_M 63.5%
   - LFM2.5-24B-A2B (offload) — FP16: UD-Q4_K_XL 59.2%
 
 ## Generative leaderboard (71 tasks, 32K primary)
@@ -35,7 +35,6 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-IQ3_M.gguf (2.23 GB) | IQ3_M | FP16 | 32,768 | 4,003 / 8,192 | 32,768 | 4 | **91.5%** | 94.7 | 100.0 | 87.5 | 100.0 | 50.0 | 100.0 | 100.0 | 4.02s | 15/37/44 | error 1 | `cards/card_spark-x2.6-4b-iq3m-bartowski.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-Q4_K_L.gguf (2.81 GB) | Q4_K_L | q8_0 | 32,768 | not recorded | 32,768 | 4 | **90.2%** | 93.0 | 90.0 | 87.5 | 100.0 | 57.1 | 100.0 | 100.0 | 4.56s | 15/38/47 | error 1 | `cards/card_spark-x2.6-4b-q4kl-bartowski-kvq8.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-IQ3_M.gguf (2.23 GB) | IQ3_M | q8_0 | 32,768 | 3,337 / 8,192 | 32,768 | 4 | **89.9%** | 94.7 | 100.0 | 87.5 | 83.3 | 50.0 | 100.0 | 100.0 | 4.55s | 15/34/41 | error 1 | `cards/card_spark-x2.6-4b-iq3m-bartowski-kvq8.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B.Q5_K_S.gguf (2.88 GB) | Q5_K_S | q4_0 | 32,768 | 3,541 / 8,192 | 32,768 | 4 | **89.9%** | 94.7 | 100.0 | 87.5 | 83.3 | 50.0 | 100.0 | 100.0 | 4.32s | 15/40/45 | error 1 | `cards/card_spark-x2.6-4b-q5ks-xhtoken-kvq4.png` | on-GPU ≤12B |
@@ -86,6 +85,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-IQ3_XS.gguf (1.91 GB) | IQ3_XS | q4_0 | 32,768 | 2,621 / 8,192 | 32,768 | 4 | **82.4%** | 89.5 | 80.0 | 87.5 | 83.3 | 50.0 | 87.5 | 83.3 | 4.43s | 15/33/41 | error 1 | `cards/card_spark-x2.6-4b-iq3xs-bartowski-kvq4.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-IQ3_XXS.gguf (1.80 GB) | IQ3_XXS | q8_0 | 32,768 | 2,925 / 8,192 | 32,768 | 4 | **81.9%** | 78.9 | 100.0 | 87.5 | 83.3 | 42.9 | 75.0 | 100.0 | 4.14s | 16/35/41 | error 1 | `cards/card_spark-x2.6-4b-iq3xxs-bartowski-kvq8.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-IQ3_XXS.gguf (1.80 GB) | IQ3_XXS | FP16 | 32,768 | 3,591 / 8,192 | 32,768 | 4 | **81.9%** | 78.9 | 100.0 | 87.5 | 83.3 | 42.9 | 75.0 | 100.0 | 3.97s | 16/37/43 | error 1 | `cards/card_spark-x2.6-4b-iq3xxs-bartowski.png` | on-GPU ≤12B |
+| Spark-X2.6-4B | — | Spark-X2.6-4B-IQ3_M.gguf (2.23 GB) | IQ3_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **81.0%** | 100.0 | 100.0 | 71.4 | 80.0 | 64.3 | 100.0 | 100.0 | 4.02s | 15/37/44 | timeout 2 | `cards/card_spark-x2.6-4b-iq3m-bartowski.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B.Q3_K_M.gguf (2.17 GB) | Q3_K_M | q4_0 | 32,768 | 2,861 / 8,192 | 32,768 | 4 | **80.5%** | 82.5 | 90.0 | 87.5 | 83.3 | 50.0 | 75.0 | 83.3 | 4.33s | 15/37/44 | error 1 · looped 1 | `cards/card_spark-x2.6-4b-q3km-xhtoken-kvq4.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-Q3_K_S.gguf (1.90 GB) | Q3_K_S | q8_0 | 32,768 | 3,023 / 8,192 | 32,768 | 4 | **79.6%** | 73.7 | 90.0 | 87.5 | 100.0 | 50.0 | 75.0 | 83.3 | 4.33s | 16/36/43 | error 3 · looped 2 | `cards/card_spark-x2.6-4b-q3ks-bartowski-kvq8.png` | on-GPU ≤12B |
 | Spark-X2.6 4B | Oct 2026 | Spark-X2.6-4B-Q3_K_S.gguf (1.90 GB) | Q3_K_S | FP16 | 32,768 | 3,689 / 8,192 | 32,768 | 4 | **79.6%** | 73.7 | 90.0 | 87.5 | 100.0 | 50.0 | 75.0 | 83.3 | 4.10s | 16/38/45 | error 3 · looped 2 | `cards/card_spark-x2.6-4b-q3ks-bartowski.png` | on-GPU ≤12B |
@@ -103,7 +103,6 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Spark-X2.6-1.7B | Oct 2026 | Spark-X2.6-1.7B-Q8_0.gguf (1.82 GB) | Q8_0 | FP16 | 32,768 | 2,575 / 8,192 | 32,768 | 4 | **82.3%** | 82.5 | 100.0 | 87.5 | 66.7 | 57.1 | 87.5 | 83.3 | 3.30s | 31/76/99 | error 1 · looped 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q8_0.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q6_K.gguf (1.41 GB) | Q6_K | FP16 | 32,768 | 2,185 / 8,192 | 32,768 | 4 | **81.3%** | 82.5 | 100.0 | 87.5 | 66.7 | 42.9 | 75.0 | 100.0 | 2.24s | 29/70/85 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q6k-xhtoken.png` | on-GPU ≤12B |
 | Spark-X2.6-1.7B | Oct 2026 | Spark-X2.6-1.7B-Q8_0.gguf (1.82 GB) | Q8_0 | q4_0 | 32,768 | 2,157 / 8,192 | 32,768 | 4 | **81.0%** | 80.7 | 90.0 | 87.5 | 50.0 | 64.3 | 87.5 | 100.0 | 3.69s | 23/67/81 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q8-kvq4.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q5_K_S.gguf (1.22 GB) | Q5_K_S | q8_0 | 32,768 | 1,743 / 8,192 | 32,768 | 4 | **79.8%** | 89.5 | 90.0 | 87.5 | 50.0 | 71.4 | 75.0 | 66.7 | 2.23s | 30/69/78 | error 1 | `cards/card_spark-x2.6-1.7b-q5ks-xhtoken-kvq8.png` | on-GPU ≤12B |
@@ -113,6 +112,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 | Spark-X2.6-1.7B | Oct 2026 | Spark-X2.6-1.7B-Q4_K_M.gguf (1.77 GB) | Q4_K_M | FP16 | 32,768 | 2,013 / 8,192 | 32,768 | 4 | **78.1%** | 78.9 | 90.0 | 87.5 | 33.3 | 57.1 | 87.5 | 100.0 | 0.21s† | 5/22/31 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q4km.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q5_K_S.gguf (1.22 GB) | Q5_K_S | q4_0 | 32,768 | 1,583 / 8,192 | 32,768 | 4 | **78.1%** | 80.7 | 90.0 | 87.5 | 66.7 | 64.3 | 75.0 | 66.7 | 2.33s | 29/71/78 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q5ks-xhtoken-kvq4.png` | on-GPU ≤12B |
 | Spark-X2.6-1.7B | Oct 2026 | Spark-X2.6-1.7B-Q4_K_M.gguf (1.77 GB) | Q4_K_M | q8_0 | 32,768 | 1,755 / 8,192 | 32,768 | 4 | **75.3%** | 73.7 | 90.0 | 87.5 | 33.3 | 57.1 | 75.0 | 100.0 | 0.19s† | 7/24/32 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q4km-kvq8.png` | on-GPU ≤12B |
+| Spark-X2.6-1.7B | — | Spark-X2.6-1.7B-Q8_0.gguf (1.82 GB) | Q8_0 | FP16 | 32,768 | not recorded | 32,768 | 4 | **75.3%** | 87.7 | 100.0 | 100.0 | 40.0 | 57.1 | 87.5 | 100.0 | 3.30s | 31/76/99 | max_turns 1 | `cards/card_spark-x2.6-1.7b-q8_0.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q3_K_M.gguf (0.94 GB) | Q3_K_M | q8_0 | 32,768 | 1,479 / 8,192 | 32,768 | 4 | **74.7%** | 89.5 | 50.0 | 87.5 | 33.3 | 64.3 | 75.0 | 100.0 | 1.81s | 22/67/98 | error 1 | `cards/card_spark-x2.6-1.7b-q3km-xhtoken-kvq8.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q5_K_S.gguf (1.22 GB) | Q5_K_S | FP16 | 32,768 | 2,001 / 8,192 | 32,768 | 4 | **73.5%** | 78.9 | 90.0 | 87.5 | 50.0 | 57.1 | 75.0 | 50.0 | 2.02s | 32/74/82 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q5ks-xhtoken.png` | on-GPU ≤12B |
 | Spark-X2.6 1.7B | Oct 2026 | Spark-X2.6-1.7B.Q4_K_S.gguf (1.04 GB) | Q4_K_S | q8_0 | 32,768 | 1,581 / 8,192 | 32,768 | 4 | **72.3%** | 75.4 | 90.0 | 75.0 | 33.3 | 57.1 | 75.0 | 83.3 | 1.60s | 40/96/110 | error 1 · max_turns 1 | `cards/card_spark-x2.6-1.7b-q4ks-xhtoken-kvq8.png` | on-GPU ≤12B |
@@ -129,7 +129,6 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Bolt E4B | Oct 23 2026 | — | UD-IQ3_XXS | q4_0 | 32,768 | not recorded | 32,768 | 4 | **89.1%** | 94.7 | 100.0 | 75.0 | 100.0 | 57.1 | 87.5 | 100.0 | 4.93s | 13/32/43 | none | `cards/card_bolt-e4b-udiq3xxs-kvq4.png` | on-GPU ≤12B |
 | Nemotron 3.5 Bolt E4B | Oct 23 2026 | — | UD-Q4_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **89.1%** | 94.7 | 100.0 | 75.0 | 100.0 | 57.1 | 87.5 | 100.0 | 5.03s | 13/38/46 | none | `cards/card_bolt-e4b-udq4xl-kvq8.png` | on-GPU ≤12B |
 | Nemotron 3.5 Bolt E4B | Oct 23 2026 | — | UD-Q4_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **88.6%** | 94.7 | 100.0 | 75.0 | 100.0 | 64.3 | 75.0 | 100.0 | 5.23s | 13/38/46 | none | `cards/card_bolt-e4b-udq4xl-kvq4.png` | on-GPU ≤12B |
 | Nemotron 3.5 Bolt E4B | Oct 23 2026 | — | UD-Q5_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **88.6%** | 94.7 | 100.0 | 75.0 | 100.0 | 64.3 | 75.0 | 100.0 | 5.74s | 11/36/47 | none | `cards/card_bolt-e4b-udq5xl-kvq4.png` | on-GPU ≤12B |
@@ -153,6 +152,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 | Bolt E4B | Oct 23 2026 | — | UD-IQ3_XXS | FP16 | 32,768 | not recorded | 32,768 | 4 | **85.6%** | 94.7 | 100.0 | 62.5 | 100.0 | 57.1 | 87.5 | 83.3 | 4.76s | 14/33/44 | error 2 | `cards/card_bolt-e4b-udiq3xxs.png` | on-GPU ≤12B |
 | Nemotron 3.5 Bolt E4B | Oct 23 2026 | Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf (6.18 GB) | Q4_K_M | q4_0 | 32,768 | 3,573 / 8,192 | 32,768 | 4 | **85.5%** | 94.7 | 100.0 | 75.0 | 100.0 | 50.0 | 75.0 | 83.3 | 4.87s | 13/41/50 | none | `cards/card_bolt-e4b-q4km-kvq4.png` | on-GPU ≤12B |
 | Bolt E4B | Oct 23 2026 | — | UD-Q2_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **85.4%** | 89.5 | 100.0 | 75.0 | 100.0 | 64.3 | 75.0 | 83.3 | 4.96s | 13/32/43 | none | `cards/card_bolt-e4b-udq2xl-kvq4.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf (3.70 GB) | UD-IQ3_XXS | q4_0 | 32,768 | not recorded | 32,768 | 4 | **85.3%** | 100.0 | 100.0 | 85.7 | 100.0 | 71.4 | 87.5 | 83.3 | 4.93s | 13/32/43 | none | `cards/card_bolt-e4b-udiq3xxs-kvq4.png` | on-GPU ≤12B |
 | Bolt E4B | Oct 23 2026 | — | UD-IQ2_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **84.3%** | 94.7 | 100.0 | 62.5 | 83.3 | 57.1 | 75.0 | 100.0 | 4.67s | 14/33/42 | error 1 | `cards/card_bolt-e4b-udiq2m-kvq8.png` | on-GPU ≤12B |
 
 ### LFM3-1.7B
@@ -224,7 +224,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-IQ4_XS.gguf (0.64 GB) | IQ4_XS | FP16 | 32,768 | 1,219 / 8,192 | 32,768 | 4 | **74.5%** | 78.9 | 90.0 | 62.5 | 66.7 | 50.0 | 62.5 | 100.0 | 0.34s† | 38/126/158 | error 1 · looped 1 | `cards/card_minicpmv47-1b-iq4xs.png` | on-GPU ≤12B |
+| MiniCPM5-2B | 2026 | MiniCPM5-2B-Q8_0.gguf (2.68 GB) | Q8_0 | FP16 | 32,768 | not recorded | 32,768 | 4 | **82.1%** | 94.7 | 100.0 | 100.0 | 80.0 | 78.6 | 87.5 | 83.3 | 2.49s | 26/51/51 | looped 1 | `cards/card_minicpm5-2b-q8_0.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-IQ4_XS.gguf (0.64 GB) | IQ4_XS | q8_0 | 32,768 | 1,075 / 8,192 | 32,768 | 4 | **72.9%** | 73.7 | 90.0 | 62.5 | 66.7 | 50.0 | 62.5 | 100.0 | 0.27s† | 43/118/158 | error 1 · looped 1 · max_turns 1 | `cards/card_minicpmv47-1b-iq4xs-kvq8.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q5_K_M.gguf (0.75 GB) | Q5_K_M | q4_0 | 32,768 | 1,045 / 8,192 | 32,768 | 4 | **72.7%** | 71.9 | 100.0 | 62.5 | 50.0 | 42.9 | 75.0 | 100.0 | 1.87s | 38/97/106 | error 1 | `cards/card_minicpm-v-4.7-1b-q5km-kvq4.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q4_K_S.gguf (0.65 GB) | Q4_K_S | q4_0 | 32,768 | 979 / 8,192 | 32,768 | 4 | **72.4%** | 71.9 | 90.0 | 62.5 | 66.7 | 50.0 | 62.5 | 100.0 | 0.24s† | 47/132/135 | error 1 · looped 3 | `cards/card_minicpmv47-1b-q4ks-kvq4.png` | on-GPU ≤12B |
@@ -257,6 +257,7 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q5_K_S.gguf (0.74 GB) | Q5_K_S | q4_0 | 32,768 | 1,035 / 8,192 | 32,768 | 4 | **64.3%** | 68.4 | 70.0 | 62.5 | 50.0 | 42.9 | 62.5 | 83.3 | 0.20s† | 32/69/121 | error 1 · looped 1 | `cards/card_minicpmv47-1b-q5ks-kvq4.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q5_K_S.gguf (0.74 GB) | Q5_K_S | FP16 | 32,768 | 1,275 / 8,192 | 32,768 | 4 | **63.1%** | 70.2 | 70.0 | 62.5 | 50.0 | 42.9 | 62.5 | 66.7 | 0.34s† | 40/122/122 | error 1 · looped 1 · max_turns 1 | `cards/card_minicpmv47-1b-q5ks.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-IQ3_M.gguf (0.56 GB) | IQ3_M | q8_0 | 32,768 | 1,027 / 8,192 | 32,768 | 4 | **62.9%** | 63.2 | 60.0 | 62.5 | 66.7 | 42.9 | 62.5 | 83.3 | 2.03s | 54/115/156 | error 1 · looped 1 | `cards/card_minicpmv47-1b-iq3m-kvq8.png` | on-GPU ≤12B |
+| MiniCPM-V 4.7 1B | 2026 | MiniCPM-V-4_7-1B-IQ4_XS.gguf (0.64 GB) | IQ4_XS | FP16 | 32,768 | not recorded | 32,768 | 4 | **62.8%** | 87.7 | 70.0 | 71.4 | 30.0 | 64.3 | 62.5 | 100.0 | 0.34s† | 38/126/158 | none | `cards/card_minicpmv47-1b-iq4xs.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q4_K_M.gguf (0.67 GB) | Q4_K_M | FP16 | 32,768 | 1,239 / 8,192 | 32,768 | 4 | **61.8%** | 56.1 | 70.0 | 62.5 | 50.0 | 42.9 | 75.0 | 83.3 | 0.26s† | 38/104/137 | error 1 · looped 3 | `cards/card_minicpmv47-1b-q4km.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q4_K_M.gguf (0.67 GB) | Q4_K_M | q8_0 | 32,768 | 1,095 / 8,192 | 32,768 | 4 | **61.6%** | 59.6 | 70.0 | 62.5 | 50.0 | 42.9 | 62.5 | 83.3 | 0.21s† | 39/88/137 | error 1 · looped 2 | `cards/card_minicpm-v-4.7-1b-q4km-kvq8.png` | on-GPU ≤12B |
 | MiniCPM-V 4.7 1B | Oct 12 2026 | MiniCPM-V-4_7-1B-Q4_1.gguf (0.69 GB) | Q4_1 | FP16 | 32,768 | 1,245 / 8,192 | 32,768 | 4 | **61.5%** | 57.9 | 70.0 | 62.5 | 50.0 | 42.9 | 50.0 | 100.0 | 0.37s† | 86/147/177 | error 1 · looped 8 | `cards/card_minicpmv47-1b-q41.png` | on-GPU ≤12B |
@@ -278,26 +279,100 @@ All runs on a single PVE GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temp 0, 71 tasks
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Qwen3.5-9B | Feb–Mar 2026 | Qwen3.5-9B-Q4_K_M.gguf (5.68 GB) | Q4_K_M | FP16 | 32,768 | 6,527 / 8,192 | 32,768 | 4 | **86.7%** | 89.5 | 90.0 | 87.5 | 100.0 | 57.1 | 75.0 | 100.0 | 6.55s | 10/26/29 | error 1 | `cards/card_qwen35-9b-q4km.png` | on-GPU ≤12B |
+| Qwen3.5-9B | Feb–Mar 2026 | Qwen3.5-9B-Q4_K_M.gguf (5.68 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **81.8%** | 94.7 | 80.0 | 100.0 | 90.0 | 71.4 | 75.0 | 100.0 | 6.55s | 10/26/29 | none | `cards/card_qwen35-9b-q4km.png` | on-GPU ≤12B |
 
 ### LFM2.5-8B-A1B
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| LFM2.5-8B-A1B | May 28 2026 | LFM2.5-8B-A1B-UD-Q4_K_M.gguf (5.32 GB) | UD-Q4_K_M | FP16 | 32,768 | 5,657 / 8,192 | 32,768 | 4 | **56.1%** | 84.2 | 50.0 | 25.0 | 100.0 | 0.0 | 12.5 | 83.3 | 2.34s | 0/1/14 | empty_response 29 · error 1 | `cards/card_lfm25-8b-a1b-udq4km.png` | on-GPU ≤12B |
+| LFM2.5-8B-A1B | May 28 2026 | LFM2.5-8B-A1B-UD-Q4_K_M.gguf (5.32 GB) | UD-Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **52.8%** | 78.9 | 50.0 | 71.4 | 30.0 | 35.7 | 50.0 | 66.7 | 2.34s | 0/1/14 | none | `cards/card_lfm25-8b-a1b-udq4km.png` | on-GPU ≤12B |
 
 ### LFM2.5-1.2B
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| LFM2.5-1.2B | Jan 2026 | LFM2.5-1.2B-Instruct-Q8_0.gguf (1.25 GB) | Q8_0 | FP16 | 32,768 | 1,781 / 8,192 | 32,768 | 4 | **65.2%** | 63.2 | 70.0 | 87.5 | 50.0 | 42.9 | 50.0 | 83.3 | 0.30s† | 44/125/194 | error 1 | `cards/card_lfm25-1.2b-q8_0.png` | on-GPU ≤12B |
 | LFM2.5-1.2B | Jan 2026 | LFM2.5-1.2B-Instruct-Q4_K_M.gguf (0.73 GB) | Q4_K_M | FP16 | 32,768 | 1,289 / 8,192 | 32,768 | 4 | **63.5%** | 57.9 | 50.0 | 87.5 | 66.7 | 42.9 | 62.5 | 83.3 | 0.97s | 72/176/210 | error 1 | `cards/card_lfm25-1.2b-q4km.png` | on-GPU ≤12B |
+| LFM2.5-1.2B | Jan 2026 | LFM2.5-1.2B-Instruct-Q8_0.gguf (1.25 GB) | Q8_0 | FP16 | 32,768 | not recorded | 32,768 | 4 | **54.2%** | 57.9 | 70.0 | 85.7 | 30.0 | 42.9 | 50.0 | 100.0 | 0.30s† | 44/125/194 | none | `cards/card_lfm25-1.2b-q8_0.png` | on-GPU ≤12B |
 
 ### LFM2.5-24B-A2B (offload)
 
 | Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | LFM2.5-24B-A2B | Oct 2026 | LFM2.5-24B-A2B-UD-Q4_K_XL.gguf (14.88 GB) | UD-Q4_K_XL | FP16 | 8,192 | 1,293 / 8,192 | 8,192 | 1 | **59.2%** | 84.2 | 70.0 | 0.0 | 100.0 | 21.4 | 12.5 | 100.0 | 11.44s | 0/0/0 | empty_response 21 · error 5 · looped 1 · max_turns 1 | `cards/card_lfm25-24b-a2b-udq4xl.png` | offload |
+
+### gemma-e4b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gemma 3n E4B | Jun 2025 | gemma-3n-E4B-it-Q4_K_M.gguf (4.54 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **52.4%** | 26.3 | 80.0 | 85.7 | 90.0 | 57.1 | 75.0 | 16.7 | 5.42s | 13/13/13 | none | `cards/card_gemma-e4b-q4_K_M.png` | on-GPU ≤12B |
+
+### gemma4-e4b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gemma 4 E4B | 2026 | google_gemma-4-E4B-it-Q4_K_M.gguf (5.41 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **86.3%** | 100.0 | 100.0 | 100.0 | 100.0 | 64.3 | 87.5 | 83.3 | 4.78s | 14/25/25 | none | `cards/card_gemma4-e4b-q4_K_M.png` | on-GPU ≤12B |
+
+### mimo-9b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| MiMo-V2.6-9B | 2026 | MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf (5.84 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **59.1%** | 63.2 | 80.0 | 71.4 | 90.0 | 57.1 | 62.5 | 0.0 | 5.00s | 13/14/13 | looped 4 · max_turns 2 · timeout 11 | `cards/card_mimo-9b-q4_K_M.png` | on-GPU ≤12B |
+
+### nemotron-3.5-bolt-e4b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Bolt E4B | Nov 2026 | Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf (6.18 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **84.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 87.5 | 100.0 | — | — | none | `cards/card_nemotron-3.5-bolt-e4b-q4-k-m-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf (6.18 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **83.6%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 87.5 | 100.0 | — | — | none | `cards/card_nemotron-3.5-bolt-e4b-q4-k-m-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf (6.18 GB) | Q4_K_M | q4_0 | 32,768 | not recorded | 32,768 | 4 | **83.2%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nemotron-3.5-bolt-e4b-q4-k-m-kvq4_0.png` | on-GPU ≤12B |
+
+### nvidia-nemotron-3.5-bolt-e4b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf (3.70 GB) | UD-IQ3_XXS | FP16 | 32,768 | not recorded | 32,768 | 4 | **86.6%** | 100.0 | 100.0 | 85.7 | 100.0 | 71.4 | 87.5 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf (7.26 GB) | UD-Q6_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **85.5%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 87.5 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf (3.70 GB) | UD-IQ3_XXS | q8_0 | 32,768 | not recorded | 32,768 | 4 | **85.3%** | 100.0 | 100.0 | 85.7 | 100.0 | 71.4 | 87.5 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf (8.19 GB) | UD-Q8_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **84.6%** | 100.0 | 100.0 | 71.4 | 100.0 | 78.6 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvq4_0.png` | offload |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf (3.74 GB) | UD-Q2_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **83.6%** | 100.0 | 100.0 | 85.7 | 100.0 | 64.3 | 75.0 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf (5.83 GB) | UD-Q5_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf (5.83 GB) | UD-Q5_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf (5.83 GB) | UD-Q5_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf (7.26 GB) | UD-Q6_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf (8.19 GB) | UD-Q8_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvf16.png` | offload |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf (8.19 GB) | UD-Q8_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **83.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvq8_0.png` | offload |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf (4.22 GB) | UD-Q3_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **83.2%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf (5.06 GB) | UD-Q4_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **83.2%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf (3.70 GB) | UD-IQ3_XXS | q4_0 | 32,768 | not recorded | 32,768 | 4 | **83.1%** | 100.0 | 90.0 | 85.7 | 100.0 | 71.4 | 75.0 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf (4.22 GB) | UD-Q3_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **82.6%** | 94.7 | 100.0 | 85.7 | 100.0 | 64.3 | 87.5 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf (5.06 GB) | UD-Q4_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **82.6%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf (3.74 GB) | UD-Q2_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.9%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf (7.26 GB) | UD-Q6_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **81.9%** | 94.7 | 100.0 | 71.4 | 100.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf (3.53 GB) | UD-IQ2_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **81.4%** | 100.0 | 100.0 | 71.4 | 90.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf (3.53 GB) | UD-IQ2_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.4%** | 100.0 | 100.0 | 71.4 | 90.0 | 64.3 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf (5.06 GB) | UD-Q4_K_XL | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.3%** | 100.0 | 100.0 | 71.4 | 100.0 | 64.3 | 75.0 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvq8_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf (4.22 GB) | UD-Q3_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **80.9%** | 94.7 | 100.0 | 71.4 | 100.0 | 64.3 | 87.5 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvf16.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf (3.53 GB) | UD-IQ2_M | q4_0 | 32,768 | not recorded | 32,768 | 4 | **80.7%** | 94.7 | 100.0 | 71.4 | 90.0 | 71.4 | 75.0 | 100.0 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvq4_0.png` | on-GPU ≤12B |
+| Bolt E4B | Nov 2026 | NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf (3.74 GB) | UD-Q2_K_XL | q4_0 | 32,768 | not recorded | 32,768 | 4 | **80.7%** | 100.0 | 90.0 | 71.4 | 100.0 | 64.3 | 75.0 | 83.3 | — | — | none | `cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvq4_0.png` | on-GPU ≤12B |
+
+### ornith-9b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ornith-1.5-9B | 2026 | Ornith-1.5-9B-Q4_K_M.gguf (5.78 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **76.8%** | 94.7 | 100.0 | 85.7 | 60.0 | 71.4 | 50.0 | 100.0 | 6.39s | 10/10/10 | none | `cards/card_ornith-9b-q4_K_M.png` | on-GPU ≤12B |
+
+### other
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Qwen3.5-4B | 2026 | Qwen3.5-4B-Q4_K_M.gguf (2.74 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **82.4%** | 94.7 | 90.0 | 100.0 | 90.0 | 71.4 | 75.0 | 100.0 | 4.08s | 16/27/27 | max_turns 1 | `cards/card_qwen3.5-4b-q4_K_M.png` | on-GPU ≤12B |
+| LFM2.5-2.6B | 2026 | LFM2.5-2.6B-Q8_0.gguf (2.87 GB) | Q8_0 | FP16 | 32,768 | not recorded | 32,768 | 4 | **58.9%** | 78.9 | 70.0 | 85.7 | 30.0 | 50.0 | 25.0 | 83.3 | 2.53s | 26/44/44 | looped 4 | `cards/card_lfm2.5-2.6b-q8_0.png` | on-GPU ≤12B |
+
+### sharp-spark-4b
+
+| Model | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Sharp-Spark-4B | — | Sharp-Spark-X2.5-4B-Q4_K_XL.gguf (2.68 GB) | Q4_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **68.4%** | 63.2 | 100.0 | 71.4 | 90.0 | 64.3 | 87.5 | 66.7 | 4.04s | 17/17/17 | none | `cards/card_sharp-spark-4b-q4_K_XL.png` | on-GPU ≤12B |
 
 ## Classifier leaderboard (SEPARATE — never merged into generative %)
 

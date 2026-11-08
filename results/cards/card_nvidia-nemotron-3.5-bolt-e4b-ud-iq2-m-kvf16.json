@@ -1,0 +1,46 @@
+[
+ {
+  "model": "nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvf16",
+  "display_name": "Bolt E4B",
+  "sub": "UD-IQ2_M \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 81.4,
+  "suites": {
+   "adversarial": 0.75,
+   "agent_chains": 1.0,
+   "coding": 0.9,
+   "instruction": 0.643,
+   "realworld": 0.3,
+   "structured": 1.0,
+   "tooluse": 1.0,
+   "retrieval": 0.714
+  },
+  "n": 94,
+  "rank": "",
+  "ts": "20261107",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "Nov 2026",
+   "gguf_file": "NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf",
+   "gguf_size_bytes": 3531578560,
+   "quant": "UD-IQ2_M",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvf16_20261107T223110Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
+  }
+ }
+]

@@ -2,40 +2,45 @@
  {
   "model": "minicpmv47-1b-iq4xs",
   "display_name": "MiniCPM-V 4.7 1B",
-  "sub": "IQ4_XS openbmb \u00b7 KV f16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev \u00b7 text-only",
-  "overall_pct": 74.5,
+  "sub": "IQ4_XS \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 62.8,
   "suites": {
-   "tooluse": 0.789,
    "adversarial": 0.625,
    "agent_chains": 1.0,
-   "structured": 0.9,
-   "retrieval": 0.625,
-   "coding": 0.667,
-   "instruction": 0.5
+   "coding": 0.3,
+   "instruction": 0.643,
+   "realworld": 0.0,
+   "structured": 0.7,
+   "tooluse": 0.877,
+   "retrieval": 0.714
   },
-  "n": 71,
+  "n": 94,
   "rank": "",
-  "ts": "20261030",
+  "ts": "20261107",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia",
+  "failure_modes": {},
   "details": {
-   "release_date": "Oct 12 2026",
+   "release_date": "2026",
    "gguf_file": "MiniCPM-V-4_7-1B-IQ4_XS.gguf",
    "gguf_size_bytes": 638856128,
    "quant": "IQ4_XS",
    "kv_type": "FP16",
    "context_tokens": 32768,
-   "vram_used_mb": 1219,
    "vram_total_mb": 8192,
    "kv_pool_tokens": 32768,
    "max_subagents": 4,
-   "server_build": "0.8.0-dev (new primary)",
-   "category": "on-GPU \u226412B"
-  },
-  "failure_modes": {
-   "looped": 1,
-   "error": 1
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/minicpmv47-1b-iq4xs_20261107T213403Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
   }
  }
 ]

@@ -1,430 +1,2135 @@
 {
- "benchmark": "slm-gauntlet v0.3.1 (71 tasks: adversarial 8, agent_chains 6, coding 10, instruction 14, realworld 20, structured 10, tooluse 19)",
+ "benchmark": "slm-gauntlet 0.5.0 (94 tasks: adversarial 8, agent_chains 6, coding 10, instruction 14, realworld 20, structured 10, tooluse 19)",
  "hardware": "8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp",
  "settings": "temperature 0, seed 1, thinking disabled, pass@1",
- "weights": "7-suite weights (tool .30 / structured .15 / retrieval .15 / coding .10 / instruction .10 / adversarial .10 / chains .10), 71 tasks",
+ "weights": "CLI 8-suite weights (tooluse 0.26 / structured 0.12 / retrieval 0.12 / coding 0.12 / instruction 0.10 / adversarial 0.08 / agent_chains 0.08 / realworld 0.12), 94 tasks",
  "methodology": "one row per model, best-scoring configuration; scores recomputed from each run log by scripts/leaderboard_check.py",
  "generated_by": "scripts/leaderboard_check.py --write",
  "models": [
   {
    "rank": 1,
-   "model": "spark-x2.6-4b-iq3m-bartowski",
-   "display_name": "Spark-X2.6 4B",
-   "configuration": "IQ3_M \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 91.55,
+   "model": "nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ3_XXS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.63,
    "suites": {
-    "adversarial": 1.0,
+    "adversarial": 0.875,
     "agent_chains": 1.0,
     "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 0.875,
+    "instruction": 0.7143,
+    "realworld": 0.35,
+    "retrieval": 0.8571,
     "structured": 1.0,
-    "tooluse": 0.9474
+    "tooluse": 1.0
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 62,
-   "card_png": "results/cards/card_spark-x2.6-4b-iq3m-bartowski.png",
-   "source_log": "results/spark-x2.6-4b-iq3m-bartowski_20261029T172423Z.json"
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 28,
+   "card_png": "results/cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16.png",
+   "source_log": "results/nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16_20261107T225053Z.json"
   },
   {
    "rank": 2,
    "model": "gemma4-e4b-q4_K_M",
-   "display_name": "Gemma 4 \u00b7 E4B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 90.5,
+   "display_name": "Gemma 4 E4B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.3,
    "suites": {
     "adversarial": 0.875,
     "agent_chains": 0.8333,
     "coding": 1.0,
-    "instruction": 0.5,
+    "instruction": 0.6429,
+    "realworld": 0.35,
     "retrieval": 1.0,
     "structured": 1.0,
-    "tooluse": 0.9474
+    "tooluse": 1.0
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
    "card_png": "results/cards/card_gemma4-e4b-q4_K_M.png",
-   "source_log": "results/gemma4-e4b-q4_K_M_20260926T121532Z.json"
+   "source_log": "results/gemma4-e4b-q4_K_M_20261107T190436Z.json"
   },
   {
    "rank": 3,
-   "model": "minicpm5-2b-q8_0",
-   "display_name": "MiniCPM-V 5 \u00b7 2B",
-   "configuration": "Q8_0",
-   "overall_pct": 89.98,
-   "suites": {
-    "adversarial": 0.875,
-    "agent_chains": 0.8333,
-    "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 1.0,
-    "structured": 1.0,
-    "tooluse": 0.9298
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 2,
-   "card_png": "results/cards/card_minicpm5-2b-q8_0.png",
-   "source_log": "results/minicpm5-2b-q8_0_20260926T125808Z.json"
-  },
-  {
-   "rank": 4,
-   "model": "bolt-e4b-udiq3xxs-kvq4",
-   "display_name": "Bolt E4B",
-   "configuration": "UD-IQ3_XXS \u00b7 KV q4_0 \u00b7 32K ctx",
-   "overall_pct": 89.14,
-   "suites": {
-    "adversarial": 0.875,
-    "agent_chains": 1.0,
-    "coding": 1.0,
-    "instruction": 0.5714,
-    "retrieval": 0.75,
-    "structured": 1.0,
-    "tooluse": 0.9474
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 25,
-   "card_png": "results/cards/card_bolt-e4b-udiq3xxs-kvq4.png",
-   "source_log": "results/bolt-e4b-udiq3xxs-kvq4_20261029T090753Z.json"
-  },
-  {
-   "rank": 5,
-   "model": "dory-1.0-4b-q5km-kvq8",
-   "display_name": "Dory 1.0 4B",
-   "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
-   "overall_pct": 88.72,
-   "suites": {
-    "adversarial": 0.875,
-    "agent_chains": 1.0,
-    "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 0.875,
-    "structured": 1.0,
-    "tooluse": 0.8947
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 2,
-   "card_png": "results/cards/card_dory-1.0-4b-q5km-kvq8.png",
-   "source_log": "results/dory-1.0-4b-q5km-kvq8_20261028T215952Z.json"
-  },
-  {
-   "rank": 6,
-   "model": "qwen35-9b-q4km",
-   "display_name": "Qwen3.5-9B",
+   "model": "qwen3.5-4b-q4_K_M",
+   "display_name": "Qwen3.5-4B",
    "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 86.68,
+   "overall_pct": 82.37,
    "suites": {
     "adversarial": 0.75,
     "agent_chains": 1.0,
-    "coding": 1.0,
-    "instruction": 0.5714,
-    "retrieval": 0.875,
+    "coding": 0.9,
+    "instruction": 0.7143,
+    "realworld": 0.25,
+    "retrieval": 1.0,
     "structured": 0.9,
-    "tooluse": 0.8947
+    "tooluse": 0.9474
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_qwen3.5-4b-q4_K_M.png",
+   "source_log": "results/qwen3.5-4b-q4_K_M_20261108T042702Z.json"
+  },
+  {
+   "rank": 4,
+   "model": "minicpm5-2b-q8_0",
+   "display_name": "MiniCPM5-2B",
+   "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 82.16,
+   "suites": {
+    "adversarial": 0.875,
+    "agent_chains": 0.8333,
+    "coding": 0.8,
+    "instruction": 0.7857,
+    "realworld": 0.2,
+    "retrieval": 1.0,
+    "structured": 1.0,
+    "tooluse": 0.9474
+   },
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_minicpm5-2b-q8_0.png",
+   "source_log": "results/minicpm5-2b-q8_0_20261108T025616Z.json"
+  },
+  {
+   "rank": 5,
+   "model": "qwen35-9b-q4km",
+   "display_name": "Qwen3.5-9B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.77,
+   "suites": {
+    "adversarial": 0.75,
+    "agent_chains": 1.0,
+    "coding": 0.9,
+    "instruction": 0.7143,
+    "realworld": 0.3,
+    "retrieval": 1.0,
+    "structured": 0.8,
+    "tooluse": 0.9474
+   },
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
    "card_png": "results/cards/card_qwen35-9b-q4km.png",
-   "source_log": "results/qwen35-9b-q4km_20261028T093120Z.json"
+   "source_log": "results/qwen35-9b-q4km_20261108T030711Z.json"
+  },
+  {
+   "rank": 6,
+   "model": "spark-x2.6-4b-iq3m-bartowski",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "IQ3_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.0,
+   "suites": {
+    "adversarial": 1.0,
+    "agent_chains": 1.0,
+    "coding": 0.8,
+    "instruction": 0.6429,
+    "realworld": 0.2,
+    "retrieval": 0.7143,
+    "structured": 1.0,
+    "tooluse": 1.0
+   },
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_spark-x2.6-4b-iq3m-bartowski.png",
+   "source_log": "results/spark-x2.6-4b-iq3m-bartowski_20261108T074914Z.json"
   },
   {
    "rank": 7,
-   "model": "lfm3-1.7b-iq4nl-bartowski",
-   "display_name": "LFM3 1.7B",
-   "configuration": "IQ4_NL \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 86.35,
+   "model": "ornith-9b-q4_K_M",
+   "display_name": "Ornith-1.5-9B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 76.86,
    "suites": {
-    "adversarial": 0.875,
+    "adversarial": 0.5,
     "agent_chains": 1.0,
-    "coding": 1.0,
-    "instruction": 0.5714,
-    "retrieval": 0.875,
-    "structured": 0.9,
-    "tooluse": 0.8421
+    "coding": 0.6,
+    "instruction": 0.7143,
+    "realworld": 0.3,
+    "retrieval": 0.8571,
+    "structured": 1.0,
+    "tooluse": 0.9474
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 60,
-   "card_png": "results/cards/card_lfm3-1.7b-iq4nl-bartowski.png",
-   "source_log": "results/lfm3-1.7b-iq4nl-bartowski_20261030T131930Z.json"
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_ornith-9b-q4_K_M.png",
+   "source_log": "results/ornith-9b-q4_K_M_20261108T032018Z.json"
   },
   {
    "rank": 8,
    "model": "spark-x2.6-1.7b-q8_0",
    "display_name": "Spark-X2.6-1.7B",
    "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 82.33,
+   "overall_pct": 75.32,
    "suites": {
     "adversarial": 0.875,
-    "agent_chains": 0.8333,
-    "coding": 0.6667,
+    "agent_chains": 1.0,
+    "coding": 0.4,
     "instruction": 0.5714,
-    "retrieval": 0.875,
+    "realworld": 0.25,
+    "retrieval": 1.0,
     "structured": 1.0,
-    "tooluse": 0.8246
+    "tooluse": 0.8772
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 21,
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
    "card_png": "results/cards/card_spark-x2.6-1.7b-q8_0.png",
-   "source_log": "results/spark-x2.6-1.7b-q8_0_20261028T071728Z.json"
+   "source_log": "results/spark-x2.6-1.7b-q8_0_20261108T080140Z.json"
   },
   {
    "rank": 9,
-   "model": "k2horizon-7b-q4_K_M",
-   "display_name": "K2-Horizon \u00b7 7B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 81.1,
+   "model": "sharp-spark-4b-q4_K_XL",
+   "display_name": "Sharp-Spark-4B",
+   "configuration": "Q4_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 68.35,
    "suites": {
-    "adversarial": 0.625,
-    "agent_chains": 1.0,
-    "coding": 1.0,
-    "instruction": 0.3571,
-    "retrieval": 0.875,
+    "adversarial": 0.875,
+    "agent_chains": 0.6667,
+    "coding": 0.9,
+    "instruction": 0.6429,
+    "realworld": 0.15,
+    "retrieval": 0.7143,
     "structured": 1.0,
-    "tooluse": 0.7719
+    "tooluse": 0.6316
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
-   "card_png": "results/cards/card_k2horizon-7b-q4_K_M.png",
-   "source_log": "results/k2horizon-7b-q4_K_M_20260927T063302Z.json"
+   "card_png": "results/cards/card_sharp-spark-4b-q4_K_XL.png",
+   "source_log": "results/sharp-spark-4b-q4_K_XL_20261107T220512Z.json"
   },
   {
    "rank": 10,
-   "model": "ornith-9b-q4_K_M",
-   "display_name": "Ornith 1.5 \u00b7 9B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 77.76,
+   "model": "minicpmv47-1b-iq4xs",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 62.81,
    "suites": {
     "adversarial": 0.625,
     "agent_chains": 1.0,
-    "coding": 0.8333,
-    "instruction": 0.5714,
-    "retrieval": 0.375,
-    "structured": 1.0,
-    "tooluse": 0.8947
+    "coding": 0.3,
+    "instruction": 0.6429,
+    "realworld": 0.0,
+    "retrieval": 0.7143,
+    "structured": 0.7,
+    "tooluse": 0.8772
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
-   "card_png": "results/cards/card_ornith-9b-q4_K_M.png",
-   "source_log": "results/ornith-9b-q4_K_M_20260926T120504Z.json"
+   "card_png": "results/cards/card_minicpmv47-1b-iq4xs.png",
+   "source_log": "results/minicpmv47-1b-iq4xs_20261107T213403Z.json"
   },
   {
    "rank": 11,
    "model": "mimo-9b-q4_K_M",
-   "display_name": "MiMo V2.6 \u00b7 9B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 74.89,
+   "display_name": "MiMo-V2.6-9B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 59.11,
    "suites": {
-    "adversarial": 0.875,
-    "agent_chains": 1.0,
-    "coding": 0.8333,
-    "instruction": 0.5,
-    "retrieval": 0.375,
-    "structured": 0.9,
-    "tooluse": 0.7895
+    "adversarial": 0.625,
+    "agent_chains": 0.0,
+    "coding": 0.9,
+    "instruction": 0.5714,
+    "realworld": 0.25,
+    "retrieval": 0.7143,
+    "structured": 0.8,
+    "tooluse": 0.6316
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
    "card_png": "results/cards/card_mimo-9b-q4_K_M.png",
-   "source_log": "results/mimo-9b-q4_K_M_20260926T123256Z.json"
+   "source_log": "results/mimo-9b-q4_K_M_20261107T213109Z.json"
   },
   {
    "rank": 12,
-   "model": "minicpmv47-1b-iq4xs",
-   "display_name": "MiniCPM-V 4.7 1B",
-   "configuration": "IQ4_XS \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 74.48,
+   "model": "lfm2.5-2.6b-q8_0",
+   "display_name": "LFM2.5-2.6B",
+   "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 58.88,
    "suites": {
-    "adversarial": 0.625,
-    "agent_chains": 1.0,
-    "coding": 0.6667,
+    "adversarial": 0.25,
+    "agent_chains": 0.8333,
+    "coding": 0.3,
     "instruction": 0.5,
-    "retrieval": 0.625,
-    "structured": 0.9,
+    "realworld": 0.2,
+    "retrieval": 0.8571,
+    "structured": 0.7,
     "tooluse": 0.7895
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 42,
-   "card_png": "results/cards/card_minicpmv47-1b-iq4xs.png",
-   "source_log": "results/minicpmv47-1b-iq4xs_20261030T231628Z.json"
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_lfm2.5-2.6b-q8_0.png",
+   "source_log": "results/lfm2.5-2.6b-q8_0_20261107T214946Z.json"
   },
   {
    "rank": 13,
-   "model": "gemma4-12b-ud-q2_K_XL",
-   "display_name": "Gemma 4 \u00b7 12B",
-   "configuration": "UD-Q2_K_XL",
-   "overall_pct": 72.57,
-   "suites": {
-    "adversarial": 0.875,
-    "agent_chains": 0.6667,
-    "coding": 0.8333,
-    "instruction": 0.5714,
-    "retrieval": 0.5,
-    "structured": 0.9,
-    "tooluse": 0.7368
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 2,
-   "card_png": "results/cards/card_gemma4-12b-ud-q2_K_XL.png",
-   "source_log": "results/gemma4-12b-ud-q2_K_XL_20260926T105720Z.json"
-  },
-  {
-   "rank": 14,
-   "model": "lfm2.5-2.6b-q8_0",
-   "display_name": "LFM 2.5 \u00b7 2.6B",
-   "configuration": "Q8_0",
-   "overall_pct": 70.94,
-   "suites": {
-    "adversarial": 0.375,
-    "agent_chains": 0.8333,
-    "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 0.75,
-    "structured": 0.7,
-    "tooluse": 0.7368
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 2,
-   "card_png": "results/cards/card_lfm2.5-2.6b-q8_0.png",
-   "source_log": "results/lfm2.5-2.6b-q8_0_20260926T113827Z.json"
-  },
-  {
-   "rank": 15,
-   "model": "qwen3.5-4b-q4_K_M",
-   "display_name": "Qwen 3.5 \u00b7 4B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 67.94,
-   "suites": {
-    "adversarial": 0.625,
-    "agent_chains": 0.6667,
-    "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 0.5,
-    "structured": 0.8,
-    "tooluse": 0.6842
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 1,
-   "card_png": "results/cards/card_qwen3.5-4b-q4_K_M.png",
-   "source_log": "results/qwen3.5-4b-q4_K_M_20260926T095817Z.json"
-  },
-  {
-   "rank": 16,
-   "model": "sharp-spark-4b-q4_K_XL",
-   "display_name": "Sharp-Spark X2.5 \u00b7 4B",
-   "configuration": "Q4_K_XL",
-   "overall_pct": 66.69,
-   "suites": {
-    "adversarial": 0.5,
-    "agent_chains": 0.6667,
-    "coding": 1.0,
-    "instruction": 0.5,
-    "retrieval": 0.5,
-    "structured": 0.8,
-    "tooluse": 0.6842
-   },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 1,
-   "card_png": "results/cards/card_sharp-spark-4b-q4_K_XL.png",
-   "source_log": "results/sharp-spark-4b-q4_K_XL_20260926T100137Z.json"
-  },
-  {
-   "rank": 17,
    "model": "lfm25-1.2b-q8_0",
    "display_name": "LFM2.5-1.2B",
    "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 65.19,
+   "overall_pct": 54.22,
    "suites": {
     "adversarial": 0.5,
-    "agent_chains": 0.8333,
-    "coding": 0.5,
+    "agent_chains": 1.0,
+    "coding": 0.3,
     "instruction": 0.4286,
-    "retrieval": 0.875,
+    "realworld": 0.05,
+    "retrieval": 0.8571,
     "structured": 0.7,
-    "tooluse": 0.6316
+    "tooluse": 0.5789
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
-   "variants_scored": 2,
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
    "card_png": "results/cards/card_lfm25-1.2b-q8_0.png",
-   "source_log": "results/lfm25-1.2b-q8_0_20261028T091215Z.json"
+   "source_log": "results/lfm25-1.2b-q8_0_20261107T220705Z.json"
   },
   {
-   "rank": 18,
+   "rank": 14,
    "model": "lfm25-8b-a1b-udq4km",
    "display_name": "LFM2.5-8B-A1B",
    "configuration": "UD-Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
-   "overall_pct": 56.1,
+   "overall_pct": 52.8,
    "suites": {
-    "adversarial": 0.125,
-    "agent_chains": 0.8333,
-    "coding": 1.0,
-    "instruction": 0.0,
-    "retrieval": 0.25,
+    "adversarial": 0.5,
+    "agent_chains": 0.6667,
+    "coding": 0.3,
+    "instruction": 0.3571,
+    "realworld": 0.1,
+    "retrieval": 0.7143,
     "structured": 0.5,
-    "tooluse": 0.8421
+    "tooluse": 0.7895
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
    "card_png": "results/cards/card_lfm25-8b-a1b-udq4km.png",
-   "source_log": "results/lfm25-8b-a1b-udq4km_20261028T084230Z.json"
+   "source_log": "results/lfm25-8b-a1b-udq4km_20261107T221543Z.json"
   },
   {
-   "rank": 19,
+   "rank": 15,
    "model": "gemma-e4b-q4_K_M",
-   "display_name": "Gemma 3n \u00b7 E4B",
-   "configuration": "Q4_K_M",
-   "overall_pct": 52.39,
+   "display_name": "Gemma 3n E4B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 52.38,
    "suites": {
-    "adversarial": 0.625,
+    "adversarial": 0.75,
     "agent_chains": 0.1667,
-    "coding": 0.8333,
-    "instruction": 0.5,
-    "retrieval": 0.75,
+    "coding": 0.9,
+    "instruction": 0.5714,
+    "realworld": 0.15,
+    "retrieval": 0.8571,
     "structured": 0.8,
     "tooluse": 0.2632
    },
-   "tasks": 71,
-   "scorer": "v0.3.1",
+   "tasks": 94,
+   "scorer": "0.5.0",
    "variants_scored": 1,
    "card_png": "results/cards/card_gemma-e4b-q4_K_M.png",
-   "source_log": "results/gemma-e4b-q4_K_M_20260926T114606Z.json"
+   "source_log": "results/gemma-e4b-q4_K_M_20261107T222442Z.json"
   }
  ],
- "offload": [
+ "offload": [],
+ "legacy_not_comparable": [
+  {
+   "model": "bolt-e4b-udq4xl-kvq8",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q4_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 89.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq4xl-kvq4",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q4_K_XL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 88.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq5xl-kvq4",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q5_K_XL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 88.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq5xl-kvq8",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q5_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 88.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq5xl",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q5_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 88.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq4xl",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q4_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq2xl-kvq8",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q2_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq2xl",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q2_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq3xl",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q3_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-q4km",
+   "display_name": "Bolt E4B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udiq2m",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ2_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq6xl-kvq4",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q6_K_XL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 86.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq6xl-kvq8",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q6_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq6xl",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q6_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq8xl",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "UD-Q8_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-q4km-kvq8",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udiq2m-kvq4",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ2_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 86.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udiq3xxs-kvq8",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ3_XXS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq3xl-kvq4",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q3_K_XL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 86.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq3xl-kvq8",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q3_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udiq3xxs",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ3_XXS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 85.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-q4km-kvq4",
+   "display_name": "Nemotron 3.5 Bolt E4B",
+   "configuration": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 85.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udq2xl-kvq4",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-Q2_K_XL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 85.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "bolt-e4b-udiq2m-kvq8",
+   "display_name": "Bolt E4B",
+   "configuration": "UD-IQ2_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 84.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "dory-1.0-4b-q5km-kvq8",
+   "display_name": "Dory 1.0 4B",
+   "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 88.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "dory-1.0-4b-q5km-kvq4",
+   "display_name": "Dory 1.0 4B",
+   "configuration": "Q5_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "gemma-e4b-q4_K_M",
+   "display_name": "Gemma 3n \u00b7 E4B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 52.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "gemma4-12b-ud-q2_K_XL",
+   "display_name": "Gemma 4 \u00b7 12B",
+   "configuration": "UD-Q2_K_XL",
+   "overall_pct": 72.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "gemma4-12b-iq3_XXS",
+   "display_name": "Gemma 4 \u00b7 12B",
+   "configuration": "IQ3_XXS",
+   "overall_pct": 68.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "gemma4-e4b-q4_K_M",
+   "display_name": "Gemma 4 \u00b7 E4B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 90.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "k2horizon-7b-q4_K_M",
+   "display_name": "K2-Horizon \u00b7 7B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 81.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm2.5-2.6b-q8_0",
+   "display_name": "LFM 2.5 \u00b7 2.6B",
+   "configuration": "Q8_0",
+   "overall_pct": 70.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm2.5-2.6b-q4_K_M",
+   "display_name": "LFM 2.5 \u00b7 2.6B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 69.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm25-1.2b-q4km",
+   "display_name": "LFM2.5-1.2B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 63.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
   {
    "model": "lfm25-24b-a2b-udq4xl",
    "display_name": "LFM2.5-24B-A2B",
    "configuration": "UD-Q4_K_XL \u00b7 KV FP16 \u00b7 8K ctx",
-   "overall_pct": 59.16,
+   "overall_pct": 59.2,
    "tasks": 71,
-   "scorer": "v0.3.1",
-   "source_log": "results/lfm25-24b-a2b-udq4xl_20261028T102450Z.json"
-  }
- ],
- "legacy_not_comparable": [
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4nl-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_NL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5km-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 85.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q40-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 84.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5km",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 84.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3m-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 84.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5ks-prithiv-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 84.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3ks-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 84.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3m-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 83.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6kl-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 83.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4km-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 83.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4nl-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_NL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 83.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q40-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 83.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5ks-prithiv",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 83.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4ks-prithiv-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 83.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4ks-prithiv-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6k-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6k",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 82.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4xs-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 82.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4ks-prithiv",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 82.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5ks-prithiv-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 82.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4km-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 82.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3m-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 82.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q5km-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6kl-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6ks-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4nl-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_NL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 82.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3kl-prithiv-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 81.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3km-prithiv",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6k-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 81.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q41-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_1 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3km-prithiv-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 81.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xxs-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XXS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 81.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q40-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 81.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6ks-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 80.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q8-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q8_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 80.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q8-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q8_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 80.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 80.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3ks-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 80.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3kl-prithiv",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 80.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q2k-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q2_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 80.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3kl-prithiv-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 80.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q41-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_1 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 80.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q41-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_1 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 80.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4xs-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 79.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3ks-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 79.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q4km",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 79.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xxs-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XXS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 79.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6kl-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 79.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xs-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 79.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q3km-prithiv-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 79.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q2k-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q2_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 78.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xs-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 78.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq4xs-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ4_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 78.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q6ks-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q6_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 78.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq2m-bartowski",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ2_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 76.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq2m-bartowski-kvq8",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ2_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 76.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-q2k-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "Q2_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 76.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xxs-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XXS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 76.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq3xs-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ3_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 73.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "lfm3-1.7b-iq2m-bartowski-kvq4",
+   "display_name": "LFM3 1.7B",
+   "configuration": "IQ2_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 63.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "mimo-9b-q4_K_M",
+   "display_name": "MiMo V2.6 \u00b7 9B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 74.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq4xs-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 72.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q5km-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 72.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q4ks-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 72.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q50",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 71.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq4xs-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 71.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q5km",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 71.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q40",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 69.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q6k-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q6_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 69.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q51-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_1 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 69.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq4nl-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_NL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 68.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q5km-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 68.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq4nl-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_NL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 68.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q40-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 68.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q6k-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q6_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 68.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q50-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 68.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q51",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_1 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 68.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q51-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_1 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 68.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q4ks",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 67.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q50-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 67.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q8-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q8_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 67.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q8_0",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 67.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q5ks-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 67.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q4ks-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 66.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q6k",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q6_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 66.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q8-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q8_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 66.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q41-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_1 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 66.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq4nl",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ4_NL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 65.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q4km-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 65.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q41-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_1 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 64.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q5ks-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 64.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q5ks",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q5_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 63.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3m-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 62.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q4km",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 61.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm-v-4.7-1b-q4km-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 61.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q41",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_1 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 61.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-q40-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "Q4_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 60.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3m",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 59.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3xs-kvq8",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 59.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3m-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 58.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3xs-kvq4",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 56.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpmv47-1b-iq3xs",
+   "display_name": "MiniCPM-V 4.7 1B",
+   "configuration": "IQ3_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 55.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm5-2b-q8_0",
+   "display_name": "MiniCPM-V 5 \u00b7 2B",
+   "configuration": "Q8_0",
+   "overall_pct": 90.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "minicpm5-2b-q4_K_M",
+   "display_name": "MiniCPM-V 5 \u00b7 2B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 88.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "ornith-9b-q4_K_M",
+   "display_name": "Ornith 1.5 \u00b7 9B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 77.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "qwen3.5-4b-q4_K_M",
+   "display_name": "Qwen 3.5 \u00b7 4B",
+   "configuration": "Q4_K_M",
+   "overall_pct": 67.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "sharp-spark-4b-q4_K_XL",
+   "display_name": "Sharp-Spark X2.5 \u00b7 4B",
+   "configuration": "Q4_K_XL",
+   "overall_pct": 66.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q6k-xhtoken",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q6_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q8-kvq4",
+   "display_name": "Spark-X2.6-1.7B",
+   "configuration": "Q8_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 81.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q5ks-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 79.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q8-kvq8",
+   "display_name": "Spark-X2.6-1.7B",
+   "configuration": "Q8_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 79.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4km-kvq4",
+   "display_name": "Spark-X2.6-1.7B",
+   "configuration": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 78.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q6k-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q6_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 78.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4km",
+   "display_name": "Spark-X2.6-1.7B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 78.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q5ks-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 78.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4km-kvq8",
+   "display_name": "Spark-X2.6-1.7B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 75.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3km-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 74.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q5ks-xhtoken",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q5_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 73.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4ks-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 72.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q6k-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q6_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 72.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3kl-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 71.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4ks-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 71.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3km-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 71.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q4ks-xhtoken",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q4_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 70.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3kl-xhtoken",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 68.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3kl-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 68.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-1.7b-q3km-xhtoken",
+   "display_name": "Spark-X2.6 1.7B",
+   "configuration": "Q3_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 68.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4kl-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 90.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3m-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 89.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5ks-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 89.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q8-kvq4",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q8_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 89.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4km-kvq8",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 89.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6ks-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 89.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6k-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 88.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5km-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4nl-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_NL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q41-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_1 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4kl-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4km-kvq4",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q4_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6k-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6k-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6kl-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3m-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q41-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_1 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4ks-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4ks-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3kl-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_L \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3kl-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q40-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_0 \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q40-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xs-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4nl-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_NL \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 87.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4nl-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_NL \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 87.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3kl-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4km",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 87.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6kl-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 86.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6ks-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6ks-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4xs-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 86.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4xs-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 86.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q41-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_1 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 86.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q6kl-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q6_K_L \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 85.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q8_0",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q8_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 85.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q40-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_0 \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 85.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5km-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 85.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q4kl-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q4_K_L \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 85.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5ks-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 85.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3km-xhtoken-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 85.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q8-kvq8",
+   "display_name": "Spark-X2.6-4B",
+   "configuration": "Q8_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 85.2,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5km-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 85.1,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq4xs-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ4_XS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 85.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3km-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 84.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q5ks-xhtoken",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q5_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 84.3,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xs-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 83.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xs-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 82.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xxs-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XXS \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 81.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xxs-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XXS \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 81.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3km-xhtoken-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 80.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3ks-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_S \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 79.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3ks-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_S \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 79.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q3ks-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q3_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 79.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq3xxs-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ3_XXS \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 78.4,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq2m-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ2_M \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 73.5,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq2m-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ2_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 71.9,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-iq2m-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "IQ2_M \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 71.8,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q2k-bartowski-kvq4",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q2_K \u00b7 KV q4_0 \u00b7 32K ctx",
+   "overall_pct": 57.7,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q2k-bartowski-kvq8",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q2_K \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 57.6,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
+  {
+   "model": "spark-x2.6-4b-q2k-bartowski",
+   "display_name": "Spark-X2.6 4B",
+   "configuration": "Q2_K \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 53.0,
+   "tasks": 71,
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
+  },
   {
    "model": "spark-x2.6-4b-q4ks-xhtoken-kvq4",
    "display_name": "Spark-X2.6 4B",
    "configuration": "Q4_K_S \u00b7 KV q4_0 \u00b7 32K ctx",
    "overall_pct": 0.0,
    "tasks": 71,
-   "reason": "transport failure: 79 of 79 attempts returned no tokens at all (100%) \u2014 the model was never reached"
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
   },
   {
    "model": "bonsai2-ptq1_0",
@@ -432,7 +2137,7 @@
    "configuration": "PTQ1_0",
    "overall_pct": 86.2,
    "tasks": 65,
-   "reason": "65 tasks (current methodology is 71)"
+   "reason": "scorer v0.3.1 (pre-0.5.0)"
   }
  ]
 }
