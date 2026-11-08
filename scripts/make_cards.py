@@ -172,6 +172,8 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'{offload_html}</div>'
         )
     verdict = m.get("verdict", "")
+    _n_tasks = m.get("n") or 71
+    _method = (m.get("details") or {}).get("methodology") or "0.5.0"
     # Deterministic verdict builder: same inputs -> same paragraph, no LLM needed.
     # Existing curated verdicts are kept; models without one get a computed template.
     if not verdict:
@@ -184,7 +186,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
                   "coding": "bug-fixing", "instruction": "stacked-constraint instruction following"}
         strong = ", ".join(bnames[k] for k in best[:2])
         weak = bnames.get(order2[0], "instruction following")
-        verdict = (f"Scores {m['overall_pct']:.1f}% across 71 tasks. Strongest at {strong}; "
+        verdict = (f"Scores {m['overall_pct']:.1f}% across {_n_tasks} tasks. Strongest at {strong}; "
                    f"{weak} is the weak suite. Zero-offload on {dev_name}" + (f" {dev_mem}" if dev_mem else "") + ".")
     # long verdicts shrink to fit so nothing clips at the bottom edge
     if len(verdict) <= 110:
@@ -251,7 +253,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'{details_html}'
         f'{failmodes_html}'
         f'<div class={vcls}>{verdict}</div>'
-        f'<div class=foot><span>slm-gauntlet v0.3.1 · seed 1 · temp 0 · 71 tasks</span>'
+        f'<div class=foot><span>slm-gauntlet v{_method} · seed 1 · temp 0 · {_n_tasks} tasks</span>'
         f'<span>{dev_name}{(" " + dev_mem) if dev_mem else ""} · {str(m.get("ts",""))[:8]}</span></div>'
         f'</div></body></html>'
     )
