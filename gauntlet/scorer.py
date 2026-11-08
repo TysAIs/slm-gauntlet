@@ -237,6 +237,74 @@ def python_exec_check(output: str, tests: str, timeout: float = 10.0) -> ScoreRe
     return ScoreResult(False, failed=[f"python_exec failed: {detail}"])
 
 
+def line_value_check(output: str, label: str, equals: float, tol: float = 0.005) -> ScoreResult:
+    """The last number on the line that names `label` must equal `equals`.
+
+    Measured on the 1070 Ti probe: a model answered
+        OVERTIME: 6 * 33.00 = $198.00
+    and a "first number after the label" regex read 6 — the grader called a correct
+    answer wrong. A model may also answer "OVERTIME: $198" or "OVERTIME: 198.00",
+    so the parse is: find the labelled line(s), take the LAST number on the last one
+    (an answer is written at the end of its own sentence), and compare numerically.
+    """
+    lines = [
+        ln for ln in output.splitlines()
+        if re.search(rf"(?<![A-Za-z0-9_]){re.escape(label)}(?![A-Za-z0-9_])", ln, re.I)
+    ]
+    if not lines:
+        return ScoreResult(False, checks=[{"check": "line_value", "ok": False, "label": label,
+                                           "detail": "label not found"}],
+                           failed=[f"line_value: no line names {label!r}"])
+    nums = re.findall(r"-?[\d,]+\.?\d*", lines[-1])
+    if not nums:
+        return ScoreResult(False, checks=[{"check": "line_value", "ok": False, "label": label,
+                                           "detail": "no number on the line"}],
+                           failed=[f"line_value: no number on the {label!r} line"])
+    try:
+        got = float(nums[-1].replace(",", ""))
+    except ValueError:
+        return ScoreResult(False, failed=[f"line_value: unparsable number {nums[-1]!r}"])
+    ok = abs(got - float(equals)) <= tol
+    return ScoreResult(
+        ok,
+        checks=[{"check": "line_value", "ok": ok, "label": label, "got": got,
+                 "expected": float(equals), "line": lines[-1].strip()[:200]}],
+        failed=[] if ok else [f"line_value: {label} is {got}, expected {float(equals)}"],
+    )
+
+
+def line_sum_check(output: str, of: list[str], label: str, tol: float = 0.02) -> ScoreResult:
+    """The number on the `label` line must equal the sum of the numbers on the `of`
+    lines — the model's own figures.
+
+    This grades internal consistency of an answer, which is what the "grand total"
+    line of a quote is: a model whose per-order arithmetic is wrong but whose total
+    adds up its own numbers has still done the total correctly. Measured on the
+    0.5.1 probe: the strict "total equals 63.50" unit was passed by 0 of 43
+    configurations (the same 3-component arithmetic nobody gets right), while the
+    consistency version is passed by 32 of 43 — a real, discriminating sub-answer.
+    """
+    vals: list[float] = []
+    for lab in of:
+        lines = [
+            ln for ln in output.splitlines()
+            if re.search(rf"(?<![A-Za-z0-9_]){re.escape(lab)}(?![A-Za-z0-9_])", ln, re.I)
+        ]
+        if not lines:
+            return ScoreResult(False, failed=[f"line_sum: no line names {lab!r}"])
+        nums = re.findall(r"-?[\d,]+\.?\d*", lines[-1])
+        if not nums:
+            return ScoreResult(False, failed=[f"line_sum: no number on the {lab!r} line"])
+        try:
+            vals.append(float(nums[-1].replace(",", "")))
+        except ValueError:
+            return ScoreResult(False, failed=[f"line_sum: unparsable number {nums[-1]!r}"])
+    target = line_value_check(output, label, sum(vals), tol=tol)
+    target.checks = [{"check": "line_sum", "ok": target.passed, "label": label,
+                      "parts": vals, "expected_sum": round(sum(vals), 4)}] + target.checks
+    return target
+
+
 class Scorer:
     """Runs a task's assertion list against model output.
 
@@ -269,7 +337,11 @@ class Scorer:
                 "regex": regex_check,
                 "json_schema": json_schema_check,
             }
-            if kind == "predicate":
+            if kind == "line_value":
+                r = line_value_check(output, a["label"], float(a["equals"]), float(a.get("tol", 0.005)))
+            elif kind == "line_sum":
+                r = line_sum_check(output, list(a["of"]), a["label"], float(a.get("tol", 0.02)))
+            elif kind == "predicate":
                 # predicates evaluate against the RAW output text — no JSON
                 # extraction (code/loose text tasks would mis-parse)
                 r = predicate_check(output, a["expr"])

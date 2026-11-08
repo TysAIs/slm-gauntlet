@@ -84,6 +84,7 @@ SCORER_EPOCHS = [        # (epoch, first card timestamp it applies to, commit)
     ("v0.3.1", "20260926", "8244f05"),
     ("0.4.0", "20261105", "v0.4-suite"),
     ("0.5.0", "20261107", "v0.5-realworld-expand"),
+    ("0.5.1", "20261108", "v0.5.1-task-validity"),
 ]
 TOL = 0.2                # published-vs-recomputed tolerance, percentage points
 BLOCK_BEGIN = "<!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->"

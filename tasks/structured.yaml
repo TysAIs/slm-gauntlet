@@ -2,45 +2,35 @@
 # All scoring deterministic via json_schema/regex asserts.
 - id: struct_nested_json
   suite: structured
-  description: Nested JSON object with arrays and enums
+  description: Nested JSON object with arrays, enums and a computed total, no extra keys
   prompt: |
-    Output ONLY valid JSON (no other text) describing this order:
+    Output ONLY valid JSON (no other text, no code fence) describing this order:
     customer "J. Doe", items: 2x widget ($9.99 each), 1x gadget ($24.50),
     shipping "express", paid with "credit_card".
-    Schema: {"customer": string, "items": [{"name": string, "qty": integer, "price": number}], "shipping": "standard"|"express", "payment": "credit_card"|"paypal"}
+    Add a "total" key equal to the sum of qty * price over all items (two decimals).
+    Schema: {"customer": string, "items": [{"name": string, "qty": integer, "price": number}], "shipping": "standard"|"express", "payment": "credit_card"|"paypal", "total": number}
   asserts:
-    - type: json_schema
-      schema:
-        type: object
-        properties:
-          customer: {type: string}
-          items:
-            type: array
-            items:
-              type: object
-              properties: {name: {type: string}, qty: {type: integer}, price: {type: number}}
-              required: [name, qty, price]
-          shipping: {type: string, enum: [standard, express]}
-          payment: {type: string, enum: [credit_card, paypal]}
-        required: [customer, items, shipping, payment]
+    - type: predicate
+      expr: >-
+        isinstance(data, dict) and sorted(data) == ['customer', 'items', 'payment', 'shipping', 'total']
+        and isinstance(data.get('items'), list) and len(data['items']) == 2
+        and abs(float(data.get('total', -1)) - 44.48) < 0.005
+        and data.get('shipping') == 'express' and data.get('payment') == 'credit_card'
   max_tokens: 512
 
 - id: struct_json_repair
   suite: structured
-  description: Fix malformed JSON preserving values
+  description: Fix JSON with single quotes, a trailing comma and a missing brace
   prompt: |
-    This JSON is malformed. Fix it and output ONLY the corrected JSON, keeping all values:
-    {"name": "widget", "count": 3, "tags": ["a", "b",] "price": 4.5
+    This JSON is malformed in three ways. Fix it and output ONLY the corrected JSON,
+    keeping all values and their types:
+    {'name': 'widget', 'count': 3, 'tags': ['a', 'b',], 'price': 4.5
   asserts:
-    - type: json_schema
-      schema:
-        type: object
-        properties:
-          name: {type: string}
-          count: {type: integer}
-          tags: {type: array, items: {type: string}}
-          price: {type: number}
-        required: [name, count, tags, price]
+    - type: predicate
+      expr: >-
+        isinstance(data, dict) and sorted(data) == ['count', 'name', 'price', 'tags']
+        and data.get('name') == 'widget' and int(data.get('count', -1)) == 3
+        and data.get('tags') == ['a', 'b'] and abs(float(data.get('price', -1)) - 4.5) < 0.005
 
 - id: struct_csv_extract
   suite: structured
@@ -67,14 +57,20 @@
 
 - id: struct_regex_gen
   suite: structured
-  description: Write a regex matching US phone numbers; must match all provided cases
+  description: Write a regex that matches the three phone formats and rejects near-misses
   prompt: |
-    Write a single Python regex (the pattern only, no explanation) that matches
-    these formats: 555-123-4567, (555) 123-4567, 5551234567.
+    Write a single Python regex that matches these three phone formats and nothing else:
+    555-123-4567, (555) 123-4567, 5551234567.
+    It must reject 555-12-3456, 55551234567 and abc.
+    The pattern will be tested with re.fullmatch, so anchor it with ^ and $.
     Format your answer as: PATTERN: <regex>
   asserts:
-    - type: regex
-      pattern: "PATTERN:.*"
+    - type: predicate
+      expr: >-
+        (lambda m: bool(m)
+         and all(re.fullmatch(m.group(1), s) for s in ['555-123-4567', '(555) 123-4567', '5551234567'])
+         and not any(re.fullmatch(m.group(1), s) for s in ['555-12-3456', '55551234567', 'abc'])
+        )(re.search(r'PATTERN:\s*(\S.*?)\s*$', out, re.M))
   max_tokens: 256
 
 - id: struct_json_array_sort
@@ -107,12 +103,15 @@
 
 - id: struct_strict_json_only
   suite: structured
-  description: JSON with no prose wrapper at all (instruction discipline)
-  prompt: Output a JSON object with exactly one key "ok" set to true. Output nothing except the JSON.
+  description: Three-key JSON with no prose wrapper and no code fence (instruction discipline)
+  prompt: >-
+    Output a JSON object with exactly three keys: "ok" set to true, "count" set to 2
+    and "label" set to "gauntlet". Output nothing except the JSON object itself: no
+    prose, no code fence, no trailing explanation.
   asserts:
-    - type: json_schema
-      schema:
-        type: object
-        properties: {ok: {type: boolean}}
-        required: [ok]
+    - type: predicate
+      expr: >-
+        isinstance(data, dict) and sorted(data) == ['count', 'label', 'ok']
+        and data.get('ok') is True and data.get('count') == 2 and data.get('label') == 'gauntlet'
+        and out.strip().startswith('{') and out.strip().endswith('}')
   max_tokens: 64

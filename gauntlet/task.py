@@ -29,7 +29,10 @@ class ToolDef(BaseModel):
 
 
 class Assert(BaseModel):
-    type: Literal["exact_match", "contains_all", "contains_any", "regex", "json_schema", "predicate", "python_exec"]
+    type: Literal[
+        "exact_match", "contains_all", "contains_any", "regex", "json_schema", "predicate",
+        "python_exec", "line_value", "line_sum",
+    ]
     value: str | None = None
     values: list[str] | None = None
     pattern: str | None = None
@@ -37,6 +40,18 @@ class Assert(BaseModel):
     expr: str | None = None  # predicate: python bool expr with `out` bound
     tests: str | None = None  # python_exec: code appended to the answer and executed
     timeout: float = 10.0  # python_exec: subprocess wall clock cap (seconds)
+    # line_value: the last number on the line that names `label` must equal `equals`.
+    # Real answers write "OVERTIME: 6 * 33.00 = $198.00", so a regex that grabs the
+    # first number after the label reads the operand, not the answer; this reads the
+    # line's final number, which is the value the model claims.
+    label: str | None = None
+    equals: float | None = None
+    tol: float = 0.005
+    # line_sum: the number on the `label` line must equal the sum of the numbers on
+    # the `of` label lines (the model's own figures). Grades "does the grand total
+    # add up to the quotes you just wrote", which is a real sub-answer and is not
+    # the same claim as "your arithmetic was right".
+    of: list[str] | None = None
     weight: float = 1.0  # partial-credit weight (Vals-AI-style rubric)
     must_pass: bool = False  # must-pass gate: failure forces task partial score to 0
 
@@ -138,6 +153,13 @@ class Task(BaseModel):
             if a.tests is not None:
                 d["tests"] = a.tests
                 d["timeout"] = a.timeout
+            if a.label is not None:
+                d["label"] = a.label
+            if a.equals is not None:
+                d["equals"] = a.equals
+                d["tol"] = a.tol
+            if a.of is not None:
+                d["of"] = a.of
             # weight/must_pass carry the rubric. Dropping them here silently
             # turned every weighted or gated assert into an unweighted one,
             # so a model that leaked the system prompt still earned full

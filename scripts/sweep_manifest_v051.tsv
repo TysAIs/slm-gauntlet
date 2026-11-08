@@ -1,0 +1,63 @@
+# v0.5.1 sweep manifest - consumed by scripts/pve_sweep.py (identical configuration
+# list to 0.5.0: the epoch change is the TASK SET, not the hardware matrix, and
+# keeping the same 48 rows is what makes a 0.5.0-vs-0.5.1 comparison an engine/task
+# change rather than a different sweep)
+# config row: alias<TAB>gguf_path<TAB>ctx<TAB>np<TAB>ctk<TAB>ctv[<TAB>extra_flags]
+# exclusion row: !<alias><TAB><reason> - the matching config is skipped with that reason
+
+spark-x2.6-4b-iq3m-bartowski	/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+gemma4-e4b-q4_K_M	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+minicpm5-2b-q8_0	/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+bolt-e4b-udiq3xxs-kvq4	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+dory-1.0-4b-q5km-kvq8	/mnt/data/models/dory-4b/NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+qwen35-9b-q4km	/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+lfm3-1.7b-iq4nl-bartowski	/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ4_NL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+spark-x2.6-1.7b-q8_0	/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+ornith-9b-q4_K_M	/mnt/data/models/ornith-9b/Ornith-1.5-9B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+mimo-9b-q4_K_M	/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+minicpmv47-1b-iq4xs	/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-IQ4_XS.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+gemma4-12b-ud-q2_K_XL	/mnt/data/models/gemma4-12b/gemma-4-12b-it-UD-Q2_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+lfm2.5-2.6b-q8_0	/mnt/data/models/lfm2.5-2.6b/LFM2.5-2.6B-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+qwen3.5-4b-q4_K_M	/mnt/data/models/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+sharp-spark-4b-q4_K_XL	/mnt/data/models/sharp-spark-4b/Sharp-Spark-X2.5-4B-Q4_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+lfm25-1.2b-q8_0	/mnt/data/models/lfm25-1.2b/LFM2.5-1.2B-Instruct-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+lfm25-8b-a1b-udq4km	/mnt/data/models/lfm25-8b-a1b/LFM2.5-8B-A1B-UD-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+gemma-e4b-q4_K_M	/mnt/data/models/gemma-e4b/gemma-3n-E4B-it-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq2-m-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q2-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q3-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q4-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q5-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q6-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvq8_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-3.5-bolt-e4b-ud-q8-k-xl-kvq4_0	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvf16	/mnt/data/models/dory-4b/NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq8_0	/mnt/data/models/dory-4b/NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq4_0	/mnt/data/models/dory-4b/NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+nemotron-3.5-bolt-e4b-q4-k-m-kvf16	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+nemotron-3.5-bolt-e4b-q4-k-m-kvq8_0	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0
+nemotron-3.5-bolt-e4b-q4-k-m-kvq4_0	/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0
+
+# EXCLUSIONS - measured on the lane, not assumed. See docs/SWEEP-v050.md.
+!dory-1.0-4b-q5km-kvq8	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!lfm3-1.7b-iq4nl-bartowski	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvf16	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq8_0	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+!nvidia-nemotron-labs-dory1.0-4b-q5-k-m-kvq4_0	GGUF architecture unknown to the deployed llama.cpp a2878d3 (2026-09-11): engine exits 1 in ~0.2 s with 'unknown model architecture' at any ctx, so this is an engine-upgrade exclusion, not a model/VRAM verdict. Evidence: results/_sweep_logs/<alias>-kv<ctk>.serve.log
+

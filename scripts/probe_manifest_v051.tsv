@@ -1,0 +1,12 @@
+# 0.5.1 PROBE manifest - the four configurations the changed tasks are calibrated on
+# before the 0.5.1 full sweep. Not a corpus: `scripts/pve_sweep.py --tasks-dir tasks_probe`
+# runs only the tasks whose prompt changed in this epoch, so nothing here is published.
+#
+# Chosen for spread, not for a ranking: the 0.5.0 top scorer (bolt iq3_xxs, 86.6%),
+# a mid-size capable model (lfm25-8b-a1b), a small fast one (spark 1.7B) and a
+# mid scorer (gemma4-e4b). If a repaired task is failed by all four, it is still
+# unwinnable and must be repaired again before the sweep spends 12 hours on it.
+nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+lfm25-8b-a1b-udq4km	/mnt/data/models/lfm25-8b-a1b/LFM2.5-8B-A1B-UD-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+gemma4-e4b-q4_K_M	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0
+spark-x2.6-1.7b-q8_0	/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q8_0.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0

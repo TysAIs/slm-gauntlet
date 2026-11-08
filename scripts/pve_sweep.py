@@ -677,6 +677,10 @@ def main() -> int:
     ap.add_argument("--thermal-limit", type=int, default=89)
     ap.add_argument("--limit", type=int, default=0, help="stop after N configs (smoke)")
     ap.add_argument("--only", default="", help="substring filter on alias")
+    ap.add_argument("--suite", default="all", help="gauntlet --suite value (all, or e.g. retrieval)")
+    ap.add_argument("--tasks-dir", default="",
+                    help="gauntlet --tasks-dir value; a PROBE directory outside tasks/ so "
+                         "the probe's task subset never mixes into a full-suite corpus")
     ap.add_argument("--restore", action="store_true", help="only restore the shipped unit and exit")
     ap.add_argument("--restore-on-exit", action="store_true")
     ap.add_argument("--no-gpu-pins", action="store_true",
@@ -808,16 +812,20 @@ def main() -> int:
         cmd = [
             str(ROOT / ".venv" / "bin" / "python"), "-m", "gauntlet.cli", "run",
             "--endpoint", f"http://{args.host}:{args.port}/v1",
-            "--model", e["alias"], "--suite", "all",
+            "--model", e["alias"], "--suite", args.suite,
             "--concurrency", str(args.concurrency), "--timeout", str(args.timeout),
             "--seed", str(args.seed), "--thermal-limit", str(args.thermal_limit),
         ]
+        if getattr(args, "tasks_dir", ""):
+            cmd += ["--tasks-dir", args.tasks_dir]
         print("    " + " ".join(cmd[1:]), flush=True)
         # Stream to a per-config log instead of buffering: a 20-minute run with no visible
         # output is indistinguishable from a hung one, and the log outlives this process.
         logs_dir = ROOT / "results" / "_sweep_logs"
         logs_dir.mkdir(parents=True, exist_ok=True)
         log_name = re.sub(r"[^A-Za-z0-9._-]+", "-", f"{e['alias']}-kv{e['ctk']}") + ".log"
+        if getattr(args, "tasks_dir", ""):
+            log_name = "probe-" + log_name
         log_path = logs_dir / log_name
         with log_path.open("w") as fh:
             fh.write(" ".join(cmd) + "\n\n")
