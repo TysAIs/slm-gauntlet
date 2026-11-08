@@ -107,18 +107,22 @@ html,body { width:1080px; height:1080px; overflow:hidden; margin:0;
 def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
     letter, color, label = rank_for(m["overall_pct"])
     suites = m["suites"]
-    order = ["tooluse", "adversarial", "agent_chains", "structured", "retrieval", "coding", "instruction"]
+    # Every suite the run actually scored, in a stable order. This list used to be a
+    # hardcoded 7 and omitted `realworld` (12 % of the 0.5.0 weighting), so a published
+    # card hid one of its own suites; the card now renders what the run holds.
+    order = ["tooluse", "adversarial", "agent_chains", "structured", "retrieval",
+             "coding", "instruction", "realworld"]
+    order += [s for s in sorted(suites) if s not in order]
+    scored = [s for s in order if suites.get(s) is not None]
     suite_html = ""
-    for s in order:
-        v = suites.get(s)
-        if v is None:
-            continue
-        pct = v * 100
+    for s in scored:
+        pct = suites[s] * 100
         suite_html += (
-            f'<div class=suite><div class=suite-name>{s.replace("_"," ")}</div>'
+            f'<div class=suite><div class=suite-name>{s.replace("_", " ")}</div>'
             f'<div class=suite-val style="color:{suite_color(pct)}">{pct:.0f}%</div>'
             f'<div class=bar><i style="width:{pct:.0f}%;background:{suite_color(pct)}"></i></div></div>'
         )
+
     # device auto-detection (manifest override wins: m["device_name"] / m["device_vram_mb"])
     dev_name = m.get("device_name")
     dev_vram = m.get("device_vram_mb")
@@ -160,7 +164,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
             f'<div class=stat-v>{wgb:.1f}<small> GB</small></div></div>'
             f'<div class=stat><div class=stat-k>KV pool</div>'
             f'<div class=stat-v>{kv_disp}</div></div>'
-            f'<div class=stat><div class=stat-k>Max context</div>'
+            f'<div class=stat><div class=stat-k>Longest ctx tested</div>'
             f'<div class=stat-v>{(cap.get("tested_ctx") or 0)/1000:.0f}<small> K tok</small></div></div>'
             f'<div class=stat><div class=stat-k>Streams tested</div>'
             f'<div class=stat-v>{cap.get("tested_slots") or 0}</div></div>'
@@ -183,8 +187,9 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         bnames = {"tooluse": "tool calling", "adversarial": "prompt-injection resistance",
                   "agent_chains": "multi-turn agent chains",
                   "structured": "strict structured output", "retrieval": "long-context retrieval",
-                  "coding": "bug-fixing", "instruction": "stacked-constraint instruction following"}
-        strong = ", ".join(bnames[k] for k in best[:2])
+                  "coding": "bug-fixing", "instruction": "stacked-constraint instruction following",
+                  "realworld": "real-world arithmetic and multi-constraint reasoning"}
+        strong = ", ".join(bnames.get(k, k) for k in best[:2])
         weak = bnames.get(order2[0], "instruction following")
         verdict = (f"Scores {m['overall_pct']:.1f}% across {_n_tasks} tasks. Strongest at {strong}; "
                    f"{weak} is the weak suite. Zero-offload on {dev_name}" + (f" {dev_mem}" if dev_mem else "") + ".")
@@ -246,7 +251,7 @@ def render_card(m: dict, perf: dict | None, cap: dict | None) -> str:
         f'</div>'
         f'<div class=scoreband>'
         f'<div><span class=overall-pct style="color:{color}">{m["overall_pct"]:.1f}%</span>'
-        f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS · 7 SUITES</div></div>'
+        f'<div class=overall-sub>GAUNTLET SCORE · {n} TESTS · {len(scored)} SUITES</div></div>'
         f'</div>'
         f'<div class=suites>{suite_html}</div>'
         f'<div class=stats>{stats_html}</div>'
