@@ -128,8 +128,28 @@ def family_of(card: dict) -> str:
     return norm_name(card.get("display_name", ""))
 
 
-def scorer_epoch(ts: str) -> str:
-    """Epoch of the scorer that produced a card, from its own timestamp."""
+def methodology_of(card: dict) -> str | None:
+    """The methodology a card says it was produced under (cards_from_runs writes it)."""
+    det = card.get("details") or {}
+    m = str(det.get("methodology") or card.get("methodology") or "").strip()
+    return m or None
+
+
+def scorer_epoch(ts: str, methodology: str | None = None) -> str:
+    """Epoch of the scorer that produced a card.
+
+    The card's OWN `details.methodology` wins when it carries one: the timestamp is
+    only a date, and an epoch that ships mid-day cannot be separated from the run
+    that finished the same morning. Measured 2026-11-08: the last 0.5.0 card and the
+    first 0.5.1 runs share the date 20261108, so a date-only epoch made one 0.5.0
+    card "current" and pushed the other 267 rows to legacy — i.e. bumping the
+    methodology emptied the table without anyone running a new sweep. The timestamp
+    path stays as the fallback for hand-made cards from before `details.methodology`
+    existed.
+    """
+    m = str(methodology or "").strip()
+    if m in EPOCHS:
+        return m
     t = str(ts or "")
     for epoch, first_ts, _commit in reversed(SCORER_EPOCHS):
         if t[:8] >= first_ts:
@@ -183,6 +203,7 @@ def load_cards(cards_dir: Path) -> list[dict]:
                 "ts": obj.get("ts"),
                 "details": obj.get("details") or {},
                 "sub": obj.get("sub", ""),
+                "methodology": (obj.get("details") or {}).get("methodology"),
             })
     return out
 
@@ -281,7 +302,7 @@ def pick_log(card: dict, logs: dict[str, list[tuple[str, str, int]]],
 
 def classify(card: dict, src: dict | None) -> tuple[bool, str]:
     """Is a card rankable in the current methodology, and if not, why not."""
-    epoch = scorer_epoch(card.get("ts", ""))
+    epoch = scorer_epoch(card.get("ts", ""), card.get("methodology"))
     n = card.get("n")
     if epoch != CURRENT_EPOCH:
         return False, f"scorer {epoch} (pre-{CURRENT_EPOCH})"
@@ -317,7 +338,7 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
     repaired, notes = [], []
     for c in cards:
         # score the card's run with the weights THAT run was produced under
-        card_epoch = scorer_epoch(c.get("ts", ""))
+        card_epoch = scorer_epoch(c.get("ts", ""), c.get("methodology"))
         w = EPOCHS[card_epoch]["weights"] if card_epoch in EPOCHS else None
         src, note = pick_log(c, logs, w)
         rankable, why = classify(c, src)
@@ -336,7 +357,7 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
             "suites": canon["suites"] if canon else c["suites"],
             "config": best_config_label(c),
             "category": c["details"].get("category") or "on-GPU ≤12B",
-            "epoch": scorer_epoch(c.get("ts", "")),
+            "epoch": scorer_epoch(c.get("ts", ""), c.get("methodology")),
             "rankable": rankable,
             "not_rankable_because": why,
             "card_suites_match_log": bool(canon) and all(
@@ -521,10 +542,15 @@ def publish_json(data: dict) -> str:
             "source_log": os.path.relpath(r["source_log"]),
         })
     doc = {
-        "benchmark": "slm-gauntlet %s (%d tasks: %s)" % (
+        # Per-suite counts come from the LIVE task files, so they only describe the row set
+        # when the published epoch IS the shipped methodology. A superseded epoch prints its
+        # own frozen task count instead of another task set's inventory (0.5.0 said
+        # "94 tasks" while listing 0.5.1's 60 realworld units).
+        "benchmark": "slm-gauntlet %s (%d tasks%s)" % (
             CURRENT_EPOCH, FULL_TASKS,
-            ", ".join("%s %d" % (k, v) for k, v in sorted(
-                task_inventory(Path(__file__).resolve().parent.parent).items()) if k != "*")),
+            "" if CURRENT_EPOCH != METHODOLOGY_VERSION else ": " + ", ".join(
+                "%s %d" % (k, v) for k, v in sorted(
+                    task_inventory(Path(__file__).resolve().parent.parent).items()) if k != "*")),
         "hardware": "8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp",
         "settings": "temperature 0, seed 1, thinking disabled, pass@1",
         "weights": WEIGHT_LABEL,
@@ -614,14 +640,14 @@ def fix_cards(data: dict, cards_dir: Path, dry_run=False) -> list[dict]:
             for obj in items:
                 if obj.get("model") != rep["model"]:
                     continue
-                _ep = scorer_epoch(obj.get("ts", ""))
+                _ep = scorer_epoch(obj.get("ts", ""), (obj.get("details") or {}).get("methodology"))
                 src = score_log(os.path.abspath(rep["source_log"]),
                                 EPOCHS[_ep]["weights"] if _ep in EPOCHS else None)
                 before = (obj.get("overall_pct"), dict(obj.get("suites") or {}))
                 obj["suites"] = {k: round(v, 4) for k, v in src["suites"].items()}
                 obj["overall_pct"] = round(src["overall"], 1)
                 obj["n"] = src["n"]
-                obj["scorer"] = scorer_epoch(obj.get("ts", ""))
+                obj["scorer"] = scorer_epoch(obj.get("ts", ""), (obj.get("details") or {}).get("methodology"))
                 obj["score_weights"] = "cli-%dsuite" % len(
                     EPOCHS[_ep]["weights"] if _ep in EPOCHS else SUITE_WEIGHTS)
                 obj["source_log"] = os.path.relpath(os.path.abspath(rep["source_log"]))
@@ -711,7 +737,7 @@ def main(argv=None) -> int:
     # METHODOLOGY_VERSION marked the entire existing corpus "legacy" and emptied
     # the leaderboard the same day the new version was written.
     try:
-        set_epoch(newest_published_epoch({scorer_epoch(c.get("ts", "")) for c in cards}))
+        set_epoch(newest_published_epoch({scorer_epoch(c.get("ts", ""), c.get("methodology")) for c in cards}))
     except KeyError as e:
         print(f"cannot pick a published epoch: {e}", file=sys.stderr)
         return 2
