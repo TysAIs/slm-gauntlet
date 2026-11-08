@@ -95,7 +95,9 @@ printed the reason in under a second. The driver now makes a failure self-explai
   called dead (`ornith-9b-q4_K_M`, `qwen35-9b-q4km` on 2026-11-07).
 
 Cause taxonomy the driver can name: `unsupported_arch`, `vram_oom`, `load_error`, `bad_flags`,
-`port_busy`, `unit_failed`, `no_answer` (driver/probe defect — never a model verdict).
+`port_busy`, `unit_failed`, `no_answer` (driver/probe defect — never a model verdict),
+`transport_blocked` (the unit answers on `127.0.0.1` inside the container but not on the
+sweep's endpoint: firewall/route/tailnet, measured 2026-11-07 — see below).
 
 Measured causes on this lane (llama.cpp `a2878d3`, 2026-09-11 build):
 
@@ -168,3 +170,32 @@ candidate, gated on a per-class context ceiling measured the same way for each s
   says why.
 * The sweep takes the test lane for hours. Nothing else may use `grunt-pve` meanwhile; the
   shipped unit is restored (and proven with a real completion) at the end.
+
+## The lane itself can be the failure: ufw (measured 2026-11-07 22:04 MST)
+
+Half-way through the 0.5.0 sweep, every new TCP connection from the sweep host to
+`<box>:8891` stopped completing: `ss` showed **SYN-SENT**, `curl` from the host timed out with
+exit 28, while the same `curl` **inside** the container returned 200. The unit was healthy and
+the model innocent. Cause: a `ufw-before6-guard.py` repair on the test container re-inserted the
+`-A INPUT -j ufw-before-input` jump (`journalctl -u ufw`: "REPAIR half-loaded IPv4 INPUT"), which
+re-armed the container's default-deny policy. The container is a Tailscale node with no LAN
+address and ufw had no rule for `tailscale0`, so only already-`ESTABLISHED` connections kept
+working — which is why the sweep looked alive while every new config died.
+
+Fix (persistent, applied on the container):
+
+```
+ufw allow in on tailscale0 comment 'tailnet test lane (grunt)'
+```
+
+After that, 3/3 `curl` attempts from the sweep host returned 200 and the sweep resumed.
+
+Lessons that are now in the driver:
+
+* a config whose unit is `active` but never answers is classified `transport_blocked` only when
+  loopback answers — the check runs **before** the unit is stopped, because a stopped unit cannot
+  testify;
+* `no_answer` therefore keeps meaning "driver/probe defect", and neither label can ever be
+  blamed on a model;
+* five configs (`gemma4-12b-ud-q2_K_XL`, `q8-k-xl-kvq4`, and the three `q4-k-m` rows) were lost
+  to this window and are re-run rather than recorded as model failures.
