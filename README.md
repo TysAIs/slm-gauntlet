@@ -4,56 +4,66 @@ A benchmark for **small language models** (sub-12B class) that runs on whatever 
 
 <!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->
 
-**Current leaderboard — 71 tasks, scorer v0.3.1, PVE GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
+**Current leaderboard — 94 tasks, scorer 0.5.0, PVE GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
 
-One row per model: the **best-scoring configuration** of that model in the corpus (230 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
+One row per model: the **best-scoring configuration** of that model in the corpus (42 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
 | Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | Spark-X2.6 4B | IQ3_M · KV FP16 · 32K ctx | **91.5%** | 95% | 100% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_spark-x2.6-4b-iq3m-bartowski.png) |
-| 🥈 | Gemma 4 · E4B | Q4_K_M | **90.5%** | 95% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_gemma4-e4b-q4_K_M.png) |
-| 🥉 | MiniCPM-V 5 · 2B | Q8_0 | **90.0%** | 93% | 88% | 83% | 100% | 100% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_minicpm5-2b-q8_0.png) |
-| 4 | Bolt E4B | UD-IQ3_XXS · KV q4_0 · 32K ctx | **89.1%** | 95% | 88% | 100% | 100% | 75% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_bolt-e4b-udiq3xxs-kvq4.png) |
-| 5 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **88.7%** | 89% | 88% | 100% | 100% | 88% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_dory-1.0-4b-q5km-kvq8.png) |
-| 6 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **86.7%** | 89% | 75% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_qwen35-9b-q4km.png) |
-| 7 | LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | **86.3%** | 84% | 88% | 100% | 90% | 88% | 100% | 57% | 71 t · v0.3.1 | [png](results/cards/card_lfm3-1.7b-iq4nl-bartowski.png) |
-| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **82.3%** | 82% | 88% | 83% | 100% | 88% | 67% | 57% | 71 t · v0.3.1 | [png](results/cards/card_spark-x2.6-1.7b-q8_0.png) |
-| 9 | K2-Horizon · 7B | Q4_K_M | **81.1%** | 77% | 62% | 100% | 100% | 88% | 100% | 36% | 71 t · v0.3.1 | [png](results/cards/card_k2horizon-7b-q4_K_M.png) |
-| 10 | Ornith 1.5 · 9B | Q4_K_M | **77.8%** | 89% | 62% | 100% | 100% | 38% | 83% | 57% | 71 t · v0.3.1 | [png](results/cards/card_ornith-9b-q4_K_M.png) |
-| 11 | MiMo V2.6 · 9B | Q4_K_M | **74.9%** | 79% | 88% | 100% | 90% | 38% | 83% | 50% | 71 t · v0.3.1 | [png](results/cards/card_mimo-9b-q4_K_M.png) |
-| 12 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **74.5%** | 79% | 62% | 100% | 90% | 62% | 67% | 50% | 71 t · v0.3.1 | [png](results/cards/card_minicpmv47-1b-iq4xs.png) |
-| 13 | Gemma 4 · 12B | UD-Q2_K_XL | **72.6%** | 74% | 88% | 67% | 90% | 50% | 83% | 57% | 71 t · v0.3.1 | [png](results/cards/card_gemma4-12b-ud-q2_K_XL.png) |
-| 14 | LFM 2.5 · 2.6B | Q8_0 | **70.9%** | 74% | 38% | 83% | 70% | 75% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_lfm2.5-2.6b-q8_0.png) |
-| 15 | Qwen 3.5 · 4B | Q4_K_M | **67.9%** | 68% | 62% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_qwen3.5-4b-q4_K_M.png) |
-| 16 | Sharp-Spark X2.5 · 4B | Q4_K_XL | **66.7%** | 68% | 50% | 67% | 80% | 50% | 100% | 50% | 71 t · v0.3.1 | [png](results/cards/card_sharp-spark-4b-q4_K_XL.png) |
-| 17 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **65.2%** | 63% | 50% | 83% | 70% | 88% | 50% | 43% | 71 t · v0.3.1 | [png](results/cards/card_lfm25-1.2b-q8_0.png) |
-| 18 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **56.1%** | 84% | 12% | 83% | 50% | 25% | 100% | 0% | 71 t · v0.3.1 | [png](results/cards/card_lfm25-8b-a1b-udq4km.png) |
-| 19 | Gemma 3n · E4B | Q4_K_M | **52.4%** | 26% | 62% | 17% | 80% | 75% | 83% | 50% | 71 t · v0.3.1 | [png](results/cards/card_gemma-e4b-q4_K_M.png) |
+| 🥇 | Bolt E4B | UD-IQ3_XXS · KV FP16 · 32K ctx | **86.6%** | 100% | 88% | 100% | 100% | 86% | 100% | 71% | 94 t · 0.5.0 | [png](results/cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16.png) |
+| 🥈 | Gemma 4 E4B | Q4_K_M · KV FP16 · 32K ctx | **86.3%** | 100% | 88% | 83% | 100% | 100% | 100% | 64% | 94 t · 0.5.0 | [png](results/cards/card_gemma4-e4b-q4_K_M.png) |
+| 🥉 | Qwen3.5-4B | Q4_K_M · KV FP16 · 32K ctx | **82.4%** | 95% | 75% | 100% | 90% | 100% | 90% | 71% | 94 t · 0.5.0 | [png](results/cards/card_qwen3.5-4b-q4_K_M.png) |
+| 4 | MiniCPM5-2B | Q8_0 · KV FP16 · 32K ctx | **82.2%** | 95% | 88% | 83% | 100% | 100% | 80% | 79% | 94 t · 0.5.0 | [png](results/cards/card_minicpm5-2b-q8_0.png) |
+| 5 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **81.8%** | 95% | 75% | 100% | 80% | 100% | 90% | 71% | 94 t · 0.5.0 | [png](results/cards/card_qwen35-9b-q4km.png) |
+| 6 | Spark-X2.6-4B | IQ3_M · KV FP16 · 32K ctx | **81.0%** | 100% | 100% | 100% | 100% | 71% | 80% | 64% | 94 t · 0.5.0 | [png](results/cards/card_spark-x2.6-4b-iq3m-bartowski.png) |
+| 7 | Ornith-1.5-9B | Q4_K_M · KV FP16 · 32K ctx | **76.9%** | 95% | 50% | 100% | 100% | 86% | 60% | 71% | 94 t · 0.5.0 | [png](results/cards/card_ornith-9b-q4_K_M.png) |
+| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **75.3%** | 88% | 88% | 100% | 100% | 100% | 40% | 57% | 94 t · 0.5.0 | [png](results/cards/card_spark-x2.6-1.7b-q8_0.png) |
+| 9 | Sharp-Spark-4B | Q4_K_XL · KV FP16 · 32K ctx | **68.3%** | 63% | 88% | 67% | 100% | 71% | 90% | 64% | 94 t · 0.5.0 | [png](results/cards/card_sharp-spark-4b-q4_K_XL.png) |
+| 10 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **62.8%** | 88% | 62% | 100% | 70% | 71% | 30% | 64% | 94 t · 0.5.0 | [png](results/cards/card_minicpmv47-1b-iq4xs.png) |
+| 11 | MiMo-V2.6-9B | Q4_K_M · KV FP16 · 32K ctx | **59.1%** | 63% | 62% | 0% | 80% | 71% | 90% | 57% | 94 t · 0.5.0 | [png](results/cards/card_mimo-9b-q4_K_M.png) |
+| 12 | LFM2.5-2.6B | Q8_0 · KV FP16 · 32K ctx | **58.9%** | 79% | 25% | 83% | 70% | 86% | 30% | 50% | 94 t · 0.5.0 | [png](results/cards/card_lfm2.5-2.6b-q8_0.png) |
+| 13 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **54.2%** | 58% | 50% | 100% | 70% | 86% | 30% | 43% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-1.2b-q8_0.png) |
+| 14 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **52.8%** | 79% | 50% | 67% | 50% | 71% | 30% | 36% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-8b-a1b-udq4km.png) |
+| 15 | Gemma 3n E4B | Q4_K_M · KV FP16 · 32K ctx | **52.4%** | 26% | 75% | 17% | 80% | 86% | 90% | 57% | 94 t · 0.5.0 | [png](results/cards/card_gemma-e4b-q4_K_M.png) |
 
-**Legacy rows — NOT comparable, kept for provenance:**
+**Legacy rows — NOT comparable, kept for provenance:** one row per model, its best-scoring pre-0.5.0 configuration; the 225 configurations behind them are listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
-| Model | Configuration | Score | Why it is not comparable |
-|---|---|---|---|
-| Spark-X2.6 4B | Q4_K_S · KV q4_0 · 32K ctx | 0.0% | transport failure: 79 of 79 attempts returned no tokens at all (100%) — the model was never reached |
-| Ternary Bonsai-2 · 27B | PTQ1_0 | 86.2% | 65 tasks (current methodology is 71) |
-
-**Offload / >12B — scored separately, never merged with the on-GPU table:**
-
-| Model | Configuration | Score | Method |
-|---|---|---|---|
-| LFM2.5-24B-A2B | UD-Q4_K_XL · KV FP16 · 8K ctx | 59.2% | 71 t · v0.3.1 |
+| Model | Best legacy configuration | Configurations | Score | Why it is not comparable |
+|---|---|---|---|---|
+| Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | 2 | 88.7% | scorer v0.3.1 (pre-0.5.0) |
+| Gemma 3n · E4B | Q4_K_M | 1 | 52.4% | scorer v0.3.1 (pre-0.5.0) |
+| Gemma 4 · 12B | UD-Q2_K_XL | 2 | 72.6% | scorer v0.3.1 (pre-0.5.0) |
+| Gemma 4 · E4B | Q4_K_M | 1 | 90.5% | scorer v0.3.1 (pre-0.5.0) |
+| K2-Horizon · 7B | Q4_K_M | 1 | 81.1% | scorer v0.3.1 (pre-0.5.0) |
+| LFM 2.5 · 2.6B | Q8_0 | 2 | 70.9% | scorer v0.3.1 (pre-0.5.0) |
+| LFM2.5-1.2B | Q4_K_M · KV FP16 · 32K ctx | 1 | 63.5% | scorer v0.3.1 (pre-0.5.0) |
+| LFM2.5-24B-A2B | UD-Q4_K_XL · KV FP16 · 8K ctx | 1 | 59.2% | scorer v0.3.1 (pre-0.5.0) |
+| LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | 60 | 86.3% | scorer v0.3.1 (pre-0.5.0) |
+| MiMo V2.6 · 9B | Q4_K_M | 1 | 74.9% | scorer v0.3.1 (pre-0.5.0) |
+| MiniCPM-V 4.7 1B | IQ4_XS · KV q8_0 · 32K ctx | 41 | 72.9% | scorer v0.3.1 (pre-0.5.0) |
+| MiniCPM-V 5 · 2B | Q8_0 | 2 | 90.0% | scorer v0.3.1 (pre-0.5.0) |
+| Nemotron 3.5 Bolt E4B | UD-Q4_K_XL · KV q8_0 · 32K ctx | 24 | 89.1% | scorer v0.3.1 (pre-0.5.0) |
+| Ornith 1.5 · 9B | Q4_K_M | 1 | 77.8% | scorer v0.3.1 (pre-0.5.0) |
+| Qwen 3.5 · 4B | Q4_K_M | 1 | 67.9% | scorer v0.3.1 (pre-0.5.0) |
+| Sharp-Spark X2.5 · 4B | Q4_K_XL | 1 | 66.7% | scorer v0.3.1 (pre-0.5.0) |
+| Spark-X2.6 1.7B | Q6_K · KV FP16 · 32K ctx | 20 | 81.3% | scorer v0.3.1 (pre-0.5.0) |
+| Spark-X2.6 4B | Q4_K_L · KV q8_0 · 32K ctx | 62 | 90.2% | scorer v0.3.1 (pre-0.5.0) |
+| Ternary Bonsai-2 · 27B | PTQ1_0 | 1 | 86.2% | scorer v0.3.1 (pre-0.5.0) |
 
 **What this table says:**
 
-- **Best on-GPU: Spark-X2.6 4B (IQ3_M · KV FP16 · 32K ctx) at 91.5%** — 62 configuration(s) of this model were scored; this is the best of them.
-- Next: Gemma 4 · E4B (Q4_K_M) at 90.5% — inside the weight of a single task (0.7-1.6 pp here depending on the suite), so a tie, not a win.
-- 2 legacy rows are excluded from the ranking (task count or scorer version differs); they keep the published number below but are never ranked against current rows.
+- **Best on-GPU: Bolt E4B (UD-IQ3_XXS · KV FP16 · 32K ctx) at 86.6%** — 28 configuration(s) of this model were scored; this is the best of them.
+- Next: Gemma 4 E4B (Q4_K_M · KV FP16 · 32K ctx) at 86.3% — inside the weight of a single task (0.7-1.6 pp here depending on the suite), so a tie, not a win.
+- 225 legacy rows are excluded from the ranking (task count or scorer version differs); they keep the published number below but are never ranked against current rows.
 
 _Generated by `scripts/leaderboard_check.py` from `results/cards/*.json`. `python3 scripts/leaderboard_check.py` fails when this block and the corpus disagree — edit the generator, not the table._
 
 <!-- END GENERATED LEADERBOARD -->
 
 Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · machine-readable [`results/_published/leaderboard.json`](results/_published/leaderboard.json) · trading cards in [`results/cards/`](results/cards/).
+
+**Task-validity note (0.5.0).** 13 of the 94 tasks are passed by no model measured so far and 12 are passed by every model, so 25 tasks currently do no ranking work. The unwinnable set is a flat **8.0 pp** off every row above — it shifts all rows down by the same amount and cannot change rank order, so 0.5.0 absolute scores are not comparable with 0.3.1/0.4.0. Every gold answer in that set was re-derived by hand and is correct; the models really do fail the tasks. Full audit, with the derivation of each answer and the repair plan: [`docs/AUDIT-TASK-VALIDITY-v0.5.md`](docs/AUDIT-TASK-VALIDITY-v0.5.md) (reproduce with `python3 scripts/audit_task_discrimination.py`).
+
 
 **How to read this:** every published score is the weighted aggregate defined in `scripts/leaderboard_check.py` (the same weights `gauntlet run` prints) and is recomputed from that run's log — a row you cannot trace to a run log does not appear in the table. The table above is generated, not written: `python3 scripts/leaderboard_check.py` exits non-zero when it and the card corpus disagree, and `--write` regenerates it.
 

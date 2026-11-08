@@ -1,0 +1,46 @@
+[
+ {
+  "model": "nemotron-3.5-bolt-e4b-q4-k-m-kvq8_0",
+  "display_name": "Bolt E4B",
+  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 84.3,
+  "suites": {
+   "adversarial": 0.875,
+   "agent_chains": 1.0,
+   "coding": 1.0,
+   "instruction": 0.714,
+   "realworld": 0.3,
+   "structured": 1.0,
+   "tooluse": 1.0,
+   "retrieval": 0.714
+  },
+  "n": 94,
+  "rank": "",
+  "ts": "20261108",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "Nov 2026",
+   "gguf_file": "Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf",
+   "gguf_size_bytes": 6180446208,
+   "quant": "Q4_K_M",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/nemotron-3.5-bolt-e4b-q4-k-m-kvq8_0_20261108T071206Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
+  }
+ }
+]

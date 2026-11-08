@@ -405,7 +405,9 @@ def legacy_groups(legacy: list[dict]) -> list[dict]:
     """
     groups: dict[tuple[str, str], list[dict]] = {}
     for r in legacy:
-        groups.setdefault((r["display_name"], r.get("epoch") or ""), []).append(r)
+        # Family, not display name: the pre-0.5.0 cards spell the same model several ways
+        # ("Spark-X2.6 4B" / "Spark-X2.6-4B"), and one model must not get two legacy rows.
+        groups.setdefault((r.get("family") or r["display_name"], r.get("epoch") or ""), []).append(r)
     out = []
     for entries in groups.values():
         entries.sort(key=lambda e: -(e.get("published") if e.get("published") is not None else -1))
@@ -745,7 +747,10 @@ def main(argv=None) -> int:
     def row_problems(have_block: str) -> list[str]:
         """Readable per-row cross-check (the exact-block compare catches edits; this names them)."""
         out = []
-        known = [r["display_name"] for r in data["rows"] + data["offload"] + data["legacy"]]
+        known = [r["display_name"] for r in data["rows"] + data["offload"]]
+        # The legacy section renders ONE row per model (best legacy configuration), so a legacy
+        # entry's own display name need not appear - its group's does.
+        known += [g["display_name"] for g in legacy_groups(data["legacy"])]
         lines = [ln for ln in have_block.splitlines() if ln.startswith("|")]
         for name in known:
             if not any(name in ln for ln in lines):

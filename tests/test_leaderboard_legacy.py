@@ -20,10 +20,11 @@ lb = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(lb)
 
 
-def _legacy(display_name, config, published, epoch="0.3.1", model=None):
+def _legacy(display_name, config, published, epoch="0.3.1", model=None, family=None):
     return {
         "model": model or display_name.lower().replace(" ", "-"),
         "display_name": display_name,
+        "family": family or display_name.lower().replace(" ", "-").replace(".", ""),
         "config": config,
         "published": published,
         "epoch": epoch,

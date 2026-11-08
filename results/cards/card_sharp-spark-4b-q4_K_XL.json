@@ -1,0 +1,46 @@
+[
+ {
+  "model": "sharp-spark-4b-q4_K_XL",
+  "display_name": "Sharp-Spark-4B",
+  "sub": "Q4_K_XL \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 68.4,
+  "suites": {
+   "adversarial": 0.875,
+   "agent_chains": 0.667,
+   "coding": 0.9,
+   "instruction": 0.643,
+   "realworld": 0.15,
+   "structured": 1.0,
+   "tooluse": 0.632,
+   "retrieval": 0.714
+  },
+  "n": 94,
+  "rank": "",
+  "ts": "20261107",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "",
+   "gguf_file": "Sharp-Spark-X2.5-4B-Q4_K_XL.gguf",
+   "gguf_size_bytes": 2677961984,
+   "quant": "Q4_K_XL",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/sharp-spark-4b-q4_K_XL_20261107T220512Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
+  }
+ }
+]

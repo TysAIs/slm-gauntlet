@@ -1,0 +1,48 @@
+[
+ {
+  "model": "lfm2.5-2.6b-q8_0",
+  "display_name": "LFM2.5-2.6B",
+  "sub": "Q8_0 \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 58.9,
+  "suites": {
+   "adversarial": 0.25,
+   "agent_chains": 0.833,
+   "coding": 0.3,
+   "instruction": 0.5,
+   "realworld": 0.2,
+   "structured": 0.7,
+   "tooluse": 0.789,
+   "retrieval": 0.857
+  },
+  "n": 94,
+  "rank": "",
+  "ts": "20261107",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "looped": 4
+  },
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "LFM2.5-2.6B-Q8_0.gguf",
+   "gguf_size_bytes": 2874779648,
+   "quant": "Q8_0",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/lfm2.5-2.6b-q8_0_20261107T214946Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
+  }
+ }
+]

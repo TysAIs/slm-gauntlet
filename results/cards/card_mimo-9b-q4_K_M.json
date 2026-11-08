@@ -1,0 +1,50 @@
+[
+ {
+  "model": "mimo-9b-q4_K_M",
+  "display_name": "MiMo-V2.6-9B",
+  "sub": "Q4_K_M \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 59.1,
+  "suites": {
+   "adversarial": 0.625,
+   "agent_chains": 0.0,
+   "coding": 0.9,
+   "instruction": 0.571,
+   "realworld": 0.25,
+   "structured": 0.8,
+   "tooluse": 0.632,
+   "retrieval": 0.714
+  },
+  "n": 94,
+  "rank": "",
+  "ts": "20261107",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "max_turns": 2,
+   "looped": 4,
+   "timeout": 11
+  },
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf",
+   "gguf_size_bytes": 5841049120,
+   "quant": "Q4_K_M",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.5.0",
+   "run_log": "results/mimo-9b-q4_K_M_20261107T213109Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 102
+  }
+ }
+]
