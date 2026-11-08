@@ -1,0 +1,32 @@
+{
+  "source": "fixture:lane_throttled_sw_thermal.json",
+  "sampled_at": "2026-11-08T02:07:06-0700",
+  "unit_props": {
+    "MainPID": "805272",
+    "NRestarts": "1",
+    "ExecMainStartTimestamp": "Sun 2026-11-08 08:46:00 UTC",
+    "ExecMainStatus": "0",
+    "MemoryCurrent": "5070073856",
+    "MemoryHigh": "8589934592",
+    "MemoryMax": "infinity",
+    "ActiveState": "active",
+    "SubState": "running"
+  },
+  "swap_free_mib": 7605,
+  "gpu_csv": "Enabled, 120.00 W, 141.39 W, 82, 78 %, 5699 MiB, 2409 MiB, 1797 MHz, 1911 MHz, 0x0000000000000020",
+  "compute_apps": "1248174, /opt/llama.cpp/build/bin/llama-server, 5694 MiB",
+  "perf_enum": "    Clocks Event Reasons\n        Idle                              : Not Active\n        SW Thermal Slowdown               : Active\n",
+  "util_samples": [
+    78,
+    78
+  ],
+  "apps_samples": [
+    "1248174, /opt/llama.cpp/build/bin/llama-server, 5694 MiB",
+    "1248174, /opt/llama.cpp/build/bin/llama-server, 5694 MiB"
+  ],
+  "health": {
+    "rc": 0,
+    "out": "PASS health   HTTP 200 .status=ok\nPASS models   id=gemma4-12b-ud-q2_K_XL\nPASS complete 2 tok finish=stop reply=READY\nRESULT green (http://LANE) model=gemma4-12b-ud-q2_K_XL"
+  },
+  "note": "Seed: the GPU row of a REAL loaded sample from the 13-minute 4-stream thermal run on this card (2026-11-05, missions/measurement-kit/2026-11-05-reverify-walls/repro-full/raw/nvidia-smi-samples.csv, row 01:32:16.821: temp 82 C, sm 1797 MHz, power 141.39 W, util 78 %, mask 0x20). The idle fields (memory 5699 MiB, persistence/power limit) are kept from the live healthy sample."
+}
