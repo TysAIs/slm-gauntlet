@@ -119,7 +119,7 @@ def gguf_sizes() -> dict[str, int]:
         return inv
     text = INVENTORY.read_text().strip()
     toks = [t for t in re.split(r"[,\n]", text) if t.strip()]
-    for size, path in zip(toks, toks[1:]):
+    for size, path in zip(toks, toks[1:], strict=False):
         if size.strip().isdigit() and path.strip().lower().endswith(".gguf"):
             inv[Path(path.strip()).name] = int(size)
     return inv
