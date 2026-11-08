@@ -383,6 +383,14 @@ Each family lists its **current-epoch** rows first, then its **pre-0.5.0** rows 
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Gemma 3n E4B | 94 t · 0.5.0 (current) | Jun 2025 | gemma-3n-E4B-it-Q4_K_M.gguf (4.54 GB) | Q4_K_M | FP16 | 32,768 | not recorded | 32,768 | 4 | **52.4%** | 26.3 | 80.0 | 85.7 | 90.0 | 57.1 | 75.0 | 16.7 | 5.42s | 13/13/13 | none | `cards/card_gemma-e4b-q4_K_M.png` | on-GPU ≤12B |
 
+### Gemma 4 · 12B
+
+**Current epoch — 94 tasks, scorer 0.5.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Gemma 4 12B | 94 t · 0.5.0 (current) | — | gemma-4-12b-it-UD-Q2_K_XL.gguf (4.66 GB) | UD-Q2_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **43.7%** | 5.3 | 90.0 | 0.0 | 60.0 | 64.3 | 87.5 | 83.3 | 8.95s | 7/7/7 | timeout 31 | `cards/card_gemma4-12b-ud-q2_K_XL.png` | on-GPU ≤12B |
+
 ### Gemma 4 · E4B
 
 **Current epoch — 94 tasks, scorer 0.5.0**

@@ -335,6 +335,28 @@
    "variants_scored": 1,
    "card_png": "results/cards/card_gemma-e4b-q4_K_M.png",
    "source_log": "results/gemma-e4b-q4_K_M_20261107T222442Z.json"
+  },
+  {
+   "rank": 16,
+   "model": "gemma4-12b-ud-q2_K_XL",
+   "display_name": "Gemma 4 12B",
+   "configuration": "UD-Q2_K_XL \u00b7 KV FP16 \u00b7 32K ctx",
+   "overall_pct": 43.66,
+   "suites": {
+    "adversarial": 0.875,
+    "agent_chains": 0.8333,
+    "coding": 0.6,
+    "instruction": 0.6429,
+    "realworld": 0.35,
+    "retrieval": 0.0,
+    "structured": 0.9,
+    "tooluse": 0.0526
+   },
+   "tasks": 94,
+   "scorer": "0.5.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_gemma4-12b-ud-q2_K_XL.png",
+   "source_log": "results/gemma4-12b-ud-q2_K_XL_20261108T150742Z.json"
   }
  ],
  "offload": [],

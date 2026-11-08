@@ -6,7 +6,7 @@ A benchmark for **small language models** (sub-12B class) that runs on whatever 
 
 **Current leaderboard — 94 tasks, scorer 0.5.0, PVE GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
 
-One row per model: the **best-scoring configuration** of that model in the corpus (42 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
+One row per model: the **best-scoring configuration** of that model in the corpus (43 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
 | Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -25,6 +25,7 @@ One row per model: the **best-scoring configuration** of that model in the corpu
 | 13 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **54.2%** | 58% | 50% | 100% | 70% | 86% | 30% | 43% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-1.2b-q8_0.png) |
 | 14 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **52.8%** | 79% | 50% | 67% | 50% | 71% | 30% | 36% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-8b-a1b-udq4km.png) |
 | 15 | Gemma 3n E4B | Q4_K_M · KV FP16 · 32K ctx | **52.4%** | 26% | 75% | 17% | 80% | 86% | 90% | 57% | 94 t · 0.5.0 | [png](results/cards/card_gemma-e4b-q4_K_M.png) |
+| 16 | Gemma 4 12B | UD-Q2_K_XL · KV FP16 · 32K ctx | **43.7%** | 5% | 88% | 83% | 90% | 0% | 60% | 64% | 94 t · 0.5.0 | [png](results/cards/card_gemma4-12b-ud-q2_K_XL.png) |
 
 **Legacy rows — NOT comparable, kept for provenance:** one row per model, its best-scoring pre-0.5.0 configuration; the 225 configurations behind them are listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
