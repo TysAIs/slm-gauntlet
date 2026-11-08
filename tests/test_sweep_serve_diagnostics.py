@@ -56,6 +56,23 @@ def test_a_dead_unit_without_engine_error_is_still_labelled():
     assert pve.classify_serve_failure("", {"ActiveState": "running", "SubState": "running"})[0] == "no_answer"
 
 
+def test_an_engine_that_answers_on_loopback_is_a_transport_failure_not_a_model_verdict():
+    """Measured 2026-11-07: a ufw-before6 guard repair re-armed the container's default-deny
+    policy with no rule for tailscale0. The unit answered 200 on 127.0.0.1 while every request
+    from the sweep host was dropped, and four healthy configs were recorded as `no_answer`
+    ("driver/probe defect"). A request that never arrived must never be blamed on the model or
+    the engine."""
+    cause, detail = pve.classify_serve_failure(
+        "", {"ActiveState": "running", "SubState": "running"}, local_ok=True)
+    assert cause == "transport_blocked"
+    assert "request never arrived" in detail
+    assert "not an engine or model verdict" in detail
+    # loopback silent as well -> still the driver's own problem
+    assert pve.classify_serve_failure("", {"ActiveState": "running"}, local_ok=False)[0] == "no_answer"
+    # a real engine error outranks the transport check
+    assert pve.classify_serve_failure(DORY_ATTEMPT, {"ActiveState": "failed"}, local_ok=True)[0] == "unsupported_arch"
+
+
 def test_stale_lines_from_the_previous_config_do_not_name_the_cause():
     """The journal window carries the previous config's crash loop: a stale dory line inside
     a minicpm5 attempt mislabelled a VRAM problem as an unsupported architecture."""

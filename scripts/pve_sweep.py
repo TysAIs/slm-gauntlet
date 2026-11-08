@@ -210,7 +210,28 @@ def unit_props(lane: Lane, unit: str) -> dict:
     return out
 
 
-def classify_serve_failure(text: str, unit_state: dict | None = None) -> tuple[str, str]:
+def localhost_answers(lane: Lane, port: int, timeout: int = 8) -> bool | None:
+    """Does the engine answer HTTP on loopback INSIDE the container?
+
+    This separates "the request never arrived" from "the engine is broken". Measured
+    2026-11-07: a `ufw-before6-guard` repair re-armed the container's default-deny policy,
+    which had no rule for the tailscale interface, so the unit answered 200 on 127.0.0.1
+    while every request from the sweep host was silently dropped - and four healthy configs
+    were recorded as `no_answer` ("driver/probe defect") with the model and engine innocent.
+    """
+    try:
+        r = lane.run(["curl", "-s", "-m", str(timeout), "-o", "/dev/null",
+                      "-w", "%{http_code}", f"http://127.0.0.1:{port}/health"],
+                     timeout=timeout + 15)
+    except Exception:
+        return None
+    if r.returncode != 0:
+        return None
+    return (r.stdout or "").strip().startswith("2")
+
+
+def classify_serve_failure(text: str, unit_state: dict | None = None,
+                           local_ok: bool | None = None) -> tuple[str, str]:
     """Turn the engine's own output into a named cause.
 
     A lost config has to be a *labelled* lost config: `unsupported_arch` is a permanent
@@ -239,6 +260,12 @@ def classify_serve_failure(text: str, unit_state: dict | None = None) -> tuple[s
         return "unit_failed", (
             f"unit is failed (exit {unit_state.get('ExecMainStatus', '?')}) and never answered "
             "HTTP; the log holds its own error"
+        )
+    if local_ok:
+        return "transport_blocked", (
+            f"unit is {st or 'unknown'} and answers HTTP on 127.0.0.1 inside the container, but "
+            "not on the sweep's endpoint - the request never arrived (firewall, route or "
+            "tailnet), so this is not an engine or model verdict"
         )
     return "no_answer", (
         f"unit is {st or 'unknown'}/{(unit_state or {}).get('SubState', '?')} but never answered "
@@ -461,13 +488,16 @@ def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
     # A crash-looping config retries every 5 s for up to 60 attempts, and each attempt re-runs
     # the loader (a VRAM-OOM config grabs and drops a CUDA context every time). Stop it: the
     # verdict is already made, and a stopped unit also releases VRAM before the next config.
+    # Ask loopback FIRST - once the unit is stopped it cannot answer, and this is the only
+    # evidence that separates "the request never arrived" from "the engine is dead".
+    local_ok = localhost_answers(lane, port)
     lane.run(["systemctl", "stop", unit], timeout=60)
     # Only this attempt's lines may name the cause.
     attempt_text = attempt_section(text)
-    cause, detail = classify_serve_failure(attempt_text, state)
+    cause, detail = classify_serve_failure(attempt_text, state, local_ok=local_ok)
     diag.update(cause=cause, detail=detail, tail=error_tail(attempt_text),
                 exec_status=state.get("ExecMainStatus"), active_state=state.get("ActiveState"),
-                restarts=state.get("NRestarts"), fastfail=fastfail)
+                restarts=state.get("NRestarts"), fastfail=fastfail, local_answers=local_ok)
     log(f"    server never came up as {entry['alias']} ({entry['path']})")
     log(f"    cause={cause}: {detail}")
     if fastfail:
@@ -722,7 +752,8 @@ def main() -> int:
                        serve_exec_status=diag.get("exec_status"),
                        serve_active_state=diag.get("active_state"),
                        serve_restarts=diag.get("restarts"),
-                       serve_fastfail=diag.get("fastfail"))
+                       serve_fastfail=diag.get("fastfail"),
+                       serve_local_answers=diag.get("local_answers"))
             failures.append(e["alias"])
             with state_path.open("a") as fh:
                 fh.write(json.dumps(rec) + "\n")
