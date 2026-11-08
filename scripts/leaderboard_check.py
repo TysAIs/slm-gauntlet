@@ -394,6 +394,28 @@ def pct(v, digits=1):
     return "—" if v is None else ("%." + str(digits) + "f%%") % v
 
 
+def legacy_groups(legacy: list[dict]) -> list[dict]:
+    """Collapse the non-comparable rows to one row per (model, epoch).
+
+    Provenance is the point of this table, not completeness: an epoch bump puts every older
+    configuration in here at once (0.5.0 moved 228 cards out of the ranking), and 228 legacy
+    rows bury the live table. The full list stays in `results/_published/leaderboard.json`
+    and in `results/_published/LEADERBOARD.md`; the README shows the best legacy configuration
+    of each model and how many sat behind it.
+    """
+    groups: dict[tuple[str, str], list[dict]] = {}
+    for r in legacy:
+        groups.setdefault((r["display_name"], r.get("epoch") or ""), []).append(r)
+    out = []
+    for entries in groups.values():
+        entries.sort(key=lambda e: -(e.get("published") if e.get("published") is not None else -1))
+        best = dict(entries[0])
+        best["variants"] = len(entries)
+        out.append(best)
+    out.sort(key=lambda r: (r["display_name"], -(r["published"] or 0)))
+    return out
+
+
 def render_block(data: dict) -> str:
     L = [BLOCK_BEGIN, ""]
     L.append("**Current leaderboard — %d tasks, scorer %s, PVE GTX 1070 Ti 8 GB, all layers "
@@ -423,13 +445,18 @@ def render_block(data: dict) -> str:
             " | ".join(cells), FULL_TASKS, r["epoch"], card))
     L.append("")
     if data["legacy"]:
-        L.append("**Legacy rows — NOT comparable, kept for provenance:**")
+        groups = legacy_groups(data["legacy"])
+        L.append("**Legacy rows — NOT comparable, kept for provenance:** one row per model, its "
+                 "best-scoring pre-0.5.0 configuration; the %d configurations behind them are "
+                 "listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)."
+                 % len(data["legacy"]))
         L.append("")
-        L.append("| Model | Configuration | Score | Why it is not comparable |")
-        L.append("|---|---|---|---|")
-        for r in data["legacy"]:
-            L.append("| {} | {} | {} | {} |".format(
-                r["display_name"], r["config"], pct(r["published"]), r["not_rankable_because"]))
+        L.append("| Model | Best legacy configuration | Configurations | Score | Why it is not comparable |")
+        L.append("|---|---|---|---|---|")
+        for r in groups:
+            L.append("| {} | {} | {} | {} | {} |".format(
+                r["display_name"], r["config"], r["variants"], pct(r["published"]),
+                r["not_rankable_because"]))
         L.append("")
     if data["offload"]:
         L.append("**Offload / >12B — scored separately, never merged with the on-GPU table:**")

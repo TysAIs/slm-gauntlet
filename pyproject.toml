@@ -38,6 +38,11 @@ select = ["E", "F", "W", "I", "UP", "B"]
 # gate also flips red whenever the unpinned ruff in CI adds a case.
 ignore = ["UP031"]
 
+[tool.ruff.lint.per-file-ignores]
+# Verbatim engine-log excerpts: each journal line has to stay one physical line, so a
+# long `cudaMalloc failed` line cannot be wrapped without editing the evidence.
+"tests/test_sweep_serve_diagnostics.py" = ["E501"]
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

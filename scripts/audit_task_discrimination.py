@@ -32,7 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from gauntlet.methodology import newest_published_epoch, epoch_spec  # noqa: E402
+from gauntlet.methodology import epoch_spec, newest_published_epoch  # noqa: E402
 
 
 def run_logs_from_sweep(state: Path) -> list[Path]:
