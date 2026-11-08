@@ -109,6 +109,28 @@ def main() -> int:
             dst = outdir / f"{a.prefix}{slug}.png"
             page.goto(src.resolve().as_uri(), wait_until="load")
             page.wait_for_timeout(120)  # let webfonts/metrics settle
+            # Fit the whole card in the frame. The card is a FIXED 1080x1080 box with
+            # `overflow:hidden`, so content taller than the box is silently cropped - the
+            # 0.5.0 cards carry 8 suite tiles and a longer verdict, and the verdict's last
+            # line was being cut off a published image. Measure the real content bottom
+            # (body height is always the fixed box, so it cannot report the overflow), then
+            # lay the card out in a taller virtual box and scale it back to the frame.
+            zoom = 1.0
+            for _ in range(4):
+                need = page.evaluate(
+                    "(() => {const el=document.querySelector('.card')||document.body;"
+                    "let b=0;for(const e of el.querySelectorAll('*')){const r=e.getBoundingClientRect();"
+                    "if(r.bottom>b)b=r.bottom;}return b;})()")
+                if not need or need <= a.size * 0.995:
+                    break
+                zoom = max(0.7, zoom * a.size / need)
+                page.evaluate(
+                    "([box, z]) => {const px=box/z + 'px';"
+                    "for (const el of [document.documentElement, document.body,"
+                    "document.querySelector('.card')]) {if(!el) continue;"
+                    "el.style.width=px; el.style.height=px;}"
+                    "document.body.style.zoom=String(z);}", [a.size, zoom])
+                page.wait_for_timeout(80)
             page.screenshot(path=str(dst), animations="disabled")
             w, h = png_geometry(dst)
             sd = stddev(dst)
@@ -118,9 +140,10 @@ def main() -> int:
                 bad += 1
             results.append({
                 "src": str(src), "dst": str(dst), "w": w, "h": h,
-                "bytes": size, "stddev": sd, "ok": ok,
+                "bytes": size, "stddev": sd, "ok": ok, "zoom": round(zoom, 3),
             })
-            print(f"{'OK ' if ok else 'BAD'} {dst} {w}x{h} {size}B stddev={sd}")
+            print(f"{'OK ' if ok else 'BAD'} {dst} {w}x{h} {size}B stddev={sd} zoom={zoom:.3f}")
+
         browser.close()
 
     if a.json_out:
