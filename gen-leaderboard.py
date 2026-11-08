@@ -66,10 +66,11 @@ _spec.loader.exec_module(_lb)
 CURRENT_EPOCH = _lb.CURRENT_EPOCH
 FULL_TASKS = _lb.FULL_TASKS
 scorer_epoch = _lb.scorer_epoch
+newest_published_epoch = _lb.newest_published_epoch
 
 
 def epoch_of(card):
-    return scorer_epoch(card.get("ts", ""))
+    return scorer_epoch(card.get("ts", ""), (card.get("details") or {}).get("methodology"))
 
 
 def method_label(card):
@@ -90,6 +91,14 @@ def main():
         if m["model"] == "announcement":
             continue
         cards.append(m)
+    # The document's header must describe the epoch it PRINTS, which is the newest one
+    # that actually has rows — not whatever methodology the code currently ships. Bumping
+    # METHODOLOGY_VERSION made this header claim "0.5.1 / 140 tasks" above a table of
+    # 0.5.0 rows the moment the task set changed, before any new run existed.
+    global CURRENT_EPOCH, FULL_TASKS
+    if cards:
+        CURRENT_EPOCH = _lb.CURRENT_EPOCH = newest_published_epoch({epoch_of(c) for c in cards})
+        FULL_TASKS = _lb.FULL_TASKS = _lb.EPOCHS[CURRENT_EPOCH]["tasks"]
     # perf
     perf = {}
     for pf in glob.glob(str(ROOT / "perf_*.json")):

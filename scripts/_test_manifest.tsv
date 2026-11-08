@@ -1,0 +1,1 @@
+spark-x2.6-4b-iq3m-bartowski	/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0

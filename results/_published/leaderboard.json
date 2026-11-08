@@ -1,5 +1,5 @@
 {
- "benchmark": "slm-gauntlet 0.5.0 (94 tasks: adversarial 8, agent_chains 6, coding 10, instruction 14, realworld 20, structured 10, tooluse 19)",
+ "benchmark": "slm-gauntlet 0.5.0 (94 tasks)",
  "hardware": "8GB-class GPU (GTX 1070 Ti), all layers on-GPU, zero CPU offload, llama.cpp",
  "settings": "temperature 0, seed 1, thinking disabled, pass@1",
  "weights": "CLI 8-suite weights (tooluse 0.26 / structured 0.12 / retrieval 0.12 / coding 0.12 / instruction 0.10 / adversarial 0.08 / agent_chains 0.08 / realworld 0.12), 94 tasks",

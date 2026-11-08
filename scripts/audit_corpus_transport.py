@@ -98,7 +98,7 @@ def main() -> int:
     logs = lb.index_logs(Path(args.results))
     affected = []
     for card in lb.load_cards(Path(args.cards)):
-        card_epoch = lb.scorer_epoch(card.get("ts", ""))
+        card_epoch = lb.scorer_epoch(card.get("ts", ""), (card.get("details") or {}).get("methodology"))
         weights = lb.EPOCHS[card_epoch]["weights"] if card_epoch in lb.EPOCHS else None
         src, _note = lb.pick_log(card, logs, weights)
         if not src:
@@ -119,7 +119,7 @@ def main() -> int:
         print("  %s  published=%s  <- %s" % (card, pct, log))
         print("       %s" % why)
     for card in lb.load_cards(Path(args.cards)):
-        epoch = lb.scorer_epoch(card.get("ts", ""))
+        epoch = lb.scorer_epoch(card.get("ts", ""), (card.get("details") or {}).get("methodology"))
         weights = lb.EPOCHS[epoch]["weights"] if epoch in lb.EPOCHS else None
         src, _ = lb.pick_log(card, logs, weights)
         if not src:
