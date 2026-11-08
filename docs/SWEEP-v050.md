@@ -26,6 +26,15 @@ then it moves wholesale.
 ## Commands
 
 ```bash
+# 0. gate: is the lane benchmarkable RIGHT NOW? (unit, endpoint with a real completion, card on the
+#    GPU and unthrottled, nobody else on it, cool, pinned). One exit code; every leg refuses
+#    separately. This also runs automatically as the first step of pve_sweep.py.
+GRUNT_HOST=<test-box> python3 scripts/preflight_lane.py            # 0 = benchmarkable
+GRUNT_HOST=<test-box> python3 scripts/preflight_lane.py --json     # machine-readable receipt
+#    prove the gate itself against the real box (seeds one fault per leg, restores the lane,
+#    ~10 min: it really does stop the unit and heat the card). Receipt under results/_preflight/.
+GRUNT_HOST=<test-box> python3 scripts/preflight_seeded_faults.py
+
 # 1. inventory of what is actually on the box (no invented quants)
 ssh pve 'pct exec 100 -- find /mnt/data/models -name "*.gguf" -printf "%s\t%p\n"' > /tmp/inv.tsv
 
@@ -61,6 +70,32 @@ repo's: the hygiene gate rejects address literals in tracked files.
 * **Publish a dead endpoint.** Every run's attempt health goes through
   `gauntlet/run_health.py`; the publisher will not rank a card whose source log is a
   transport failure (see audit F16).
+* **Start on a card that is not benchmarkable.** `scripts/preflight_lane.py` runs before the
+  first config and the driver reports a `REFUSED <leg>` line instead of scoring anything. Its
+  rule set is written out in that file's header; the two rules that matter most, and why they
+  are written down rather than left to judgement:
+  * the throttle mask is a bitmask with a legit idle bit (`0x1 GPU_IDLE`, the measured state of
+    this card at 139 of 1911 MHz / 9.7 W / 0 %), so the gate only refuses on the slowdown bits
+    (`HW_SLOWDOWN 0x8`, `SW_THERMAL 0x20`, `HW_THERMAL 0x40`, `HW_POWER_BRAKE 0x80`) and never
+    on a clock-versus-max comparison;
+  * temperature comes from the PVE HOST (`nvidia-smi --query-gpu=temperature.gpu`) because
+    inside LXC 100 the same query answers `[Function Not Found]`, and the refuse line is 80 C
+    against the card's 83 C target (thermal slowdown fired on 8.8-17.4 % of loaded samples in
+    the 13-minute reference run).
+  A leg that cannot be asked (ssh/`pct exec`/nvidia-smi failure) exits 8 - "cannot ask" - and is
+  never recorded as a fault.
+* **Trust the gate's rules without proving them.** `scripts/preflight_seeded_faults.py` seeds one
+  REAL fault per leg on the box (stop the unit, point at a dead port, run a genuine `-ngl 0`
+  engine, hold the card with `llama-bench`, burn it past 80 C, raise the power limit), runs the
+  shipped gate, and quotes its exit code per leg; it restores the lane and then requires the
+  unseeded state to return 0. Two findings from running it are now baked into the gate:
+  a `-ngl 0` engine still holds **169 MiB** of CUDA context (a 100 MiB floor called that healthy),
+  so the CPU-fallback floor is 256 MiB against a measured 1796 MiB for a real 2B `-ngl 99`
+  offload; and a stopped unit keeps its VRAM resident for a moment, so a seed must wait for the
+  card to be released before judging it. Offline rule proofs stay in
+  `tests/test_preflight_lane.py` (recorded samples) and
+  `tests/test_preflight_seeded_faults.py` (expectations cross-checked against the gate's exit
+  contract).
 
 ## Cost model (measured, not estimated)
 

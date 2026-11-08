@@ -12,6 +12,10 @@ results/*
 !results/_published
 !results/_published/**
 !results/cards
+# The lane-gate proofs are RECEIPTS, not run output: a refusal is only trustworthy if the exit
+# code it quoted is in the repo, so these are tracked on purpose.
+!results/_preflight
+!results/_preflight/**
 
 # --- python ---
 __pycache__/

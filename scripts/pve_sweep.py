@@ -9,6 +9,9 @@ re-run had no driver. This is that driver, and it is resume-safe because a full 
 spans hours.
 
 WHAT IT DOES, PER MANIFEST ENTRY
+  0. gate the lane first (`scripts/preflight_lane.py`): unit active, endpoint answering with a
+     real completion, card on the GPU and unthrottled, nobody else on it, cool, pinned. A refusal
+     prints `REFUSED <leg>` and exits 4 without serving a config or writing a state line.
   1. write a systemd drop-in for llama-worker@8891 that replaces ExecStart with the
      config's model, alias, context, slots and KV types (the shipped template hardcodes
      MiniCPM; a drop-in keeps the unit's Restart/MemoryHigh policy intact)
@@ -681,6 +684,9 @@ def main() -> int:
     ap.add_argument("--no-vram-gate", action="store_true",
                     help="do not wait for the card to look idle before starting a config "
                          "(use when something else legitimately owns the GPU, e.g. an isolated probe)")
+    ap.add_argument("--no-preflight", action="store_true",
+                    help="skip scripts/preflight_lane.py (the benchmarkability gate); use only "
+                         "when you are deliberately scoring a card you know is busy/hot")
     args = ap.parse_args()
 
     lane = Lane(args.ssh, args.ct)
@@ -696,6 +702,44 @@ def main() -> int:
             print(f"[sweep] GPU pins not applied ({pins.get('error') or pins}); "
                   f"refusing to score configs on a throttling card", flush=True)
             return 3
+
+    # ONE gate before the first config (scripts/preflight_lane.py): unit active, endpoint answering
+    # with a real completion, card on the GPU and not throttled, nobody else on it, cool, pinned.
+    # Measured 2026-11-07/08: a wedged worker answered /health and /v1/models while a 16-token
+    # completion never returned, and a sick card would have scored every config for 20 minutes.
+    # A refusal must be a REFUSED line with no state line written - not a run of zeroed rows.
+    if not args.no_preflight:
+        pf_cmd = [sys.executable, str(ROOT / "scripts" / "preflight_lane.py"),
+                  "--ssh", args.ssh, "--ct", args.ct, "--unit", args.unit,
+                  "--port", str(args.port), "--json"]
+        if args.host:
+            pf_cmd += ["--host", args.host]
+        try:
+            pf = subprocess.run(pf_cmd, capture_output=True, text=True, timeout=300)
+        except Exception as exc:  # noqa: BLE001 - a gate that cannot run must not score anything
+            print(f"[sweep] REFUSED preflight could not run: {exc}", flush=True)
+            return 4
+        detail = ""
+        try:
+            obj = json.loads(pf.stdout)
+            legs = obj.get("legs", [])
+            bad = [item for item in legs if not item.get("ok")]
+            detail = (bad[0]["detail"] if bad else "")
+            leg = obj.get("refused") or "preflight"
+            if not bad:
+                g = {item["leg"]: item.get("data") or {} for item in legs}
+                detail = (f"unit mainpid={g.get('unit', {}).get('main_pid')}, "
+                          f"{g.get('gpu', {}).get('throttle_mask')} "
+                          f"{g.get('gpu', {}).get('temperature_c')} C, "
+                          f"{g.get('gpu', {}).get('gpu_memory_used_mib')} MiB resident, "
+                          f"{g.get('pin', {}).get('power_limit_w')} W pin")
+        except Exception:
+            leg, detail = "preflight", (pf.stdout + pf.stderr).strip()[-300:]
+        if pf.returncode != 0:
+            print(f"[sweep] REFUSED {leg} (exit {pf.returncode}): {detail}", flush=True)
+            print("[sweep] no config was served and no state line was written", flush=True)
+            return 4
+        print(f"[sweep] preflight green: lane benchmarkable ({detail[:120]})", flush=True)
 
     entries, exclusions = read_manifest(Path(args.manifest))
     if args.only:

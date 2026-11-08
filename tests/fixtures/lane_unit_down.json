@@ -1,0 +1,31 @@
+{
+  "source": "fixture:lane_unit_down.json",
+  "sampled_at": "2026-11-08T02:07:06-0700",
+  "unit_props": {
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "MainPID": "0",
+    "NRestarts": "0",
+    "MemoryCurrent": "0",
+    "MemoryHigh": "8589934592",
+    "MemoryMax": "infinity",
+    "ExecMainStatus": "0"
+  },
+  "swap_free_mib": 7605,
+  "gpu_csv": "Enabled, 120.00 W, 8.60 W, 33, 0 %, 2 MiB, 8106 MiB, 139 MHz, 1911 MHz, 0x0000000000000001",
+  "compute_apps": "",
+  "perf_enum": "\n==============NVSMI LOG==============\n\nTimestamp                                 : Sun Nov  8 02:07:07 2026\nDriver Version                            : 550.163.01\nCUDA Version                              : 12.4\n\nAttached GPUs                             : 1\nGPU 00000000:01:00.0\n    Performance State                     : P8\n    Clocks Event Reasons\n        Idle                              : Active\n        Applications Clocks Setting       : Not Active\n        SW Power Cap                      : Not Active\n        HW Slowdown                       : Not Active\n            HW Thermal Slowdown           : Not Active\n            HW Power Brake Slowdown       : Not Active\n        Sync Boost                        : Not Active\n        SW Thermal Slowdown               : Not Active\n        Display Clock Setting             : Not Active\n    Sparse Operation Mode                 : N/A\n\n",
+  "util_samples": [
+    0,
+    0
+  ],
+  "apps_samples": [
+    "",
+    ""
+  ],
+  "health": {
+    "rc": 1,
+    "out": "FAIL health   no TCP answer on http://LANE (wrong port / container down / not on tailnet)\nRESULT red  (http://LANE)"
+  },
+  "note": "Seed: worker unit stopped (systemctl stop). The endpoint leg will also fail - a stopped unit cannot answer - but the unit leg is the cause and is reported first."
+}
