@@ -1,0 +1,54 @@
+[
+ {
+  "model": "minicpmv47-1b-q4km-kvq8",
+  "display_name": "MiniCPM-V 4.7 1B",
+  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 53.5,
+  "suites": {
+   "adversarial": 0.6,
+   "agent_chains": 0.833,
+   "calendar": 0.4,
+   "classify": 0.667,
+   "coding": 0.4,
+   "docintake": 0.793,
+   "email": 0.565,
+   "instruction": 0.444,
+   "realworld": 0.15,
+   "structured": 0.5,
+   "summarize": 0.5,
+   "support": 0.625,
+   "tooluse": 0.596,
+   "retrieval": 0.286
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261109",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "looped": 2
+  },
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "MiniCPM-V-4_7-1B-Q4_K_M.gguf",
+   "gguf_size_bytes": 672003680,
+   "quant": "Q4_K_M",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/minicpmv47-1b-q4km-kvq8_20261109T063945Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

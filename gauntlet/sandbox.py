@@ -90,9 +90,36 @@ class ToolSandbox:
                     "seats_left": self.rng.randint(0, 9),
                 }
             )
+        # remember what was offered: the chain tasks' state asserts grade
+        # "reserved the cheapest offered flight" against these prices.
+        self.state.setdefault("flight_offers", []).extend(flights)
         return {"flights": flights}
 
+    def cheapest_offered_flight_id(self) -> str | None:
+        """flight_id of the cheapest search_flights result so far this run.
+
+        The booking/price chain tasks grade "did the agent pick the cheapest
+        option it was offered" — that is only decidable from the prices the
+        sandbox itself generated, so the sandbox tracks them. Returns None
+        when no search has run yet.
+        """
+        best = None
+        for offer in self.state.get("flight_offers", []):
+            if best is None or offer["price_usd"] < best["price_usd"]:
+                best = offer
+        return best["flight_id"] if best else None
+
+    def cheapest_offered_price(self) -> float | None:
+        """price_usd of the cheapest search_flights result so far this run."""
+        best = None
+        for offer in self.state.get("flight_offers", []):
+            if best is None or offer["price_usd"] < best["price_usd"]:
+                best = offer
+        return best["price_usd"] if best else None
+
     def _tool_reserve_flight(self, flight_id: str, passenger: dict) -> dict:
+        if not isinstance(passenger, dict):
+            return {"error": "invalid_passenger", "message": "passenger must be an object with name and passport"}
         if not passenger.get("name") or not passenger.get("passport"):
             return {"error": "missing_passenger_fields", "message": "passenger needs name and passport"}
         confirmation = f"CONF-{self.rng.randint(100000, 999999)}"
@@ -155,6 +182,15 @@ class ToolSandbox:
 
     def _tool_database_query(self, table: str, filters: dict | None = None) -> dict:
         """Mock records service used by retrieval/data tasks."""
+        if isinstance(filters, str):
+            # Models sometimes pass filters as a JSON string; a malformed
+            # tool call must return an error dict, not crash the run.
+            try:
+                filters = json.loads(filters)
+            except (ValueError, TypeError):
+                return {"error": "invalid_filters"}
+            if not isinstance(filters, dict):
+                return {"error": "invalid_filters"}
         rows = self.state.setdefault(f"db_{table}", [])
         if filters:
             keys = list(filters.keys())

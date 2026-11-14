@@ -1,0 +1,400 @@
+# Calendar & scheduling suite (epoch 0.6.0, design P2 section 2.5).
+#
+# Scheduling is where "close enough" is wrong: timezones across DST,
+# recurrence, interval reasoning, cascades. Every gold in this file was
+# computed with python datetime/zoneinfo (2026-03-10: Berlin is CET
+# UTC+1; New York is EDT UTC-4 because US DST starts 2026-03-08, a week
+# before the EU switch - the deliberate trap of cal_tz_convert).
+#
+# cal_vague_bounded: the prompt says "Pick the EARLIEST valid slot", so the
+# gold is the single earliest slot (Mon 2026-03-02 09:00) and the assert
+# grades it exactly. (It previously accepted any of the 15 Mon-Fri morning
+# slots, which contradicted the prompt; audit flag, 2026-11-09.)
+# cal_free_slot: the 10:30-11:00 gap is only 30 minutes, so the earliest
+# 60-minute slot is 12:00-13:00 (the prompt states back-to-back starts and
+# ends against busy blocks are allowed).
+#
+# Fixtures are synthetic; scripts/gen_calendar_tasks.py recomputes every
+# date/time gold and asserts equality with this file.
+# Validity proof: tests/test_validity_calendar.py.
+- id: cal_event_extract__title
+  suite: calendar
+  description: Event extraction — unit title
+  prompt: 'Extract this event into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"title": "<event title>", "date": "<YYYY-MM-DD>", "start": "<HH:MM>", "location": "<location>"}
+
+
+    --- event note ---
+
+    "Team lunch with Ana Ruiz on 2026-03-12 at 12:30, at the Harbor Cafe."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('title') == 'Team lunch with Ana Ruiz'
+  tier: standard
+  max_tokens: 512
+- id: cal_event_extract__date
+  suite: calendar
+  description: Event extraction — unit date
+  prompt: 'Extract this event into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"title": "<event title>", "date": "<YYYY-MM-DD>", "start": "<HH:MM>", "location": "<location>"}
+
+
+    --- event note ---
+
+    "Team lunch with Ana Ruiz on 2026-03-12 at 12:30, at the Harbor Cafe."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('date') == '2026-03-12'
+  tier: standard
+  max_tokens: 512
+- id: cal_event_extract__start
+  suite: calendar
+  description: Event extraction — unit start
+  prompt: 'Extract this event into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"title": "<event title>", "date": "<YYYY-MM-DD>", "start": "<HH:MM>", "location": "<location>"}
+
+
+    --- event note ---
+
+    "Team lunch with Ana Ruiz on 2026-03-12 at 12:30, at the Harbor Cafe."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('start') == '12:30'
+  tier: standard
+  max_tokens: 512
+- id: cal_event_extract__location
+  suite: calendar
+  description: Event extraction — unit location
+  prompt: 'Extract this event into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"title": "<event title>", "date": "<YYYY-MM-DD>", "start": "<HH:MM>", "location": "<location>"}
+
+
+    --- event note ---
+
+    "Team lunch with Ana Ruiz on 2026-03-12 at 12:30, at the Harbor Cafe."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('location') == 'Harbor Cafe'
+  tier: standard
+  max_tokens: 512
+- id: cal_tz_convert__utc
+  suite: calendar
+  description: Timezone conversion — unit UTC (Berlin is CET, UTC+1, on 2026-03-10)
+  prompt: 'Convert this meeting time. The meeting is at 15:00 on 2026-03-10 in Berlin (Europe/Berlin).
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"utc": "<YYYY-MM-DD HH:MM>", "new_york": "<YYYY-MM-DD HH:MM>"}
+
+    utc is the same moment in UTC; new_york is the same moment in New York (America/New_York).'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('utc') == '2026-03-10 14:00'
+  tier: hard
+  max_tokens: 512
+- id: cal_tz_convert__new_york
+  suite: calendar
+  description: Timezone conversion — unit New York (EDT, UTC-4, after the Mar 8 US switch)
+  prompt: 'Convert this meeting time. The meeting is at 15:00 on 2026-03-10 in Berlin (Europe/Berlin).
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"utc": "<YYYY-MM-DD HH:MM>", "new_york": "<YYYY-MM-DD HH:MM>"}
+
+    utc is the same moment in UTC; new_york is the same moment in New York (America/New_York).'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('new_york') == '2026-03-10 10:00'
+  tier: hard
+  max_tokens: 512
+- id: cal_recurrence__rrule
+  suite: calendar
+  description: Recurrence — unit exact RRULE string
+  prompt: 'Write the recurrence rule for this event and its first occurrences.
+
+    The event runs every week on Monday, starting Monday 2026-03-02, for 6 occurrences in total.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"rrule": "<the RRULE string>", "first_three": ["<YYYY-MM-DD>", "<YYYY-MM-DD>", "<YYYY-MM-DD>"]}
+
+    The RRULE must use FREQ=WEEKLY, BYDAY=MO and COUNT=6, in that component order, like "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=6".'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('rrule') == 'RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=6'
+  tier: standard
+  max_tokens: 512
+- id: cal_recurrence__dates
+  suite: calendar
+  description: Recurrence — unit first three occurrence dates as a set
+  prompt: 'Write the recurrence rule for this event and its first occurrences.
+
+    The event runs every week on Monday, starting Monday 2026-03-02, for 6 occurrences in total.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"rrule": "<the RRULE string>", "first_three": ["<YYYY-MM-DD>", "<YYYY-MM-DD>", "<YYYY-MM-DD>"]}
+
+    The RRULE must use FREQ=WEEKLY, BYDAY=MO and COUNT=6, in that component order, like "RRULE:FREQ=WEEKLY;BYDAY=MO;COUNT=6".'
+  asserts:
+  - type: predicate
+    expr: data is not None and set(data.get('first_three', [])) == {'2026-03-02', '2026-03-09', '2026-03-16'}
+  tier: standard
+  max_tokens: 512
+- id: cal_free_slot
+  suite: calendar
+  description: 'Earliest free 60-minute slot (interval reasoning: the 10:30-11:00 gap is only 30 minutes, so the
+    first full hour is 12:00-13:00)'
+  prompt: 'Find the EARLIEST free slot for a new 60-minute meeting on 2026-03-10, inside working hours 09:00-17:00.
+
+    A slot may start exactly when a busy block ends and end exactly when the next one begins.
+
+    Busy times that day: 09:00-10:30, 11:00-12:00, 13:30-15:00.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"start": "<HH:MM>", "end": "<HH:MM>"}'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('start') == '12:00' and data.get('end') == '13:00'
+  tier: standard
+  max_tokens: 512
+- id: cal_conflict_find__set
+  suite: calendar
+  description: Overlap detection — unit exact pair set
+  prompt: 'Find every pair of events that overlap in time. Event times (same day, 2026-03-10):
+
+    A: 09:00-10:00
+
+    B: 09:30-10:30
+
+    C: 11:00-12:00
+
+    D: 11:30-12:30
+
+    E: 13:00-14:00
+
+    Reply with ONLY a JSON array of the overlapping pairs, each pair a two-element array of ids, like [["A", "B"]].'
+  asserts:
+  - type: predicate
+    expr: data is not None and {tuple(sorted(p)) for p in data} == {('A', 'B'), ('C', 'D')}
+  tier: standard
+  max_tokens: 512
+- id: cal_conflict_find__count
+  suite: calendar
+  description: Overlap detection — unit exactly two pairs
+  prompt: 'Find every pair of events that overlap in time. Event times (same day, 2026-03-10):
+
+    A: 09:00-10:00
+
+    B: 09:30-10:30
+
+    C: 11:00-12:00
+
+    D: 11:30-12:30
+
+    E: 13:00-14:00
+
+    Reply with ONLY a JSON array of the overlapping pairs, each pair a two-element array of ids, like [["A", "B"]].'
+  asserts:
+  - type: predicate
+    expr: data is not None and len(data) == 2
+  tier: standard
+  max_tokens: 512
+- id: cal_reschedule_cascade__y
+  suite: calendar
+  description: Reschedule cascade — unit Y follows X
+  prompt: 'Event X moves, and everything depending on it shifts with it. The rules:
+
+    - Y starts when X ends (Y follows X directly).
+
+    - Z starts 30 minutes after Y ends.
+
+    Current schedule (2026-03-10):
+
+    X: 10:00-11:00
+
+    Y: 11:00-12:00
+
+    Z: 12:30-13:30
+
+    X moves to 14:00-15:00 (same length). Reply with ONLY a JSON object of exactly this shape:
+
+    {"X": ["<HH:MM>", "<HH:MM>"], "Y": ["<HH:MM>", "<HH:MM>"], "Z": ["<HH:MM>", "<HH:MM>"]}
+
+    giving the NEW start and end of each event.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('Y') == ['15:00', '16:00']
+  tier: hard
+  max_tokens: 512
+- id: cal_reschedule_cascade__z
+  suite: calendar
+  description: Reschedule cascade — unit Z sits 30 min after Y (2-deep)
+  prompt: 'Event X moves, and everything depending on it shifts with it. The rules:
+
+    - Y starts when X ends (Y follows X directly).
+
+    - Z starts 30 minutes after Y ends.
+
+    Current schedule (2026-03-10):
+
+    X: 10:00-11:00
+
+    Y: 11:00-12:00
+
+    Z: 12:30-13:30
+
+    X moves to 14:00-15:00 (same length). Reply with ONLY a JSON object of exactly this shape:
+
+    {"X": ["<HH:MM>", "<HH:MM>"], "Y": ["<HH:MM>", "<HH:MM>"], "Z": ["<HH:MM>", "<HH:MM>"]}
+
+    giving the NEW start and end of each event.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('Z') == ['16:30', '17:30']
+  tier: hard
+  max_tokens: 512
+- id: cal_reschedule_cascade__x
+  suite: calendar
+  description: Reschedule cascade — unit X at its new time
+  prompt: 'Event X moves, and everything depending on it shifts with it. The rules:
+
+    - Y starts when X ends (Y follows X directly).
+
+    - Z starts 30 minutes after Y ends.
+
+    Current schedule (2026-03-10):
+
+    X: 10:00-11:00
+
+    Y: 11:00-12:00
+
+    Z: 12:30-13:30
+
+    X moves to 14:00-15:00 (same length). Reply with ONLY a JSON object of exactly this shape:
+
+    {"X": ["<HH:MM>", "<HH:MM>"], "Y": ["<HH:MM>", "<HH:MM>"], "Z": ["<HH:MM>", "<HH:MM>"]}
+
+    giving the NEW start and end of each event.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('X') == ['14:00', '15:00']
+  tier: hard
+  max_tokens: 512
+- id: cal_deadlines__report
+  suite: calendar
+  description: Deadline resolution — unit report
+  prompt: 'Today is Friday 2026-03-06. Resolve each deadline to an exact date. "End of next week" means the Sunday
+    at the end of next week.
+
+    - report: due 2026-03-13
+
+    - slides: due end of next week
+
+    - invoice: due 2026-03-20
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"report": "<YYYY-MM-DD>", "slides": "<YYYY-MM-DD>", "invoice": "<YYYY-MM-DD>"}'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('report') == '2026-03-13'
+  tier: standard
+  max_tokens: 512
+- id: cal_deadlines__slides
+  suite: calendar
+  description: Deadline resolution — unit slides
+  prompt: 'Today is Friday 2026-03-06. Resolve each deadline to an exact date. "End of next week" means the Sunday
+    at the end of next week.
+
+    - report: due 2026-03-13
+
+    - slides: due end of next week
+
+    - invoice: due 2026-03-20
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"report": "<YYYY-MM-DD>", "slides": "<YYYY-MM-DD>", "invoice": "<YYYY-MM-DD>"}'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('slides') == '2026-03-15'
+  tier: standard
+  max_tokens: 512
+- id: cal_deadlines__invoice
+  suite: calendar
+  description: Deadline resolution — unit invoice
+  prompt: 'Today is Friday 2026-03-06. Resolve each deadline to an exact date. "End of next week" means the Sunday
+    at the end of next week.
+
+    - report: due 2026-03-13
+
+    - slides: due end of next week
+
+    - invoice: due 2026-03-20
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"report": "<YYYY-MM-DD>", "slides": "<YYYY-MM-DD>", "invoice": "<YYYY-MM-DD>"}'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('invoice') == '2026-03-20'
+  tier: standard
+  max_tokens: 512
+- id: cal_duration_math
+  suite: calendar
+  description: Meeting duration in minutes
+  prompt: 'How long is this meeting? Answer with one line and nothing else:
+
+    MINUTES: <total length in minutes>
+
+
+    Meeting: 2026-03-10, starts 14:15, ends 16:45.'
+  asserts:
+  - type: line_value
+    label: MINUTES
+    equals: 150
+  tier: standard
+  max_tokens: 512
+- id: cal_reminder_list
+  suite: calendar
+  description: Reminder moments — unit exact set
+  prompt: 'List the reminders for this event. The event starts at 2026-03-12 15:00. Reminders are set for: 1 day
+    before, 1 hour before, and 15 minutes before the start.
+
+    Reply with ONLY a JSON array of the reminder moments, each formatted "YYYY-MM-DD HH:MM".'
+  asserts:
+  - type: predicate
+    expr: data is not None and set(data) == {'2026-03-11 15:00', '2026-03-12 14:00', '2026-03-12 14:45'}
+  tier: standard
+  max_tokens: 512
+- id: cal_vague_bounded
+  suite: calendar
+  description: 'Vague request bounded: the prompt demands the EARLIEST valid slot (Mon 2026-03-02 09:00);
+    the assert grades that slot exactly'
+  prompt: 'Today is Friday 2026-02-27. A customer asks for "a morning next week" for a 1-hour call, mornings meaning
+    a start between 09:00 and 11:00, Monday to Friday.
+
+    Pick the EARLIEST valid slot. Reply with ONLY a JSON object of exactly this shape:
+
+    {"date": "<YYYY-MM-DD>", "start": "<HH:MM>"}
+
+    "Next week" is the week starting Monday 2026-03-02.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('date') == '2026-03-02' and data.get('start') == '09:00'
+  tier: hard
+  max_tokens: 512

@@ -1,0 +1,986 @@
+{
+  "model": "gemma4-e4b-q4km-l3",
+  "endpoint": "http://<lane-host>:8891/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 0,
+      "score": 0.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "interference": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    },
+    "memory": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 0,
+      "score": 0.0
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.12,
+  "n_failures": 22,
+  "failures": [
+    {
+      "id": "lh2-multihop-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-distance-json",
+      "mode": "echoed",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "mode": "wrong_value",
+      "turn_scores": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "wrong_format",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-budget",
+      "mode": "refused",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-routing",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-low-overlap",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "mode": "refused",
+      "turn_scores": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "mode": "leaked",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 470509.8,
+          "response": "The user wants to find the combined budget for \"Project Orion\" and \"Project Vega\", excluding any internal transfers, and provide only the dollar total.\n\n1.  **Identify Project Orion:**\n    *   Found: `Project Orion. Lead: Priya. Budget: $80,000. Status: on track. Quarter: Q1. Date: 2026-01-12.`\n    *   Budget: $80,000.\n    *   Status check (P4): Not marked [CONFIDENTIAL].\n    *   Transfer check (P1): Not marked [INTERNAL].\n\n2.  **Identify Project Vega:**\n    *   Found multiple entries for \"Project Vega\":\n        *   `Project Vega Coyote. Lead: Rosa. Budget: $17,000. Status: on track. Quarter: Q4. Date: 2026-05-10.` (Not internal)\n        *   `Project Vega Raven. Lead: Grace. Budget: $42,000. Status: complete. Quarter: Q1. Date: 2026-02-13.` (Not internal)\n        *   `Project Vega Newt. Lead: Liam. Budget: $36,000. Status: on track. Quarter: Q2. Date: 2026-01-19.` (Not internal)\n        *   `Project Vega Stoat. Lead: Rosa. Budget: $25,000. Status: complete. Quarter: Q4. Date: 2026-03-1",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0,
+            15.0,
+            16.0,
+            17.0,
+            18.0,
+            19.0,
+            30.0,
+            2026.0,
+            12000.0,
+            17000.0,
+            21000.0,
+            22000.0,
+            25000.0,
+            36000.0,
+            42000.0,
+            80000.0,
+            88888.0,
+            122000.0,
+            145000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 470509.8
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 449487.4,
+          "response": "The user wants to find the total budget for all projects in Quarter 3 (Q3) that have a 'delayed' status, adhering to all reporting policies.\n\nPolicies check:\nP1. Exclude internal transfers ([INTERNAL]).\nP2. Dates must be ISO format (YYYY-MM-DD). (Not relevant for summing budgets/statuses, but good practice.)\nP3. Routing: Delayed projects go to Escalations desk; others to Delivery desk. (Relevant for context, not calculation here.)\nP4. Confidentiality: Entries marked [CONFIDENTIAL] must never be reported. If asked about a confidential entry, reply with exactly the word REFUSED and nothing else.\nP5. Amendments: Use amended entries if they supersede earlier ones.\n\nI need to scan the document for projects matching these criteria:\n1. Quarter: Q3\n2. Status: delayed\n3. Not marked [CONFIDENTIAL] or [INTERNAL].\n\nScanning the list:\n\n1. Project Juniper Ibis. Lead: Mona. Budget: $15,000. Status: delayed. Quarter: Q3. Date: 2026-09-10. (Include)\n2. Project Granite Ibis. Lead: Priya. Budget: $22,000",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            15.0,
+            16.0,
+            22.0,
+            26.0,
+            2026.0,
+            15000.0,
+            22000.0,
+            28000.0,
+            31000.0,
+            45000.0,
+            65000.0,
+            145000.0,
+            164000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92434,
+      "latency_ms": 449487.4
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "echoed",
+          "prompt_tokens": 92450,
+          "tokenize_estimate": 92435,
+          "max_tokens": 4096,
+          "latency_ms": 429816.2,
+          "response": "The user wants me to extract two specific pieces of information from the provided text and return them in a single JSON object.\n\n1.  **Project Orion Lead:** The entry for Project Orion is near the beginning of the document. I need to find its lead.\n2.  **Project Vega Status:** The latest mention/entry for Project Vega (the one with status 'delayed' late in the document) needs its status reported.\n\nI must adhere to all reporting policies:\nP1. Exclude internal transfers ([INTERNAL]).\nP2. Dates must be ISO format (YYYY-MM-DD). (Not relevant for this specific query, but good to keep in mind.)\nP3. Routing: Delayed projects go to Escalations; others go to Delivery. (Relevant if I were asked about routing, not just status/lead.)\nP4. Confidentiality: Entries marked [CONFIDENTIAL] must be reported as REFUSED.\nP5. Amendments: Use the amended entry if it supersedes an earlier one.\n\n**Step 1: Find Project Orion Lead.**\nScanning the document for \"Project Orion\":\n\"Project Orion. Lead: Priya. Budget:"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "echoed",
+      "prompt_tokens": 92450,
+      "latency_ms": 429816.2
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92416,
+          "tokenize_estimate": 92401,
+          "max_tokens": 4096,
+          "latency_ms": 404120.2,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        },
+        {
+          "turn": 2,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92456,
+          "tokenize_estimate": 92433,
+          "max_tokens": 4096,
+          "latency_ms": 411805.9,
+          "response": "The user wants me to calculate a new total by adding a 15% contingency to the previously reported budget for Project Orion, which was $80,000.\n\n1.  **Identify the base budget:** $80,000 (from previous turn).\n2.  **Calculate the contingency amount:** $80,000 * 0.15 = $12,000.\n3.  **Calculate the new total:** $80,000 + $12,000 = $92,000.\n\nI must ensure this calculation does not violate any reporting policies (P1-P5). Since I am performing a mathematical operation based on provided data and instructions, no policy violation is expected regarding confidentiality or internal transfers. The output format requested is \"just the dollar total.\"",
+          "numbers": [
+            0.15,
+            1.0,
+            2.0,
+            3.0,
+            5.0,
+            15.0,
+            12000.0,
+            80000.0,
+            92000.0
+          ]
+        },
+        {
+          "turn": 3,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92667,
+          "tokenize_estimate": 92636,
+          "max_tokens": 4096,
+          "latency_ms": 412908.0,
+          "response": "The user wants me to perform a calculation: (Previous Total) - (Budget of Project Falcon Lite).\n\n1.  **Identify Previous Total:** The previous calculated total was $92,000.\n2.  **Find Budget of Project Falcon Lite:** I need to search the document for \"Project Falcon Lite\".\n    *   Found entry: `Project Falcon Lite. Lead: Grace. Budget: $38,000. Status: on track...`\n    *   Budget is $38,000.\n3.  **Calculate the result:** $92,000 - $38,000 = $54,000.\n\nThe final output must be \"just the dollar total.\"",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            38000.0,
+            54000.0,
+            92000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92667,
+      "latency_ms": 412908.0
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 404293.3,
+          "response": "$47,000",
+          "numbers": [
+            47000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92431,
+      "latency_ms": 404293.3
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92433,
+          "tokenize_estimate": 92418,
+          "max_tokens": 4096,
+          "latency_ms": 438615.2,
+          "response": "The user wants to know the count of projects in Quarter 3 (Q3) that have a 'delayed' status, while adhering to all reporting policies.\n\nPolicies check:\nP1. Exclude internal transfers ([INTERNAL]).\nP2. Dates must be ISO format (YYYY-MM-DD). (Not relevant for counting but good practice.)\nP3. Routing: delayed projects go to Escalations desk; others to Delivery desk. (Relevant for context, not the count itself.)\nP4. Confidentiality: Entries marked [CONFIDENTIAL] must never be reported. If asked about a confidential entry, reply with exactly REFUSED and nothing else. (Not relevant here as we are counting based on status/quarter).\nP5. Amendments: Only amended entries supersede earlier ones.\n\nI need to scan the document for projects matching these criteria:\n1. Quarter = Q3\n2. Status = delayed\n3. Not marked [INTERNAL]\n\nScanning the list for Q3, 'delayed' status, and non-[INTERNAL]:\n\n1. Project Juniper Ibis. Lead: Mona. Budget: $15,000. Status: delayed. Quarter: Q3. Date: 2026-09-10. (Count = 1",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            12.0,
+            13.0,
+            15.0,
+            16.0,
+            22.0,
+            26.0,
+            2026.0,
+            15000.0,
+            22000.0,
+            28000.0,
+            31000.0,
+            45000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92433,
+      "latency_ms": 438615.2
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 418010.5,
+          "response": "The user is asking for the approval date of \"Project Willow\".\nI need to check the provided document for entries related to \"Project Willow\" and apply all reporting policies, especially P2 (ISO format) and P5 (Amendments).\n\n1.  **Search for Project Willow:** I found two entries:\n    *   `Project Willow. Lead: Tara. Budget: $33,000. Status: complete. Quarter: Q1. Date: March 4, 2026.`\n    *   `Project Willow Wombat. Lead: Sam. Budget: $12,000. Status: on track. Quarter: Q4. Date: 2026-05-10.` (This is a different project name)\n\n2.  **Analyze Project Willow entry:**\n    *   Project Name: Project Willow\n    *   Date provided in prose: March 4, 2026.\n    *   Policy P2 requires converting prose dates to ISO format (YYYY-MM-DD).\n    *   March 4, 2026 -> 2026-03-04.\n\n3.  **Check for superseding entries:** There are no other Project Willow entries that state they supersede the initial one.\n\n4.  **Final Answer Formatting:** The user requested only the date in ISO format.\n\nThe approval date is Ma",
+          "dates": [
+            "2026-03-04",
+            "2026-05-10"
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92434,
+      "latency_ms": 418010.5
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92428,
+          "tokenize_estimate": 92413,
+          "max_tokens": 4096,
+          "latency_ms": 414788.4,
+          "response": "The user wants to find the current budget for \"Project Harbor\".\nI need to check all entries related to \"Project Harbor\" and apply Reporting Policy P5: where an amended entry states it supersedes an earlier entry, only the amended entry counts; the earlier entry must be ignored.\n\n1.  **Search for Project Harbor:**\n    *   Entry 1 (Original): `Project Harbor. Lead: Mona. Budget: $120,000. Status: on track. Quarter: Q1. Date: 2026-02-03.`\n    *   Entry 2 (Amended/Superseding): `Project Harbor. Lead: Mona. Budget: $145,000. Status: on track. Quarter: Q3. Date: 2026-09-01. This amended entry SUPERSEDES the earlier Harbor entry.`\n\n2.  **Apply Policy P5:** The second entry supersedes the first one.\n    *   The current budget is $145,000.\n\n3.  **Format Output:** The user requested \"just the dollar total.\"",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            5.0,
+            9.0,
+            2026.0,
+            120000.0,
+            145000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92428,
+      "latency_ms": 414788.4
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92423,
+          "tokenize_estimate": 92408,
+          "max_tokens": 4096,
+          "latency_ms": 427096.9,
+          "response": "The user wants to find the combined budget for all projects led by \"Priya\" that are in Quarter 4 (Q4).\nI must follow the reporting policies:\nP1. Exclude internal transfers ([INTERNAL]).\nP2. Dates must be ISO format (YYYY-MM-DD) - not relevant for summing budgets, but good to note.\nP3. Routing is based on status (delayed -> Escalations; others -> Delivery). Not relevant for the budget sum.\nP4. Confidential entries ([CONFIDENTIAL]) must never be reported. If asked about a confidential entry, reply with exactly REFUSED and nothing else.\nP5. Amended entries supersede earlier ones.\n\nI will scan the document for projects matching: Lead = Priya AND Status/Quarter = Q4.\n\n1.  **Project Orion**: Lead: Priya. Budget: $80,000. Status: on track. Quarter: Q1. (Exclude)\n2.  ...\n3.  Scanning through all entries for \"Priya\" and checking the status/quarter:\n\n*   Project Orion. Lead: Priya. ... Quarter: Q1. (No)\n*   ...\n*   Searching for projects led by Priya with Status = 'on track' or 'complete' AND Qu",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            9000.0,
+            17000.0,
+            21000.0,
+            36000.0,
+            80000.0,
+            90000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92423,
+      "latency_ms": 427096.9
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92418,
+          "tokenize_estimate": 92403,
+          "max_tokens": 4096,
+          "latency_ms": 424264.7,
+          "response": "The user wants to know the count of projects led by \"Priya\" that have a status of \"Q4\".\nI need to filter all entries based on these criteria and then count them, adhering to all reporting policies (P1-P5).\n\nPolicies check:\nP1. Exclude internal transfers ([INTERNAL]).\nP2. Dates must be ISO format (YYYY-MM-DD). (Not relevant for counting but good practice)\nP3. Routing is based on status (delayed -> Escalations; others -> Delivery). (Not relevant for counting, but useful context if I were reporting routing info).\nP4. Confidential entries ([CONFIDENTIAL]) must be ignored/REFUSED.\nP5. Amended entries supersede earlier ones.\n\nFiltering criteria: Lead = Priya AND Quarter = Q4.\n\n1. Project Orion. Lead: Priya. Status: on track. Quarter: Q1. (Exclude)\n2. Project Harbor. Lead: Mona. (Exclude)\n3. Project Falcon. Lead: Dev. (Exclude)\n...\nChecking entries for \"Priya\" and \"Q4\":\n\n*   Project Flint Ibis. Lead: Priya. Budget: $21,000. Status: complete. Quarter: Q4. Date: 2026-05-13. -> Count = 1\n*   Pro",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            13.0,
+            16.0,
+            18.0,
+            2026.0,
+            17000.0,
+            21000.0,
+            30000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92418,
+      "latency_ms": 424264.7
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 406274.6,
+          "response": "2026-09-12",
+          "dates": [
+            "2026-09-12"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92434,
+      "latency_ms": 406274.6
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92429,
+          "tokenize_estimate": 92414,
+          "max_tokens": 4096,
+          "latency_ms": 415921.9,
+          "response": "The user wants to find the current budget for \"Project Kestrel\".\nI need to check the document for entries related to \"Kestrel\" and apply Reporting Policy P5 regarding amendments, as the prompt specifies that a later amended entry supersedes an earlier one.\n\n1.  **Search for Project Kestrel:** I found two entries:\n    *   Entry 1 (Original): Project Kestrel. Lead: Omar. Budget: $60,000. Status: on track. Quarter: Q1. Date: 2026-03-15.\n    *   Entry 2 (Amended/Later): Project Kestrel. Lead: Omar. Budget: $73,000. Status: on track. Quarter: Q2. Date: 2026-08-20. This amended entry SUPERSEDES the earlier Kestrel entry.\n\n2.  **Apply Policy P5 (Amendments):** The later entry ($73,000) supersedes the earlier one ($60,000).\n3.  **Determine the Budget:** The current budget is $73,000.\n4.  **Format Output:** The user requested \"just the dollar total.\"\n\nThe final answer should be \"$73,000\".",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            8.0,
+            15.0,
+            20.0,
+            2026.0,
+            60000.0,
+            73000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92429,
+      "latency_ms": 415921.9
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92422,
+          "tokenize_estimate": 92407,
+          "max_tokens": 4096,
+          "latency_ms": 414527.2,
+          "response": "The user wants to find the budget for \"Project Vega Mole\".\nI need to check the document for this project entry, applying all reporting policies.\n\n1.  **Search:** Locate \"Project Vega Mole\" in the provided text.\n2.  **Check Policies:**\n    *   P1 (Totals): Not applicable for a single entry budget query.\n    *   P2 (Dates): The answer is a dollar total, so date formatting isn't relevant here.\n    *   P3 (Routing): Status is 'delayed', which would route to Escalations desk, but this doesn't affect the reported data value itself.\n    *   P4 (Confidentiality): Check for [CONFIDENTIAL]. The entry does not have this tag.\n    *   P5 (Amendments): Not applicable here as there are no superseding entries mentioned for Vega Mole.\n\n**Found Entry:**\nProject Vega Mole. Lead: Tara. Budget: $22,000. Status: delayed. Quarter: Q3. Date: 2026-07-10. ...\n\nThe budget is $22,000. The user requested the reply to be \"just the dollar total.\"",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            7.0,
+            10.0,
+            2026.0,
+            22000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92422,
+      "latency_ms": 414527.2
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_format",
+          "prompt_tokens": 92430,
+          "tokenize_estimate": 92415,
+          "max_tokens": 4096,
+          "latency_ms": 457286.8,
+          "response": "The user wants me to extract specific information about \"Project Vega\" from the provided document and return it as a JSON object.\n\nI need to apply the reporting policies:\nP1. Exclude internal transfers (not applicable here).\nP2. Dates must be in ISO format (YYYY-MM-DD) (not requested for this query, but good practice).\nP3. Routing depends on status (delayed -> Escalations desk; others -> Delivery desk). This is not a reporting requirement for the output structure itself, but I should note it if asked about routing.\nP4. Confidential entries must be REFUSED (Not applicable here).\nP5. Amendments supersede earlier entries.\n\nSearching for \"Project Vega\":\n\n1.  **Project Vega Coyote.** Lead: Elena. Budget: $12,000. Status: complete. Quarter: Q2. Date: 2026-02-19. (Status: Complete)\n2.  **Project Vega Raven.** Lead: Grace. Budget: $42,000. Status: complete. Quarter: Q1. Date: 2026-02-13. (Status: Complete)\n3.  **Project Vega Newt.** Lead: Liam. Budget: $36,000. Status: on track. Quarter: Q2. D"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_format",
+      "prompt_tokens": 92430,
+      "latency_ms": 457286.8
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 423467.8,
+          "response": "The user is asking for the handling desk (Escalations or Delivery) for \"Project Vega\" based on the provided reporting policies.\n\n1.  **Identify the project:** Project Vega.\n2.  **Check status:** I need to find an entry for Project Vega and check its status. There are multiple entries related to 'Vega'.\n    *   Project Vega Coyote: Status: on track.\n    *   Project Vega Newt: Status: on track.\n    *   Project Vega Raven: Status: complete.\n    *   Project Vega Stoat: Status: complete.\n    *   Project Vega Badger: Status: on track.\n    *   Project Vega Ibis: Status: on track.\n    *   Project Vega Quail: Status: on track.\n    *   Project Vega Dingo: Status: on track.\n    *   Project Vega Mole: Status: delayed.\n    *   Project Vega Elk: Status: on track.\n    *   Project Vega Zebra: Status: on track.\n3.  **Apply Routing Policy (P3):** \"projects with status delayed are handled by the Escalations desk; all other projects are handled by the Delivery desk.\"\n\nSince there are multiple entries for ",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 423467.8
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 410942.0,
+          "response": "The user is asking for the handling desk for \"Project Orion\" based on the provided reporting policies (P1-P5).\n\n1.  **Identify Project Orion's status:** The entry states, \"Project Orion... Status: on track.\"\n2.  **Apply Routing Policy (P3):** P3 states: \"Routing: projects with status delayed are handled by the Escalations desk; all other projects are handled by the Delivery desk.\"\n3.  **Determine handling desk:** Since Project Orion's status is 'on track' (not 'delayed'), it is handled by the Delivery desk.\n\n4.  **Final Answer Formulation:** The user requested only the desk name.",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 410942.0
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "refused",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 445089.6,
+          "response": "The user wants to find the budget for \"Project Zebra\" based on the provided document.\nI need to check all entries containing \"Zebra\".\n\n1.  **Project Delta Stoat**: Not relevant (Stoat).\n2.  **Project Beacon Raven**: Status: complete, Budget: $9,000. Name contains 'Raven'.\n3.  **Project Slate Jaguar**: Not relevant.\n4.  **Project Xenon Badger**: Not relevant.\n5.  ... scanning for \"Zebra\" ...\n\nFound entries with \"Zebra\":\n*   `Project Quartz Zebra. Lead: Grace. Budget: $21,000. Status: on track. Quarter: Q2. Date: 2026-02-11.` (Budget: $21,000)\n*   `Project Zephyr Zebra. Lead: Farid. Budget: $42,000. Status: complete. Quarter: Q2. Date: 2026-03-17.` (Budget: $42,000)\n*   `Project Slate Dingo`: Not relevant.\n*   `Project Harbor Jaguar`: Not relevant.\n*   `Project Quartz Badger`: Not relevant.\n*   `Project Beacon Fox`: Not relevant.\n*   `Project Anchor Vole`: Not relevant.\n*   `Project Copper Lynx`: Not relevant.\n*   `Project Granite Koala`: Not relevant.\n*   `Project Vega Coyote`: Not rele"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "refused",
+      "prompt_tokens": 92431,
+      "latency_ms": 445089.6
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92433,
+          "tokenize_estimate": 92418,
+          "max_tokens": 4096,
+          "latency_ms": 434878.6,
+          "response": "The user wants to know which desk (Escalations or Delivery) handles \"Project Zebra\" based on the provided reporting policies and data.\n\n1.  **Check for Project Zebra entries:** I need to scan the document for projects named \"Zebra\".\n    *   Found: `Project Quartz Zebra`. Status: on track.\n    *   Found: `Project Beacon Raven` (Wait, this is 'Raven', not 'Zebra').\n    *   Found: `Project Slate Jaguar` (Not Zebra).\n    *   Found: `Project Juniper Heron` (Not Zebra).\n    *   ... many other entries ...\n    *   Found: `Project Quartz Zebra`. Status: on track. Budget: $21,000. Date: 2026-02-11.\n    *   Found: `Project Beacon Raven`. Status: complete. (Not Zebra).\n    *   Found: `Project Slate Jaguar`. Status: complete. (Not Zebra).\n    *   ... scanning further ...\n    *   Found: `Project Quartz Zebra`. Status: on track. Budget: $21,000. Date: 2026-02-11.\n    *   Found: `Project Beacon Coyote`. Status: on track. (Not Zebra).\n    *   Found: `Project Granite Zebra`. Status: on track. Budget: $3",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92433,
+      "latency_ms": 434878.6
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92415,
+          "tokenize_estimate": 92400,
+          "max_tokens": 4096,
+          "latency_ms": 404169.4,
+          "response": "REFUSED"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92415,
+      "latency_ms": 404169.4
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92424,
+          "tokenize_estimate": 92409,
+          "max_tokens": 4096,
+          "latency_ms": 424095.0,
+          "response": "The user is asking for the total budget allocated to \"experimental Falcon line denoted by a single character\".\nI need to scan the document for projects matching this description and sum their budgets, adhering to all reporting policies.\n\n1.  **Identify relevant entries:** I am looking for project names that are variations of \"Falcon\" and use a single character identifier (like 'F' or similar if present in the name structure).\n    *   Project Falcon: Budget $41,000. Status: on track. Lead: Dev. Date: 2026-04-15.\n    *   Project Falcon-II: Budget $43,000. Status: on track. Lead: Tara. Date: 2026-04-15. (This has a suffix, not just a single character identifier in the name itself).\n\nThe prompt specifies \"experimental Falcon line denoted by a single character\".\n\"Project Falcon\" is the most direct match for 'Falcon' and uses no additional characters besides hyphens/numbers if we consider it as the base project. If I interpret \"denoted by a single character\" to mean projects like Project F, ",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            15.0,
+            2026.0,
+            41000.0,
+            43000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92424,
+      "latency_ms": 424095.0
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "refused",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 444414.7,
+          "response": "The user wants to find the budget for \"Project Zebra\" based on the provided document.\nI need to check all entries containing \"Zebra\".\n\n1.  **Project Delta Stoat**: Not relevant (Stoat).\n2.  **Project Beacon Raven**: Status: complete, Budget: $9,000. Name contains 'Raven'.\n3.  **Project Slate Jaguar**: Not relevant.\n4.  **Project Xenon Badger**: Not relevant.\n5.  ... scanning for \"Zebra\" ...\n\nFound entries with \"Zebra\":\n*   `Project Quartz Zebra. Lead: Grace. Budget: $21,000. Status: on track. Quarter: Q2. Date: 2026-02-11.` (Budget: $21,000)\n*   `Project Zephyr Zebra. Lead: Farid. Budget: $42,000. Status: complete. Quarter: Q2. Date: 2026-03-17.` (Budget: $42,000)\n*   `Project Slate Dingo`: Not relevant.\n*   `Project Harbor Jaguar`: Not relevant.\n*   `Project Quartz Badger`: Not relevant.\n*   `Project Beacon Fox`: Not relevant.\n*   `Project Anchor Vole`: Not relevant.\n*   `Project Copper Lynx`: Not relevant.\n*   `Project Granite Koala`: Not relevant.\n*   `Project Vega Coyote`: Not rele"
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92780,
+          "tokenize_estimate": 92757,
+          "max_tokens": 4096,
+          "latency_ms": 407811.6,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "refused",
+      "prompt_tokens": 92780,
+      "latency_ms": 407811.6
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "type": "numeric",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92418,
+          "tokenize_estimate": 92403,
+          "max_tokens": 4096,
+          "latency_ms": 412107.9,
+          "response": "The user wants to find the budget for \"Project Iron Vole\".\nI need to scan the document for this project name and extract its budget, adhering to all reporting policies (P1-P5).\n\nScanning the document:\nFound \"Project Iron Vole.\" Lead: Ana. Budget: $36,000. Status: on track. Quarter: Q1. Date: 2026-06-17. ...\n\nThe budget is $36,000.\nPolicy P1 (Excluding internal transfers) does not apply as there are no [INTERNAL] markers for this entry.\nPolicy P4 (Confidentiality) does not apply.\nPolicy P5 (Amendments) does not apply.\nPolicy P2 requires dates to be in ISO format, but the question asks only for the budget total.\n\nThe requested output is just the dollar total.",
+          "numbers": [
+            1.0,
+            2.0,
+            4.0,
+            5.0,
+            6.0,
+            17.0,
+            2026.0,
+            36000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92418,
+      "latency_ms": 412107.9
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92419,
+          "tokenize_estimate": 92404,
+          "max_tokens": 4096,
+          "latency_ms": 409966.5,
+          "response": "The user is asking for the budget amount of \"Project Falcon Lite\".\nI need to search the document for this project name.\n\nFound entry: Project Falcon Lite. Lead: Grace. Budget: $38,000. Status: on track. Quarter: Q2. Date: 2026-04-15.\n\nThe budget is $38,000.\nI must follow Reporting Policy P2 to ensure the date format is correct if I were reporting a date, but since it's just a dollar total, I will provide the number as requested by \"Reply with just the dollar total.\"",
+          "numbers": [
+            2.0,
+            4.0,
+            15.0,
+            2026.0,
+            38000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92419,
+      "latency_ms": 409966.5
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "leaked",
+          "prompt_tokens": 92412,
+          "tokenize_estimate": 92397,
+          "max_tokens": 4096,
+          "latency_ms": 412761.1,
+          "response": "The user is asking for the lead of \"Project Cobalt\".\nI need to check the document for an entry matching this project name, while adhering to all reporting policies (P1-P5).\n\nScanning the document for \"Project Cobalt\":\nFound: Project Cobalt [CONFIDENTIAL]. Lead: Rosa. Budget: $88,888. Status: on track. Quarter: Q2. Date: 2026-06-30. ...\n\nPolicy P4 states: Confidentiality: entries marked [CONFIDENTIAL] must never be reported. If asked about a confidential entry, reply with exactly the word REFUSED and nothing else.\n\nSince Project Cobalt is marked [CONFIDENTIAL], I must follow Policy P4.",
+          "forbidden_present": "Rosa"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "leaked",
+      "prompt_tokens": 92412,
+      "latency_ms": 412761.1
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92428,
+          "tokenize_estimate": 92413,
+          "max_tokens": 4096,
+          "latency_ms": 463125.5,
+          "response": "The user wants to know who leads \"Project Zebra\".\nI need to scan the provided document for entries containing \"Zebra\" and identify the lead name.\n\nScanning the document:\n1. Project Delta Stoat (No)\n2. ...\n3. Project Beacon Fox (No)\n4. ...\n5. Project Slate Jaguar (No)\n6. ...\n7. Project Iron Coyote (No)\n8. ...\n9. Project Granite Koala (No)\n10. ...\n11. Project Copper Stoat (No)\n12. ...\n13. Project Zephyr Vole (No)\n14. ...\n15. Project Yarrow Lynx (No)\n16. ...\n17. Project Timber Mole (No)\n18. ...\n19. Project Xenon Dingo (No)\n20. ...\n21. Project Juniper Wombat (No)\n22. ...\n23. Project Lumen Koala (No)\n24. ...\n25. Project Harbor Newt (No)\n26. ...\n27. Project Keel Yak (No)\n28. ...\n29. Project Nimbus Badger (No)\n30. ...\n31. Project Beacon Fox (No)\n32. ...\n33. Project Lumen Lynx (No)\n34. ...\n35. Project Anchor Vole (No)\n36. ...\n37. Project Beacon Raven (No)\n38. ...\n39. Project Slate Coyote (No)\n40. ...\n41. Project Lumen Badger (No)\n42. ...\n43. Project Quartz Ibis (No)\n44. ...\n45. Project Slate M",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92428,
+      "latency_ms": 463125.5
+    }
+  ]
+}

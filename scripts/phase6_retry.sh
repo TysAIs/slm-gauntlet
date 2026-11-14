@@ -5,7 +5,8 @@
 set -u
 cd "$(dirname "$0")/.." || exit 1
 ROOT=$(pwd)
-export GRUNT_HOST=${GRUNT_HOST:-<lane>}
+: "${GRUNT_HOST:?GRUNT_HOST must be set (the endpoint address belongs to the operator, not the repo)}"
+export GRUNT_HOST
 PY="$ROOT/.venv/bin/python"
 STATE="$ROOT/results/_sweep_state_retry.jsonl"
 run() {

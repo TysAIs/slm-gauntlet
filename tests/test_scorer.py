@@ -11,6 +11,7 @@ from gauntlet.scorer import (
     regex_check,
 )
 from gauntlet.task import Assert as TaskAssert
+from gauntlet.task import Task as TaskModel
 
 
 def test_exact_match():
@@ -102,6 +103,81 @@ def test_scorer_runs_assert_list():
     result2 = scorer.score("no useful info", task_asserts)
     assert not result2.passed
     assert len(result2.failed) == 2
+
+
+# --- json_schema keyword coverage (P3: additionalProperties/pattern/min/max/minItems) ---
+
+def test_json_schema_additional_properties():
+    schema = {"type": "object",
+              "properties": {"a": {"type": "integer"}},
+              "required": ["a"], "additionalProperties": False}
+    assert json_schema_check('{"a": 1}', schema).passed
+    assert not json_schema_check('{"a": 1, "b": 2}', schema).passed
+
+
+def test_json_schema_pattern():
+    schema = {"type": "object",
+              "properties": {"id": {"type": "string", "pattern": "^V[0-9]{3}$"}},
+              "required": ["id"]}
+    assert json_schema_check('{"id": "V123"}', schema).passed
+    assert not json_schema_check('{"id": "X123"}', schema).passed
+
+
+def test_json_schema_minimum_maximum():
+    schema = {"type": "object",
+              "properties": {"kg": {"type": "integer", "minimum": 50, "maximum": 5000}},
+              "required": ["kg"]}
+    assert json_schema_check('{"kg": 1200}', schema).passed
+    assert not json_schema_check('{"kg": 10}', schema).passed
+    assert not json_schema_check('{"kg": 9000}', schema).passed
+
+
+def test_json_schema_min_items():
+    schema = {"type": "array", "minItems": 3, "items": {"type": "string"}}
+    assert json_schema_check('["a", "b", "c"]', schema).passed
+    assert not json_schema_check('["a"]', schema).passed
+
+
+# --- new assert types: needle_set / entity_gate / set_equal ---
+
+def test_needle_set_equality():
+    from gauntlet.scorer import needle_set_check
+    assert needle_set_check("The code is ZEBRA-12345.", "ZEBRA-12345").passed
+    # naming a decoy alongside the secret fails (substring scoring passed this)
+    assert not needle_set_check("ZEBRA-12345 and ZEBRA-99999", "ZEBRA-12345").passed
+    assert not needle_set_check("ZEBRA-99999", "ZEBRA-12345").passed
+    assert not needle_set_check("no code here", "ZEBRA-12345").passed
+    # via the full Scorer dispatch + Task schema round-trip
+    a = TaskAssert(type="needle_set", value="ZEBRA-12345")
+    dicts = TaskModel(id="x", suite="retrieval", description="d", prompt="p",
+                      asserts=[a]).to_assert_dicts()
+    assert Scorer().score("ZEBRA-12345", dicts).passed
+    assert not Scorer().score("ZEBRA-12345 ZEBRA-99999", dicts).passed
+
+
+def test_entity_gate():
+    from gauntlet.scorer import entity_gate_check
+    src = "Ada Lovelace ordered 3 widgets for 45.50 on 2026-01-15."
+    assert entity_gate_check("Ada Lovelace ordered 3 widgets.", src).passed
+    assert not entity_gate_check("Ada Lovelace ordered 9 widgets.", src).passed
+    assert not entity_gate_check("Ada Lovelace paid on 2026-02-01.", src).passed
+    a = TaskAssert(type="entity_gate", source=src)
+    dicts = TaskModel(id="x", suite="structured", description="d", prompt="p",
+                      asserts=[a]).to_assert_dicts()
+    assert Scorer().score("Ada Lovelace ordered 3 widgets.", dicts).passed
+
+
+def test_set_equal():
+    from gauntlet.scorer import set_equal_check
+    assert set_equal_check('["billing", "spam"]', ["spam", "billing"]).passed
+    assert set_equal_check("spam, billing", ["spam", "billing"]).passed
+    assert set_equal_check("spam\nbilling", ["spam", "billing"]).passed
+    assert not set_equal_check('["spam"]', ["spam", "billing"]).passed
+    assert not set_equal_check('["spam", "billing", "urgent"]', ["spam", "billing"]).passed
+    a = TaskAssert(type="set_equal", values=["spam", "billing"])
+    dicts = TaskModel(id="x", suite="structured", description="d", prompt="p",
+                      asserts=[a]).to_assert_dicts()
+    assert Scorer().score('["billing", "spam"]', dicts).passed
 
 
 def test_score_result_merge():

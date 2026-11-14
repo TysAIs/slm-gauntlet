@@ -114,6 +114,7 @@
 
 - id: hif_verbatim_token
   suite: instruction
+  copy_task: true
   description: copy one token verbatim while ignoring a decoy token
   tier: hard
   prompt: |-

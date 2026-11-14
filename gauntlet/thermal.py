@@ -1,6 +1,6 @@
 """Thermal guard for the test box.
 
-The gauntlet runs on a single GTX 1070 Ti. Operator's ruling (2026-11-04) is a HARD
+The gauntlet runs on a single GTX 1070 Ti. The operator's ruling (2026-11-04) is a HARD
 abort at 89 C — the card is rated to 94 C. Before this module nothing in
 `gauntlet/` ever read the GPU temperature, so `gauntlet run` would happily cook
 the card; the only watchdog in the repo was a 84 C (pre-ruling) one-liner inside
@@ -17,7 +17,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 
-# Operator's ruling, 2026-11-04: abort at 89 C (1070 Ti is rated to 94 C).
+# The operator's ruling, 2026-11-04: abort at 89 C (1070 Ti is rated to 94 C).
 THERMAL_LIMIT_C = 89.0
 
 
@@ -67,6 +67,6 @@ def assert_thermal_ok(limit_c: float = THERMAL_LIMIT_C) -> float | None:
     if temp >= limit_c:
         raise ThermalAbort(
             f"[gauntlet] thermal abort: GPU is {temp:.0f}C, ceiling is {limit_c:.0f}C "
-            f"(Operator's 89C rule). Let it cool, then re-run; --thermal-limit 0 disables."
+            f"(the operator's 89C rule). Let it cool, then re-run; --thermal-limit 0 disables."
         )
     return temp

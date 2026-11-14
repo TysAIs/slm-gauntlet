@@ -1,0 +1,52 @@
+[
+ {
+  "model": "spark-x2.6-4b-iq3m-kvq8",
+  "display_name": "Spark-X2.6-4B",
+  "sub": "IQ3_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 81.2,
+  "suites": {
+   "adversarial": 0.8,
+   "agent_chains": 1.0,
+   "calendar": 0.7,
+   "classify": 0.848,
+   "coding": 0.8,
+   "docintake": 0.897,
+   "email": 0.804,
+   "instruction": 0.667,
+   "realworld": 0.45,
+   "structured": 0.8,
+   "summarize": 0.85,
+   "support": 0.656,
+   "tooluse": 0.947,
+   "retrieval": 1.0
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261109",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "",
+   "gguf_file": "Spark-X2.6-4B-IQ3_M.gguf",
+   "gguf_size_bytes": 2233950848,
+   "quant": "IQ3_M",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/spark-x2.6-4b-iq3m-kvq8_20261109T141736Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

@@ -36,6 +36,13 @@
       expr: "(lambda d: len({v['id'] for v in d.get('fleet', [])}) == 3)(json.loads(out))"
     - type: predicate
       expr: "(lambda d: any(v['type']=='bike' for v in d.get('fleet', [])))(json.loads(out))"
+    # the prompt dictates the fleet's actual values, so grade them, not just
+    # the schema shape: ids/types/capacities/addons must match the vehicles
+    # described (addons compared as sets — order carries no meaning)
+    - type: predicate
+      expr: "(lambda d: {v['id']: v for v in d.get('fleet', [])} == {} or ({v['id']: (v['type'], v['capacity_kg'], sorted(v['addons'])) for v in d.get('fleet', [])} == {'V101': ('van', 1200, ['fridge']), 'V202': ('bike', 50, []), 'V303': ('truck', 3500, ['dashcam', 'gps'])}))(json.loads(out))"
+      weight: 2.0
+      must_pass: true
   max_tokens: 512
 
 - id: hst_types_strict

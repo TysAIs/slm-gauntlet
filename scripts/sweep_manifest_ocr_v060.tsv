@@ -1,0 +1,5 @@
+# Stage 3 OCR board manifest, epoch 0.6.0 (2026-11-09)
+# MiniCPM-OCR 1.0 served via the sweep driver with its mmproj in extra flags (driver appends
+# extra flags verbatim); the OCR bench (extra-suites/ocr/bench.py, 10 tasks) runs against the
+# live endpoint during the serve window. Result reported on the OCR board, not the text screen.
+minicpm-ocr-1.0-q4km-mmproj	/mnt/data/models/minicpm-ocr-1.0/MiniCPM-OCR-1_0-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0 --mmproj /mnt/data/models/minicpm-ocr-1.0/mmproj-model-f16-4x.gguf

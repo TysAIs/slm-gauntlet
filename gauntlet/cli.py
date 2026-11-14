@@ -47,8 +47,12 @@ def validate_tasks(tasks: list[Task]) -> None:
                 problems.append(f"{t.id}: python_exec assert has no `tests`")
             if a.type == "predicate" and not a.expr:
                 problems.append(f"{t.id}: predicate assert has no `expr`")
-            if a.type in ("contains_all", "contains_any") and not a.values:
+            if a.type in ("contains_all", "contains_any", "set_equal") and not a.values:
                 problems.append(f"{t.id}: {a.type} assert has no `values`")
+            if a.type == "needle_set" and not a.value:
+                problems.append(f"{t.id}: needle_set assert has no `value`")
+            if a.type == "entity_gate" and not a.source:
+                problems.append(f"{t.id}: entity_gate assert has no `source`")
         if not t.asserts and not t.state_asserts:
             problems.append(f"{t.id}: no asserts")
         for sa in t.state_asserts:
@@ -74,7 +78,7 @@ def load_tasks(suites: list[str] | None = None, tasks_dir: Path | None = None) -
 
 def cmd_run(args: argparse.Namespace) -> int:
     check_weights()
-    # Thermal preflight: Operator's 89C rule (1070 Ti is rated to 94C). Refuse to
+    # Thermal preflight: the operator's 89C rule (1070 Ti is rated to 94C). Refuse to
     # start hot; a host without a readable sensor is a no-op, not a failure.
     from gauntlet.thermal import THERMAL_LIMIT_C, assert_thermal_ok
 
@@ -110,9 +114,22 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     print(f"[gauntlet] {len(tasks)} tasks -> {args.endpoint} (model={args.model}, methodology {METHODOLOGY_VERSION})")
 
+    from gauntlet.provenance import collect_provenance
+
+    provenance_box: dict = {}
+
     async def go():
         client = GauntletClient(base_url=args.endpoint, model=args.model, timeout=args.timeout)
         try:
+            provenance_box["data"] = await collect_provenance(
+                client,
+                gguf_path=getattr(args, "gguf", None),
+                quant=getattr(args, "quant", None),
+                kv_type=getattr(args, "kv_type", None),
+                ctx=getattr(args, "ctx", None),
+                np_=getattr(args, "slots", None),
+                serve_flags=getattr(args, "serve_flags", None),
+            )
             return await run_suite(client, tasks, concurrency=args.concurrency, seed=args.seed)
         finally:
             await client.close()
@@ -134,6 +151,7 @@ def cmd_run(args: argparse.Namespace) -> int:
             "transport_failure": failed,
             "zero_token_errors": zero,
             "attempts": total,
+            "provenance": provenance_box.get("data"),
         },
         outdir=Path("results"),
     )
@@ -191,12 +209,20 @@ def main(argv: list[str] | None = None) -> int:
         "--thermal-limit",
         type=float,
         default=89.0,
-        help="refuse to start at or above this GPU temperature in C (default 89, Operator's rule; 0 disables)",
+        help="refuse to start at or above this GPU temperature in C (default 89, the operator's rule; 0 disables)",
     )
     run_p.add_argument(
         "--repeats", type=int, default=1,
         help="run every task k times; pass^k = all-reps reliability (tau-bench style). 3 recommended",
     )
+    run_p.add_argument("--gguf", default=None,
+                       help="path to the served GGUF (recorded in result provenance, sha256 hashed once)")
+    run_p.add_argument("--quant", default=None, help="quant label, recorded in result provenance")
+    run_p.add_argument("--kv-type", default=None, help="KV cache type, recorded in result provenance")
+    run_p.add_argument("--ctx", type=int, default=None, help="serve context size, recorded in result provenance")
+    run_p.add_argument("--slots", type=int, default=None, help="serve slot count (np), recorded in result provenance")
+    run_p.add_argument("--serve-flags", default=None,
+                       help="full serve command line / flags when known, recorded in result provenance")
     run_p.set_defaults(fn=cmd_run)
 
     perf_p = sub.add_parser("perf", help="throughput benchmark (TTFT/tok-s at c=1/4/8)")

@@ -332,8 +332,6 @@ def resolve_health_probe(explicit: str | None) -> str:
     for rel in (
         os.path.join(".hermes", "skills", "mlops", "local-llm-serving", "scripts",
                      "grunt_health.sh"),
-        os.path.join(".hermes", "profiles", "audit-lane", "skills", "mlops",
-                     "local-llm-serving", "scripts", "grunt_health.sh"),
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "grunt_health.sh"),
     ):
         candidates.append(os.path.join(home, rel) if not rel.startswith("/") else rel)

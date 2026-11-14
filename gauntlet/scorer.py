@@ -17,9 +17,28 @@ paths. Supported assertion types (used in task YAML):
                      only if the process exits 0. Use for coding tasks: a
                      regex can match broken code, an execution cannot.
 
-The JSON-Schema support is intentionally minimal (types, properties, required,
-items, enum) — enough for the gauntlet's structured-output suite without a
+The JSON-Schema support covers types, properties, required,
+additionalProperties (false), items, enum, pattern, minimum/maximum and
+minItems/maxItems — enough for the gauntlet's structured-output suite without a
 jsonschema dependency.
+
+Two pure set checks round out the suite toolkit:
+
+  state_predicate:{type: state_predicate, expr: "<python bool expr>"}
+                  -- like predicate, but evaluated against the sandbox after
+                     the run (runner path only): `state`, `files` (path ->
+                     content) and `sb` (the ToolSandbox itself) are bound.
+                     Chain tasks use it to grade outcomes against sandbox
+                     truth (e.g. the cheapest flight actually offered), which
+                     no static expected value can express.
+  needle_set:     {type: needle_set, value: "<the secret ZEBRA code>"}
+                  -- passes iff the set of ZEBRA codes in the answer equals
+                     exactly {value} (needle scoring: decoys must not appear).
+  entity_gate:    {type: entity_gate, source: "<text the answer may draw from>"}
+                  -- every entity token (number, date, capitalized name) in the
+                     answer must appear in source; anything else is fabricated.
+  set_equal:      {type: set_equal, values: [...]} -- the answer's labels
+                     (JSON array, or comma/newline list) equal values as a set.
 """
 
 from __future__ import annotations
@@ -115,7 +134,13 @@ def regex_check(output: str, pattern: str) -> ScoreResult:
 
 
 def _validate_schema(value: Any, schema: dict, path: str = "$") -> list[str]:
-    """Minimal JSON-Schema subset validator. Returns list of errors."""
+    """JSON-Schema subset validator. Returns list of errors.
+
+    Supported keywords: type, properties, required, additionalProperties,
+    items, enum, pattern, minimum, maximum, minItems, maxItems. additionalProperties
+    is enforced only when it is `false` (a schema-valued additionalProperties is
+    not part of the subset and is ignored, like any unknown keyword).
+    """
     errors: list[str] = []
     t = schema.get("type")
     type_map = {
@@ -138,9 +163,29 @@ def _validate_schema(value: Any, schema: dict, path: str = "$") -> list[str]:
         for req in schema.get("required", []):
             if req not in value:
                 errors.append(f"{path}: missing required key {req!r}")
-    if isinstance(value, list) and "items" in schema:
-        for i, item in enumerate(value):
-            errors.extend(_validate_schema(item, schema["items"], f"{path}[{i}]"))
+        if schema.get("additionalProperties") is False:
+            for key in value:
+                if key not in schema["properties"]:
+                    errors.append(f"{path}: additional property {key!r} not allowed")
+    if isinstance(value, list):
+        if "items" in schema:
+            for i, item in enumerate(value):
+                errors.extend(_validate_schema(item, schema["items"], f"{path}[{i}]"))
+        if "minItems" in schema and len(value) < schema["minItems"]:
+            errors.append(f"{path}: {len(value)} items, fewer than minItems {schema['minItems']}")
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            errors.append(f"{path}: {len(value)} items, more than maxItems {schema['maxItems']}")
+    if isinstance(value, str) and "pattern" in schema:
+        try:
+            if re.search(schema["pattern"], value) is None:
+                errors.append(f"{path}: {value!r} does not match pattern {schema['pattern']!r}")
+        except re.error as e:
+            errors.append(f"{path}: bad pattern {schema['pattern']!r}: {e}")
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if "minimum" in schema and value < schema["minimum"]:
+            errors.append(f"{path}: {value} below minimum {schema['minimum']}")
+        if "maximum" in schema and value > schema["maximum"]:
+            errors.append(f"{path}: {value} above maximum {schema['maximum']}")
     if "enum" in schema and value not in schema["enum"]:
         errors.append(f"{path}: {value!r} not in enum {schema['enum']}")
     return errors
@@ -154,6 +199,91 @@ def json_schema_check(output: str, schema: dict) -> ScoreResult:
     errors = _validate_schema(value, schema)
     ok = not errors
     return ScoreResult(ok, checks=[{"check": "json_schema", "ok": ok}], failed=errors)
+
+
+_ZEBRA_RE = re.compile(r"ZEBRA-\d+")
+
+
+def needle_set_check(output: str, secret: str) -> ScoreResult:
+    """Needle scoring: the answer passes iff the set of ZEBRA codes in it is
+    exactly {secret}. Substring matching let an answer that also named a decoy
+    code score the same as one that named only the secret; set equality makes
+    naming a decoy (or missing the secret) fail the task."""
+    found = set(_ZEBRA_RE.findall(output))
+    ok = found == {secret}
+    return ScoreResult(
+        ok,
+        checks=[{"check": "needle_set", "ok": ok, "expected": secret,
+                 "found": sorted(found)}],
+        failed=[] if ok else [f"needle_set: answer codes {sorted(found)}, expected exactly [{secret!r}]"],
+    )
+
+
+_ENTITY_NUM_RE = re.compile(r"\d[\d,]*(?:\.\d+)?")
+_ENTITY_DATE_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}/\d{1,2}/\d{2,4}\b")
+_ENTITY_NAME_RE = re.compile(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*")
+_ENTITY_NAME_STOP = {
+    "The", "This", "That", "These", "Those", "It", "In", "On", "At", "As",
+    "A", "An", "If", "When", "While", "After", "Before", "But", "And", "Or",
+    "So", "Then", "There", "Here", "Yes", "No", "Note", "Answer", "Result",
+    "Total", "Summary",
+}
+
+
+def extract_entities(text: str) -> set[str]:
+    """Entity tokens an answer can fabricate: numbers, dates, capitalized names.
+
+    Deliberately conservative (sentence-initial capitalized words are skipped)
+    so the gate catches invented values, not ordinary prose openings."""
+    ents: set[str] = set(_ENTITY_NUM_RE.findall(text))
+    ents |= set(_ENTITY_DATE_RE.findall(text))
+    for m in _ENTITY_NAME_RE.finditer(text):
+        if m.start() > 0 and text[m.start() - 1] not in ".!?\n":
+            ents.add(m.group(0))
+    ents -= _ENTITY_NAME_STOP
+    return ents
+
+
+def entity_gate_check(output: str, source: str) -> ScoreResult:
+    """Values in the output must be a subset of the values in the source text:
+    an answer that introduces a number, date or name the source never contained
+    fabricated it. Both sides pass through the same extractor."""
+    out_ents = extract_entities(output)
+    src_ents = extract_entities(source)
+    extra = sorted(out_ents - src_ents)
+    ok = not extra
+    return ScoreResult(
+        ok,
+        checks=[{"check": "entity_gate", "ok": ok, "extra": extra}],
+        failed=[] if ok else [f"entity_gate: values absent from source: {extra}"],
+    )
+
+
+def set_equal_check(output: str, values: list[str]) -> ScoreResult:
+    """Label-set equality: the answer's labels must equal `values` as a SET —
+    order-free, duplicates collapse, missing or extra labels fail. The answer
+    may be a JSON array or free text with comma/newline-separated labels."""
+    want = {str(v).strip() for v in values}
+    got: set[str] | None = None
+    try:
+        parsed = json.loads(_strip_code_fence(output))
+    except (ValueError, TypeError):
+        parsed = None
+    if isinstance(parsed, list) and all(isinstance(x, str) for x in parsed):
+        got = {x.strip() for x in parsed}
+    else:
+        flat = [ln.strip(" \t-*") for ln in re.split(r"[,\n]", output)]
+        flat = [x for x in flat if x]
+        if flat and all(x in want for x in flat):
+            got = set(flat)
+    ok = got is not None and got == want
+    return ScoreResult(
+        ok,
+        checks=[{"check": "set_equal", "ok": ok,
+                 "missing": sorted(want - got) if got is not None else sorted(want),
+                 "extra": sorted(got - want) if got is not None else []}],
+        failed=[] if ok else ["set_equal: answer labels do not equal expected set"],
+    )
 
 
 def predicate_check(output: Any, expr: str) -> ScoreResult:
@@ -186,6 +316,44 @@ def predicate_check(output: Any, expr: str) -> ScoreResult:
     except Exception as e:  # noqa: BLE001 — task authors get the error message
         return ScoreResult(False, failed=[f"predicate error: {e}"])
     return ScoreResult(ok, checks=[{"check": "predicate", "ok": ok, "expr": expr}])
+
+
+def state_predicate_check(sandbox: Any, expr: str, output: str = "") -> ScoreResult:
+    """Evaluate a boolean expression against sandbox state after a run.
+
+    Bindings: `state` (sandbox.state dict), `files` (sandbox file path ->
+    text content, so absence is testable: ``"rma.json" not in files``), `sb`
+    (the ToolSandbox, for derived facts like the cheapest flight the sandbox
+    actually offered), and `out` (the run's final text output, so a state
+    condition can also require the agent to have REPORTED the right value).
+    Same restricted builtins as predicate_check.
+    Only the runner can score these: a state predicate grades the world the
+    agent's tool calls produced, which does not exist at text-score time.
+    """
+    import json as _json
+
+    safe_builtins = {
+        "len": len, "abs": abs, "sum": sum, "round": round,
+        "any": any, "all": all, "min": min, "max": max, "int": int, "float": float,
+        "str": str, "json": _json, "sorted": sorted, "list": list, "dict": dict,
+        "set": set, "tuple": tuple, "enumerate": enumerate, "zip": zip, "range": range,
+        "bool": bool, "isinstance": isinstance, "reversed": reversed,
+        "re": re,
+    }
+    root = sandbox.root
+    files: dict[str, str] = {}
+    for fp in sorted(root.rglob("*")):
+        if fp.is_file():
+            try:
+                files[str(fp.relative_to(root))] = fp.read_text()
+            except (OSError, UnicodeDecodeError):
+                pass
+    try:
+        ok = bool(eval(expr, {"__builtins__": safe_builtins, "state": sandbox.state,
+                              "files": files, "sb": sandbox, "out": output}))
+    except Exception as e:  # noqa: BLE001 — task authors get the error message
+        return ScoreResult(False, failed=[f"state_predicate error: {e}"])
+    return ScoreResult(ok, checks=[{"check": "state_predicate", "ok": ok, "expr": expr}])
 
 
 _CODE_FENCE = re.compile(r"```(?:python|py)?\s*\n(.*?)```", re.DOTALL)
@@ -315,9 +483,26 @@ class Scorer:
       - ScoreResult.passed remains the strict all-checks binary
     """
 
+    def split_state_predicates(self, asserts: list[dict]) -> tuple[list[dict], list[dict]]:
+        """Partition asserts into (text asserts, state_predicate asserts).
+
+        state_predicate asserts need the sandbox, so they are scored by the
+        runner after the agent loop, never by score(). score() refuses them
+        outright so a state predicate can never be silently dropped or
+        trivially passed by text-only callers (validity tests included).
+        """
+        text_asserts = [a for a in asserts if a.get("type") != "state_predicate"]
+        state_asserts = [a for a in asserts if a.get("type") == "state_predicate"]
+        return text_asserts, state_asserts
+
     def score(self, output: str, asserts: list[dict]) -> ScoreResult:
         if not asserts:
             raise ValueError("task has no asserts — refusing to score trivially")
+        if any(a.get("type") == "state_predicate" for a in asserts):
+            raise ValueError(
+                "state_predicate asserts are scored by the runner against the "
+                "sandbox (Scorer.split_state_predicates); score() grades text only"
+            )
         result = ScoreResult(True)
         earned = 0.0
         total = 0.0
@@ -337,7 +522,13 @@ class Scorer:
                 "regex": regex_check,
                 "json_schema": json_schema_check,
             }
-            if kind == "line_value":
+            if kind == "needle_set":
+                r = needle_set_check(output, a["value"])
+            elif kind == "entity_gate":
+                r = entity_gate_check(output, a["source"])
+            elif kind == "set_equal":
+                r = set_equal_check(output, list(a["values"]))
+            elif kind == "line_value":
                 r = line_value_check(output, a["label"], float(a["equals"]), float(a.get("tol", 0.005)))
             elif kind == "line_sum":
                 r = line_sum_check(output, list(a["of"]), a["label"], float(a.get("tol", 0.02)))

@@ -31,13 +31,19 @@ class ToolDef(BaseModel):
 class Assert(BaseModel):
     type: Literal[
         "exact_match", "contains_all", "contains_any", "regex", "json_schema", "predicate",
-        "python_exec", "line_value", "line_sum",
+        "python_exec", "line_value", "line_sum", "needle_set", "entity_gate", "set_equal",
+        "state_predicate",
     ]
     value: str | None = None
     values: list[str] | None = None
     pattern: str | None = None
     schema_: dict | None = Field(default=None, alias="schema")
     expr: str | None = None  # predicate: python bool expr with `out` bound
+    # state_predicate: python bool expr evaluated by the runner against the
+    # sandbox after the run (`state`, `files`, `sb` bound) — for outcomes
+    # decidable only from sandbox truth (cheapest offered flight, file
+    # absence). Never scored by Scorer.score().
+    source: str | None = None  # entity_gate: text the answer's entities must come from
     tests: str | None = None  # python_exec: code appended to the answer and executed
     timeout: float = 10.0  # python_exec: subprocess wall clock cap (seconds)
     # line_value: the last number on the line that names `label` must equal `equals`.
@@ -120,6 +126,7 @@ class Task(BaseModel):
     max_turns: int = 8  # agent-loop turns (tool round-trips) allowed
     canary: str | None = None  # embedded canary GUID for generated tasks
     contamination_risk: Literal["none", "generated", "known"] = "none"
+    copy_task: bool = False  # the graded value IS a verbatim copy from the prompt (leak-scan exemption)
 
     @field_validator("repeats")
     @classmethod
@@ -150,6 +157,8 @@ class Task(BaseModel):
                 d["schema"] = a.schema_
             if a.expr is not None:
                 d["expr"] = a.expr
+            if a.source is not None:
+                d["source"] = a.source
             if a.tests is not None:
                 d["tests"] = a.tests
                 d["timeout"] = a.timeout
@@ -168,7 +177,6 @@ class Task(BaseModel):
             d["must_pass"] = a.must_pass
             out.append(d)
         return out
-
 
 class Suite(BaseModel):
     name: str

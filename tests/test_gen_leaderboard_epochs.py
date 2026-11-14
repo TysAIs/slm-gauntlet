@@ -11,7 +11,7 @@ These are regressions for defects that were live in `results/_published/LEADERBO
     ("Qwen3.5-4B-Q4_K_M", "LFM2.5-2.6B-Q8_0"), which silently dropped two measured
     models into a junk section instead of their own family.
 
-The generator is a standalone script (`gen-leaderboard.py`), so it is loaded by path.
+The generator is a standalone script (`scripts/gen_leaderboard.py`), so it is loaded by path.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import importlib.util
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-_spec = importlib.util.spec_from_file_location("gen_leaderboard", ROOT / "gen-leaderboard.py")
+_spec = importlib.util.spec_from_file_location("gen_leaderboard", ROOT / "scripts" / "gen_leaderboard.py")
 gl = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(gl)
 
@@ -38,7 +38,7 @@ def test_vendor_prefixed_cards_join_the_same_family():
 
 
 def test_row_method_is_derived_from_the_card_not_the_document():
-    current = {"ts": "20261108T044913Z", "n": gl.FULL_TASKS}
+    current = {"ts": "20261109T044913Z", "n": gl.FULL_TASKS}
     old = {"ts": "20261029T040626Z", "n": 71}
     cur_label = gl.method_label(current)
     old_label = gl.method_label(old)
@@ -53,7 +53,7 @@ def test_best_of_cannot_be_won_by_a_previous_epoch():
     cards = [
         {"model": "legacy-4b", "display_name": "Legacy", "ts": "20261029T040626Z", "n": 71,
          "overall_pct": 90.2, "details": {"quant": "Q4", "kv_type": "q8_0", "category": "on-GPU"}},
-        {"model": "current-4b", "display_name": "Current", "ts": "20261108T044913Z",
+        {"model": "current-4b", "display_name": "Current", "ts": "20261109T044913Z",
          "n": gl.FULL_TASKS, "overall_pct": 86.6,
          "details": {"quant": "IQ3_XXS", "kv_type": "f16", "category": "on-GPU"}},
     ]

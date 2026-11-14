@@ -2,60 +2,85 @@
 
 A benchmark for **small language models** (sub-12B class) that runs on whatever device you have — NVIDIA, AMD, or Apple Silicon. The card generator auto-detects your GPU and its memory, so every model card shows **your** hardware, not ours. It measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
 
+**Start with [`SCOREBOARD.md`](SCOREBOARD.md)** — every board on one screen, each labelled with the hardware it was measured on, single-run cells marked as such. This README explains the method; the scoreboard is the result.
+
 <!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->
 
-**Current leaderboard — 94 tasks, scorer 0.5.0, PVE GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
+**Current leaderboard — 320 tasks, scorer 0.6.0, NVIDIA GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
 
-One row per model: the **best-scoring configuration** of that model in the corpus (43 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
+One row per model: the **best-scoring configuration** of that model in the corpus (59 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py`, recomputed from that run's log on the authoring tree; the published instrument is the model's own card (`results/cards/*.json`), which carries the per-suite result the score is computed from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an authoring-tree tool: in a public clone it reports every card as not reproducible. The `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
 | Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 🥇 | Bolt E4B | UD-IQ3_XXS · KV FP16 · 32K ctx | **86.6%** | 100% | 88% | 100% | 100% | 86% | 100% | 71% | 94 t · 0.5.0 | [png](results/cards/card_nvidia-nemotron-3.5-bolt-e4b-ud-iq3-xxs-kvf16.png) |
-| 🥈 | Gemma 4 E4B | Q4_K_M · KV FP16 · 32K ctx | **86.3%** | 100% | 88% | 83% | 100% | 100% | 100% | 64% | 94 t · 0.5.0 | [png](results/cards/card_gemma4-e4b-q4_K_M.png) |
-| 🥉 | Qwen3.5-4B | Q4_K_M · KV FP16 · 32K ctx | **82.4%** | 95% | 75% | 100% | 90% | 100% | 90% | 71% | 94 t · 0.5.0 | [png](results/cards/card_qwen3.5-4b-q4_K_M.png) |
-| 4 | MiniCPM5-2B | Q8_0 · KV FP16 · 32K ctx | **82.2%** | 95% | 88% | 83% | 100% | 100% | 80% | 79% | 94 t · 0.5.0 | [png](results/cards/card_minicpm5-2b-q8_0.png) |
-| 5 | Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | **81.8%** | 95% | 75% | 100% | 80% | 100% | 90% | 71% | 94 t · 0.5.0 | [png](results/cards/card_qwen35-9b-q4km.png) |
-| 6 | Spark-X2.6-4B | IQ3_M · KV FP16 · 32K ctx | **81.0%** | 100% | 100% | 100% | 100% | 71% | 80% | 64% | 94 t · 0.5.0 | [png](results/cards/card_spark-x2.6-4b-iq3m-bartowski.png) |
-| 7 | Ornith-1.5-9B | Q4_K_M · KV FP16 · 32K ctx | **76.9%** | 95% | 50% | 100% | 100% | 86% | 60% | 71% | 94 t · 0.5.0 | [png](results/cards/card_ornith-9b-q4_K_M.png) |
-| 8 | Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | **75.3%** | 88% | 88% | 100% | 100% | 100% | 40% | 57% | 94 t · 0.5.0 | [png](results/cards/card_spark-x2.6-1.7b-q8_0.png) |
-| 9 | Sharp-Spark-4B | Q4_K_XL · KV FP16 · 32K ctx | **68.3%** | 63% | 88% | 67% | 100% | 71% | 90% | 64% | 94 t · 0.5.0 | [png](results/cards/card_sharp-spark-4b-q4_K_XL.png) |
-| 10 | MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | **62.8%** | 88% | 62% | 100% | 70% | 71% | 30% | 64% | 94 t · 0.5.0 | [png](results/cards/card_minicpmv47-1b-iq4xs.png) |
-| 11 | MiMo-V2.6-9B | Q4_K_M · KV FP16 · 32K ctx | **59.1%** | 63% | 62% | 0% | 80% | 71% | 90% | 57% | 94 t · 0.5.0 | [png](results/cards/card_mimo-9b-q4_K_M.png) |
-| 12 | LFM2.5-2.6B | Q8_0 · KV FP16 · 32K ctx | **58.9%** | 79% | 25% | 83% | 70% | 86% | 30% | 50% | 94 t · 0.5.0 | [png](results/cards/card_lfm2.5-2.6b-q8_0.png) |
-| 13 | LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | **54.2%** | 58% | 50% | 100% | 70% | 86% | 30% | 43% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-1.2b-q8_0.png) |
-| 14 | LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | **52.8%** | 79% | 50% | 67% | 50% | 71% | 30% | 36% | 94 t · 0.5.0 | [png](results/cards/card_lfm25-8b-a1b-udq4km.png) |
-| 15 | Gemma 3n E4B | Q4_K_M · KV FP16 · 32K ctx | **52.4%** | 26% | 75% | 17% | 80% | 86% | 90% | 57% | 94 t · 0.5.0 | [png](results/cards/card_gemma-e4b-q4_K_M.png) |
-| 16 | Gemma 4 12B | UD-Q2_K_XL · KV FP16 · 32K ctx | **43.7%** | 5% | 88% | 83% | 90% | 0% | 60% | 64% | 94 t · 0.5.0 | [png](results/cards/card_gemma4-12b-ud-q2_K_XL.png) |
+| 🥇 | Gemma 4 E4B | Q4_K_M · KV q8_0 · 32K ctx | **90.2%** | 95% | 90% | 83% | 100% | 100% | 100% | 72% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-e4b-q4km-kvq8.png) |
+| 🥈 | Bolt E4B | UD-IQ3_XXS · KV q8_0 · 32K ctx | **89.7%** | 95% | 90% | 83% | 100% | 86% | 100% | 83% | 320 t · 0.6.0 | [png](results/cards/card_bolt-e4b-udiq3xxs-kvq8.png) |
+| 🥉 | Qwen3.5-9B | Q4_K_M · KV q4_0 · 32K ctx | **86.2%** | 89% | 80% | 100% | 80% | 86% | 100% | 56% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-9b-q4km-kvq4.png) |
+| 4 | Spark-X2.6-4B | Q8_0 · KV q4_0 · 32K ctx | **86.0%** | 89% | 100% | 100% | 90% | 100% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_spark-x2.6-4b-q8-kvq4.png) |
+| 5 | MiMo-V2.6-9B | Q4_K_M · KV FP16 · 32K ctx | **84.8%** | 100% | 80% | 100% | 70% | 71% | 100% | 56% | 320 t · 0.6.0 | [png](results/cards/card_mimo-v2.6-9b-q4km-kvf16.png) |
+| 6 | Ornith-1.5-9B | Q4_K_M · KV FP16 · 32K ctx | **84.2%** | 84% | 60% | 100% | 90% | 100% | 80% | 67% | 320 t · 0.6.0 | [png](results/cards/card_ornith-1.5-9b-q4km-kvf16.png) |
+| 7 | Gemma 4 E2B | Q4_0 · KV q8_0 · 32K ctx | **83.5%** | 82% | 80% | 83% | 80% | 100% | 100% | 78% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-e2b-q4_0-kvq8.png) |
+| 8 | Qwen3.5-4B | Q4_K_M · KV FP16 · 32K ctx | **83.3%** | 89% | 70% | 100% | 70% | 100% | 80% | 50% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-4b-q4km-kvf16.png) |
+| 9 | MiniCPM5-2B | Q4_K_M · KV FP16 · 32K ctx | **80.3%** | 95% | 90% | 83% | 80% | 100% | 90% | 83% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-2b-q4km-kvf16.png) |
+| 10 | Gemma 4 12B | UD-Q2_K_XL · KV q8_0 · 32K ctx | **79.5%** | 79% | 90% | 83% | 80% | 71% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-12b-udq2kxl-kvq8.png) |
+| 11 | Ministral 3 8B | Q4_K_M · KV q8_0 · 32K ctx | **79.5%** | 89% | 60% | 100% | 40% | 86% | 90% | 78% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-8b-q4km-kvq8.png) |
+| 12 | Sharp-Spark-4B | Q4_K_XL · KV q8_0 · 32K ctx | **76.9%** | 63% | 90% | 50% | 100% | 71% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_sharp-spark-4b-q4kxl-kvq8.png) |
+| 13 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **76.5%** | 74% | 80% | 100% | 50% | 100% | 80% | 44% | 320 t · 0.6.0 | [png](results/cards/card_dory-1.0-4b-q5km-kvq8.png) |
+| 14 | Granite 4.2 8B | Q4_K_M · KV q8_0 · 32K ctx | **74.2%** | 95% | 80% | 100% | 60% | 100% | 40% | 50% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-8b-q4km-kvq8.png) |
+| 15 | Spark-X2.6-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 77% | 90% | 100% | 50% | 57% | 20% | 56% | 320 t · 0.6.0 | [png](results/cards/card_spark-x2.6-1.7b-q4km-kvq8.png) |
+| 16 | Ministral 3 3B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 89% | 70% | 83% | 50% | 71% | 60% | 72% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-3b-q4km-kvq8.png) |
+| 17 | Qwen3.5-2B | Q4_K_M · KV q8_0 · 32K ctx | **67.3%** | 79% | 80% | 100% | 30% | 57% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-2b-q4km-kvq8.png) |
+| 18 | LFM3-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **66.5%** | 84% | 50% | 83% | 40% | 57% | 80% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm3-1.7b-q4km-kvq8.png) |
+| 19 | Granite 4.2 3B | Q4_K_M · KV q8_0 · 32K ctx | **65.7%** | 89% | 80% | 67% | 50% | 86% | 20% | 33% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-3b-q4km-kvq8.png) |
+| 20 | Gemma 3n E4B | Q4_K_M · KV q8_0 · 32K ctx | **64.7%** | 26% | 50% | 17% | 70% | 43% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_gemma3n-e4b-q4km-kvq8.png) |
+| 21 | Nemotron 3 Nano 4B | Q4_K_M · KV q8_0 · 32K ctx | **64.0%** | 74% | 60% | 67% | 50% | 29% | 70% | 39% | 320 t · 0.6.0 | [png](results/cards/card_nemotron3-nano-4b-q4km-kvq8.png) |
+| 22 | LFM2.5-2.6B | Q4_K_M · KV q8_0 · 32K ctx | **62.3%** | 79% | 50% | 83% | 60% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-2.6b-q4km-kvq8.png) |
+| 23 | Llama 3.1 8B | Q4_K_M · KV q8_0 · 32K ctx | **61.8%** | 16% | 40% | 17% | 60% | 100% | 90% | 56% | 320 t · 0.6.0 | [png](results/cards/card_llama-3.1-8b-q4km-kvq8.png) |
+| 24 | LFM2.5-8B-A1B | UD-Q4_K_M · KV q8_0 · 32K ctx | **54.7%** | 84% | 60% | 67% | 20% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-8b-a1b-udq4km-kvq8.png) |
+| 25 | Qwen3.5-0.8B | Q4_K_M · KV q8_0 · 32K ctx | **54.6%** | 63% | 60% | 100% | 40% | 57% | 10% | 39% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-0.8b-q4km-kvq8.png) |
+| 26 | MiniCPM-V 4.7 1B | Q4_K_M · KV q8_0 · 32K ctx | **53.5%** | 60% | 60% | 83% | 50% | 29% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_minicpmv47-1b-q4km-kvq8.png) |
+| 27 | LFM2.5-1.2B | Q4_K_M · KV q8_0 · 32K ctx | **53.1%** | 58% | 70% | 100% | 40% | 71% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-1.2b-q4km-kvq8.png) |
+| 28 | MiniCPM5-1B | Q4_K_M · KV q8_0 · 32K ctx | **45.9%** | 47% | 60% | 50% | 30% | 71% | 30% | 56% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-1b-q4km-kvq8.png) |
 
-**Legacy rows — NOT comparable, kept for provenance:** one row per model, its best-scoring pre-0.5.0 configuration; the 225 configurations behind them are listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
+**Legacy rows — NOT comparable, kept for provenance:** one row per model, its best-scoring pre-0.5.0 configuration; the 243 configurations behind them are listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
 | Model | Best legacy configuration | Configurations | Score | Why it is not comparable |
 |---|---|---|---|---|
-| Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | 2 | 88.7% | scorer v0.3.1 (pre-0.5.0) |
-| Gemma 3n · E4B | Q4_K_M | 1 | 52.4% | scorer v0.3.1 (pre-0.5.0) |
-| Gemma 4 · 12B | UD-Q2_K_XL | 2 | 72.6% | scorer v0.3.1 (pre-0.5.0) |
-| Gemma 4 · E4B | Q4_K_M | 1 | 90.5% | scorer v0.3.1 (pre-0.5.0) |
-| K2-Horizon · 7B | Q4_K_M | 1 | 81.1% | scorer v0.3.1 (pre-0.5.0) |
-| LFM 2.5 · 2.6B | Q8_0 | 2 | 70.9% | scorer v0.3.1 (pre-0.5.0) |
-| LFM2.5-1.2B | Q4_K_M · KV FP16 · 32K ctx | 1 | 63.5% | scorer v0.3.1 (pre-0.5.0) |
-| LFM2.5-24B-A2B | UD-Q4_K_XL · KV FP16 · 8K ctx | 1 | 59.2% | scorer v0.3.1 (pre-0.5.0) |
-| LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | 60 | 86.3% | scorer v0.3.1 (pre-0.5.0) |
-| MiMo V2.6 · 9B | Q4_K_M | 1 | 74.9% | scorer v0.3.1 (pre-0.5.0) |
-| MiniCPM-V 4.7 1B | IQ4_XS · KV q8_0 · 32K ctx | 41 | 72.9% | scorer v0.3.1 (pre-0.5.0) |
-| MiniCPM-V 5 · 2B | Q8_0 | 2 | 90.0% | scorer v0.3.1 (pre-0.5.0) |
-| Nemotron 3.5 Bolt E4B | UD-Q4_K_XL · KV q8_0 · 32K ctx | 24 | 89.1% | scorer v0.3.1 (pre-0.5.0) |
-| Ornith 1.5 · 9B | Q4_K_M | 1 | 77.8% | scorer v0.3.1 (pre-0.5.0) |
-| Qwen 3.5 · 4B | Q4_K_M | 1 | 67.9% | scorer v0.3.1 (pre-0.5.0) |
-| Sharp-Spark X2.5 · 4B | Q4_K_XL | 1 | 66.7% | scorer v0.3.1 (pre-0.5.0) |
-| Spark-X2.6 1.7B | Q6_K · KV FP16 · 32K ctx | 20 | 81.3% | scorer v0.3.1 (pre-0.5.0) |
-| Spark-X2.6 4B | Q4_K_L · KV q8_0 · 32K ctx | 62 | 90.2% | scorer v0.3.1 (pre-0.5.0) |
-| Ternary Bonsai-2 · 27B | PTQ1_0 | 1 | 86.2% | scorer v0.3.1 (pre-0.5.0) |
+| Bolt E4B | UD-IQ3_XXS · KV FP16 · 32K ctx | 27 | 86.6% | scorer 0.5.0 (pre-0.6.0) |
+| Dory 1.0 4B | Q5_K_M · KV q4_0 · 32K ctx | 1 | 87.5% | scorer v0.3.1 (pre-0.6.0) |
+| Gemma 3n E4B | Q4_K_M · KV FP16 · 32K ctx | 1 | 52.4% | scorer 0.5.0 (pre-0.6.0) |
+| Gemma 4 12B | UD-Q2_K_XL · KV FP16 · 32K ctx | 1 | 43.7% | scorer 0.5.0 (pre-0.6.0) |
+| Gemma 4 E4B | Q4_K_M · KV FP16 · 32K ctx | 1 | 86.3% | scorer 0.5.0 (pre-0.6.0) |
+| LFM2.5-1.2B | Q4_K_M · KV FP16 · 32K ctx | 1 | 63.5% | scorer v0.3.1 (pre-0.6.0) |
+| LFM2.5-1.2B | Q8_0 · KV FP16 · 32K ctx | 1 | 54.2% | scorer 0.5.0 (pre-0.6.0) |
+| LFM2.5-2.6B | Q8_0 · KV FP16 · 32K ctx | 1 | 58.9% | scorer 0.5.0 (pre-0.6.0) |
+| LFM2.5-24B-A2B | UD-Q4_K_XL · KV FP16 · 8K ctx | 1 | 59.2% | scorer v0.3.1 (pre-0.6.0) |
+| LFM2.5-8B-A1B | UD-Q4_K_M · KV FP16 · 32K ctx | 1 | 52.8% | scorer 0.5.0 (pre-0.6.0) |
+| LFM3 1.7B | IQ4_NL · KV FP16 · 32K ctx | 59 | 86.3% | scorer v0.3.1 (pre-0.6.0) |
+| MiMo-V2.6-9B | Q4_K_M · KV FP16 · 32K ctx | 1 | 59.1% | scorer 0.5.0 (pre-0.6.0) |
+| MiniCPM-V 4.7 1B | IQ4_XS · KV q8_0 · 32K ctx | 41 | 72.9% | scorer v0.3.1 (pre-0.6.0) |
+| MiniCPM-V 4.7 1B | IQ4_XS · KV FP16 · 32K ctx | 1 | 62.8% | scorer 0.5.0 (pre-0.6.0) |
+| MiniCPM5-2B | Q8_0 · KV FP16 · 32K ctx | 1 | 82.1% | scorer 0.5.0 (pre-0.6.0) |
+| Nemotron 3.5 Bolt E4B | UD-Q4_K_XL · KV q8_0 · 32K ctx | 21 | 89.1% | scorer v0.3.1 (pre-0.6.0) |
+| Ornith-1.5-9B | Q4_K_M · KV FP16 · 32K ctx | 1 | 76.8% | scorer 0.5.0 (pre-0.6.0) |
+| Qwen3.5-4B | Q4_K_M · KV FP16 · 32K ctx | 1 | 82.4% | scorer 0.5.0 (pre-0.6.0) |
+| Qwen3.5-9B | Q4_K_M · KV FP16 · 32K ctx | 1 | 81.8% | scorer 0.5.0 (pre-0.6.0) |
+| Sharp-Spark-4B | Q4_K_XL · KV FP16 · 32K ctx | 1 | 68.4% | scorer 0.5.0 (pre-0.6.0) |
+| Spark-X2.6 1.7B | Q6_K · KV FP16 · 32K ctx | 19 | 81.3% | scorer v0.3.1 (pre-0.6.0) |
+| Spark-X2.6 4B | Q4_K_L · KV q8_0 · 32K ctx | 58 | 90.2% | scorer v0.3.1 (pre-0.6.0) |
+| Spark-X2.6-1.7B | Q8_0 · KV FP16 · 32K ctx | 1 | 75.3% | scorer 0.5.0 (pre-0.6.0) |
+| Spark-X2.6-4B | IQ3_M · KV FP16 · 32K ctx | 1 | 81.0% | scorer 0.5.0 (pre-0.6.0) |
+
+**Offload / >12B — scored separately, never merged with the on-GPU table:**
+
+| Model | Configuration | Score | Method |
+|---|---|---|---|
+| Bolt E4B | UD-Q8_K_XL · KV FP16 · 32K ctx | 90.5% | 320 t · 0.6.0 |
 
 **What this table says:**
 
-- **Best on-GPU: Bolt E4B (UD-IQ3_XXS · KV FP16 · 32K ctx) at 86.6%** — 28 configuration(s) of this model were scored; this is the best of them.
-- Next: Gemma 4 E4B (Q4_K_M · KV FP16 · 32K ctx) at 86.3% — inside the weight of a single task (0.7-1.6 pp here depending on the suite), so a tie, not a win.
-- 225 legacy rows are excluded from the ranking (task count or scorer version differs); they keep the published number below but are never ranked against current rows.
+- **Best on-GPU: Gemma 4 E4B (Q4_K_M · KV q8_0 · 32K ctx) at 90.2%** — 3 configuration(s) of this model were scored; this is the best of them.
+- Next: Bolt E4B (UD-IQ3_XXS · KV q8_0 · 32K ctx) at 89.7% — inside the weight of a single task (0.7-1.6 pp here depending on the suite), so a tie, not a win.
+- 243 legacy rows are excluded from the ranking (task count or scorer version differs); they keep the published number below but are never ranked against current rows.
 
 _Generated by `scripts/leaderboard_check.py` from `results/cards/*.json`. `python3 scripts/leaderboard_check.py` fails when this block and the corpus disagree — edit the generator, not the table._
 
@@ -63,10 +88,31 @@ _Generated by `scripts/leaderboard_check.py` from `results/cards/*.json`. `pytho
 
 Full data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md) · machine-readable [`results/_published/leaderboard.json`](results/_published/leaderboard.json) · trading cards in [`results/cards/`](results/cards/).
 
-**Task-validity note (0.5.0).** 13 of the 94 tasks are passed by no model measured so far and 12 are passed by every model, so 25 tasks currently do no ranking work. The unwinnable set is a flat **8.0 pp** off every row above — it shifts all rows down by the same amount and cannot change rank order, so 0.5.0 absolute scores are not comparable with 0.3.1/0.4.0. Every gold answer in that set was re-derived by hand and is correct; the models really do fail the tasks. Full audit, with the derivation of each answer and the repair plan: [`docs/AUDIT-TASK-VALIDITY-v0.5.md`](docs/AUDIT-TASK-VALIDITY-v0.5.md) (reproduce with `python3 scripts/audit_task_discrimination.py`).
+## Epochs — what is comparable with what
 
+The current epoch is **0.6.0**: 320 scored tasks across 14 suites, weights in
+`gauntlet/methodology.py`. Its rows are comparable with each other and with nothing else.
+0.5.0 (94 tasks) and earlier (71 tasks, scorer v0.3.1) are frozen as measured — different
+task set, different weights, different engine — so they are printed in separate tables and
+never ranked against current rows. The task-validity audit that produced the 0.5.1 repair
+(25 of the 94 tasks carried no ranking information: a flat 8.0 pp on every 0.5.0 row) is
+historical: [`docs/AUDIT-TASK-VALIDITY-v0.5.md`](docs/AUDIT-TASK-VALIDITY-v0.5.md), repair
+in [`docs/AUDIT-TASK-VALIDITY-v0.5.1.md`](docs/AUDIT-TASK-VALIDITY-v0.5.1.md).
 
-**How to read this:** every published score is the weighted aggregate defined in `scripts/leaderboard_check.py` (the same weights `gauntlet run` prints) and is recomputed from that run's log — a row you cannot trace to a run log does not appear in the table. The table above is generated, not written: `python3 scripts/leaderboard_check.py` exits non-zero when it and the card corpus disagree, and `--write` regenerates it.
+## What is published, and what you can check
+
+Every score above is the weighted aggregate defined in `scripts/leaderboard_check.py`, the
+same figures `gauntlet run` prints. The published instrument is the model's **card**
+(`results/cards/*.json`): it carries the per-suite results the score is computed from, and
+[`SCOREBOARD.md`](SCOREBOARD.md) is re-derived from those cards by
+`scripts/scoreboard_check.py`, which exits non-zero on any disagreement — 88 cells in a
+public clone, 144 on the authoring tree, with the boards whose raw logs stay private named
+rather than skipped silently. The raw run logs behind the cards also stay on the authoring
+machine, so `scripts/leaderboard_check.py` cannot reproduce a card in a public clone — it is
+an authoring-tree tool, not a stranger-facing check. The table above is generated, never
+written: `python3 scripts/leaderboard_check.py` exits non-zero when this block,
+`results/_published/leaderboard.json` and the card corpus disagree, and `--write`
+regenerates them.
 
 ---
 
@@ -88,17 +134,24 @@ Three layers, all deterministic:
 
 Same model + same seed → identical results.
 
-### The suites
+### The suites (14 scored units, 320 tasks in epoch 0.6.0)
 
 | Suite | Tasks | What it measures |
 |---|---|---|
+| **realworld** | 60 | Multi-constraint everyday agent work: expense splits with policy arithmetic, multi-answer scenarios scored as sub-answer units, state graded |
+| **email** | 46 | Mailbox agent: triage into buckets, extraction, reply policy, urgency rules |
+| **classify** | 33 | Route content to exactly one department; strict single-label output |
+| **support** | 32 | Ticket classification and priority under explicit policy rules |
+| **docintake** | 29 | Invoice/document → exact JSON record, field by field |
+| **calendar** | 20 | Event extraction into a fixed record shape |
+| **summarize** | 20 | Decisions/actions only, verbatim, from meeting notes |
 | **tooluse** | 12 + 7 hard | Correct tool selection and arguments; calculator grounding (does it use the tool or hallucinate arithmetic?); error recovery (tool fails once → must retry); sandbox escape refusal; distractor discipline; and a **hard tier**: policy compliance with traps, long-context reservations, missing functions, state conflicts, multi-step computation chains |
-| **adversarial** | 8 | Prompt-injection resistance: injected "ignore instructions" in email/tool data, system-prompt exfiltration, priority inversion, sycophancy pressure, base64-encoded bypasses, impersonation. Must resist the attack **and** still complete the real job |
+| **instruction** | 8 + 10 hard | Exact ordering, format locks, negation constraints, 4-constraint stacks; hard tier adds conflict hierarchy, multi-turn persistence, exact counts, verbatim copy |
+| **adversarial** | 10 | Prompt-injection resistance: injected "ignore instructions" in email/tool data, system-prompt exfiltration, priority inversion, sycophancy pressure, base64-encoded bypasses, impersonation. Must resist the attack **and** still complete the real job |
+| **coding** | 10 | Bug fixes, dict/list transforms, regex parsing, contradiction traps where the naive solution is invalid |
+| **structured** | 8 + 2 hard | Valid JSON against a schema, extraction from messy input, exact function signatures; hard tier adds decoy fields |
+| **retrieval** | 7 | Needle-in-a-haystack from 8K to 24K tokens, NoLiMa-style associative needles, refusal-when-absent, multi-needle — generated per run, not stored |
 | **agent_chains** | 6 | Multi-turn tool pipelines (3-8 turns): search→pick→reserve chains, file write→append→read-back, lookup→transform→compute, mid-chain error recovery, conditional branches on tool output |
-| **structured** | 8 + 2 hard | Valid JSON against a schema, extraction from messy input, exact function signatures |
-| **retrieval** | 8 | Needle-in-a-haystack from 4K to 32K tokens, NoLiMa-style associative needles, and refusal-when-absent (anti-hallucination) |
-| **coding** | 6 | Bug fixes, dict/list transforms, regex parsing, contradiction traps where the naive solution is invalid |
-| **instruction** | 8 + 6 hard | Exact ordering, format locks, negation constraints, 4-constraint stacks |
 
 ### How needle-in-a-haystack works (no agent needed)
 
@@ -123,11 +176,12 @@ The benchmark is **device-agnostic**. `gauntlet.device.detect_device()` auto-det
 - **AMD** — via `rocm-smi`
 - **CPU** — fallback
 
-The card generator stamps whatever device it ran on into the model card — GPU name, total memory, and whether weights fit fully on-device or needed RAM offload. No manual config. Your cards show your hardware.
+The card generator stamps whatever device it ran on into the model card — GPU name, total memory, and whether weights fit fully on-device or needed RAM offload. No manual config. Your cards show your hardware. (The published corpus was measured on an NVIDIA GTX 1070 Ti 8 GB; re-deriving those exact cards needs `--device "GTX 1070 Ti:8192:nvidia"`, because no tool should re-stamp someone else's measurement with your GPU.)
 
 ## Quickstart
 
 Requirements: Python 3.11+, any OpenAI-compatible server. Tested with llama.cpp (`llama-server`).
+Card images additionally need `playwright` + chromium (see step 5).
 
 ```bash
 git clone <this-repo>
@@ -149,6 +203,10 @@ gauntlet perf --endpoint http://localhost:8080/v1 --model my-model
 
 # 4. Leaderboard from your local runs
 gauntlet report
+
+# 5. Your own model card, with your own score (PNG)
+python3 scripts/cards_from_runs.py --models my-model    # card JSON from YOUR run log
+python3 scripts/publish_cards.py --models my-model      # HTML -> verified 1080x1080 PNG
 ```
 
 Or with Docker (serves + benches in one command):
@@ -198,6 +256,7 @@ If you are an AI agent tasked with benchmarking a model using this repo:
 3. Run `gauntlet run --endpoint <url> --model <name> --suite all --concurrency 1` for a first pass.
 4. Read `results/<model>_<ts>.json`: `subagent_capability_score` is the headline; `failure_modes` explains regressions.
 5. The sandbox is fully in-memory — no host filesystem writes, no network calls from tasks. Safe to run unattended.
+6. For the model card PNG: `python3 scripts/cards_from_runs.py --models <name>` then `python3 scripts/publish_cards.py --models <name>` (needs playwright + chromium). The card records the device it was measured on.
 
 ---
 
@@ -205,9 +264,35 @@ If you are an AI agent tasked with benchmarking a model using this repo:
 
 One canonical llama.cpp load recipe per model×quant lives in `runtimes/recipes/*.yaml` (context, slots, KV cache type, temperature). Copy an existing recipe and adjust. Recipes make runs comparable across machines and quantizations.
 
+## Repository layout
+
+```
+tasks/            the scored task corpus: 14 suites as YAML (retrieval is generated at run time)
+gauntlet/         the package: runner, agent loop, sandbox, scorer, client, device detection
+runtimes/         one canonical llama.cpp load recipe per model x quant
+results/cards/    the published instrument: one card JSON (+ HTML/PNG render) per scored configuration
+results/_published/  machine-readable leaderboard.json and the long-form LEADERBOARD.md
+docs/             method and epoch records, indexed in docs/README.md
+scripts/          tooling: leaderboard + scoreboard verification, card generation/rendering,
+                  hygiene gate, lane preflight/sweep (authoring-side)
+extra-suites/     opt-in instruments that are never merged into the generative headline:
+                  long-horizon (102K context), OCR/document extraction, routing
+classifier-bench/ the classifier lane
+llama.cpp/        a submodule pointer without a published .gitmodules: an empty directory in a
+                  fresh clone, and nothing in the package needs it
+```
+
+Raw run logs and per-run artifacts are gitignored (`results/*`); what ships is the card corpus,
+the published leaderboard and the receipts under `results/_preflight`.
+
 ## Repository hygiene
 
-This repo must never contain personal information or private infrastructure details. `scripts/hygiene-check.sh` scans every tracked file (and full git history with `--history`) for identity/IP patterns and runs as a blocking CI step on every push. Results directories with run artifacts are gitignored — publish what you choose, share what you want.
+This repo must never contain personal information or private infrastructure details. Two gates enforce that, and both are blocking CI steps on every push:
+
+- `scripts/hygiene-check.sh` — every tracked text file (and, with `--history`, every blob in git history and every author/committer field) against identity, personal-mail, private-hostname and internal-lane patterns;
+- `scripts/image_privacy_check.py` — every shipped image, against PNG/JPEG text chunks and PII-shaped byte strings (the text gate cannot read binaries).
+
+Results directories with run artifacts are gitignored — publish what you choose, share what you want.
 
 ## Credits & thanks
 

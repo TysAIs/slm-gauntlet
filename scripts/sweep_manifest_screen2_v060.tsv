@@ -1,0 +1,15 @@
+# Stage 3 screen manifest, epoch 0.6.0 (2026-11-09)
+# The 9 new text models at the canonical screen config (Q4_K_M-class x KV q8_0, T1 ctx 32768,
+# np 1, -fa on --reasoning-budget 0 -cram 0), full 320-unit battery, same format as
+# scripts/sweep_manifest_screen_v060.tsv. Gemma 4 E2B's canonical quant is its Google QAT
+# q4_0 build (no community Q4_K_M exists for it). MiniCPM-OCR 1.0 runs on the OCR board
+# (separate manifest with --mmproj), not in this table.
+qwen3.5-0.8b-q4km-kvq8	/mnt/data/models/qwen3.5-0.8b/Qwen3.5-0.8B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-2b-q4km-kvq8	/mnt/data/models/qwen3.5-2b/Qwen3.5-2B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+nemotron3-nano-4b-q4km-kvq8	/mnt/data/models/nemotron3-nano-4b/NVIDIA-Nemotron3-Nano-4B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+ministral3-3b-q4km-kvq8	/mnt/data/models/ministral3-3b/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+ministral3-8b-q4km-kvq8	/mnt/data/models/ministral3-8b/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+granite4.2-3b-q4km-kvq8	/mnt/data/models/granite42-3b/granite-4.2-3b-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+granite4.2-8b-q4km-kvq8	/mnt/data/models/granite42-8b/granite-4.2-8b-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+minicpm5-1b-q4km-kvq8	/mnt/data/models/minicpm5-1b/MiniCPM5-1B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-e2b-q4_0-kvq8	/mnt/data/models/gemma4-e2b/gemma-4-E2B_q4_0-it.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0

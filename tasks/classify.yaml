@@ -1,0 +1,765 @@
+# Content routing & classification suite (epoch 0.6.0, design P2 section 2.2).
+#
+# The routing layer every agent pipeline starts with. Exact-match and set
+# equality (as predicates) throughout; ordinals are anchored IN the prompt
+# so the scale is a reading task, not a taste task. Phishing fixtures use
+# only *.example lookalike domains. PII typing asks for TYPES only and its
+# gate unit fails any answer that echoes a PII value.
+#
+# Batch table: one scenario prompt, ten per-position units (audit rule 5:
+# N independent values = N units).
+# Fixtures are synthetic; scripts/gen_classify_tasks.py recomputes the
+# batch table and the multilabel set from the fixture data and asserts
+# equality with this file.
+# Validity proof: tests/test_validity_classify.py.
+- id: cr_route4
+  suite: classify
+  description: Route one item to one of four departments (legal cues)
+  prompt: 'Route this content item to exactly one department. Departments: support, sales, legal, hr.
+
+    Reply with ONLY the department name.
+
+
+    --- item ---
+
+    "Our contract''s indemnity clause conflicts with the new vendor agreement; can someone review both before Friday?"
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: legal
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__set
+  suite: classify
+  description: Multi-label tagging — unit full tag set equality
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and set(data) == {'hiring', 'pricing', 'support'}
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__hiring
+  suite: classify
+  description: Multi-label tagging — unit tag 'hiring' present
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'hiring' in data
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__pricing
+  suite: classify
+  description: Multi-label tagging — unit tag 'pricing' present
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'pricing' in data
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__support
+  suite: classify
+  description: Multi-label tagging — unit tag 'support' present
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'support' in data
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__no_launch
+  suite: classify
+  description: Multi-label tagging — unit false tag 'launch' absent
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'launch' not in data
+  tier: standard
+  max_tokens: 512
+- id: cr_multilabel__no_event
+  suite: classify
+  description: Multi-label tagging — unit false tag 'event' absent
+  prompt: 'Assign ALL applicable tags to this post. Tag set: launch, hiring, support, pricing, event.
+
+    Reply with ONLY a JSON array of the applicable tags.
+
+
+    --- post ---
+
+    "We are hiring two support engineers. Also, our pricing page was updated today with the new tiers."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'event' not in data
+  tier: standard
+  max_tokens: 512
+- id: cr_priority_ordinal
+  suite: classify
+  description: Four-level ordinal priority (production-down anchor)
+  prompt: 'Rate the priority of this message on the scale low < medium < high < urgent.
+
+    Anchors: low = routine information; medium = needs action this week; high = blocks a team today; urgent = production
+    is down or a deadline is being missed right now.
+
+    Reply with ONLY the priority word.
+
+
+    --- message ---
+
+    "The checkout API has been returning errors for the last ten minutes and customers cannot complete purchases."
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: urgent
+  tier: standard
+  max_tokens: 512
+- id: cr_phish_verdict__verdict
+  suite: classify
+  description: Phishing verdict — unit verdict (lookalike domain + pressure + credential request)
+  prompt: 'Is this email a phishing attempt? Reply with ONLY a JSON object of exactly this shape:
+
+    {"verdict": "phish" or "legit", "reason_code": "<code>"}
+
+    Reason codes: lookalike_domain (sender domain imitates a real brand), urgency_pressure (threats or extreme time
+    pressure), credential_request (asks for password or payment details), none (no signal).
+
+
+    --- email ---
+
+    From: security@paypa1.example
+
+    Subject: URGENT: account suspended in 2 hours
+
+    Body: "Verify your password immediately at the link below or your account will be closed permanently."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('verdict') == 'phish'
+  tier: standard
+  max_tokens: 512
+- id: cr_phish_verdict__reason
+  suite: classify
+  description: Phishing verdict — unit primary reason_code
+  prompt: 'Is this email a phishing attempt? Reply with ONLY a JSON object of exactly this shape:
+
+    {"verdict": "phish" or "legit", "reason_code": "<code>"}
+
+    Reason codes: lookalike_domain (sender domain imitates a real brand), urgency_pressure (threats or extreme time
+    pressure), credential_request (asks for password or payment details), none (no signal).
+
+
+    --- email ---
+
+    From: security@paypa1.example
+
+    Subject: URGENT: account suspended in 2 hours
+
+    Body: "Verify your password immediately at the link below or your account will be closed permanently."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('reason_code') == 'lookalike_domain'
+  tier: standard
+  max_tokens: 512
+- id: cr_lang_id
+  suite: classify
+  description: Language identification — exact ISO code
+  prompt: 'Identify the language of this text. Reply with ONLY its ISO 639-1 code (two letters).
+
+
+    --- text ---
+
+    "Bonjour, je voudrais confirmer notre rendez-vous de demain matin."
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: fr
+  tier: standard
+  max_tokens: 512
+- id: cr_voice_intent
+  suite: classify
+  description: Voice-command intent from a transcript
+  prompt: 'A voice command was transcribed. Identify the user''s intent. Intents: play_music, set_timer, send_message,
+    get_weather, other.
+
+    Reply with ONLY the intent name.
+
+
+    --- transcript ---
+
+    "Set a timer for twenty minutes, please."
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: set_timer
+  tier: standard
+  max_tokens: 512
+- id: cr_pii_types__set
+  suite: classify
+  description: PII typing — unit type set (values never requested)
+  prompt: 'Which TYPES of personal data appear in this text? Choose from: email, phone, ssn, credit_card, address,
+    name.
+
+    Reply with ONLY a JSON array of the types present. Never output the values themselves.
+
+
+    --- text ---
+
+    "Reach Ana Ruiz at ana.ruiz@example.com or on 555-0142 about the shipment."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and set(data) == {'email', 'name', 'phone'}
+  tier: standard
+  max_tokens: 512
+- id: cr_pii_types__no_values
+  suite: classify
+  description: PII typing — unit no PII value leaks into the output (gate)
+  prompt: 'Which TYPES of personal data appear in this text? Choose from: email, phone, ssn, credit_card, address,
+    name.
+
+    Reply with ONLY a JSON array of the types present. Never output the values themselves.
+
+
+    --- text ---
+
+    "Reach Ana Ruiz at ana.ruiz@example.com or on 555-0142 about the shipment."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: '''ana.ruiz@example.com'' not in out and ''555-0142'' not in out'
+    must_pass: true
+  tier: standard
+  max_tokens: 512
+- id: cr_doc_type
+  suite: classify
+  description: Document type from opening lines
+  prompt: 'Classify this document by its opening lines. Types: invoice, resume, contract, memo, report.
+
+    Reply with ONLY the type.
+
+
+    --- document (first lines) ---
+
+    "INVOICE No. 4471
+
+    Issued: 2026-03-01
+
+    Bill to: Harbor Studio
+
+    Total due: 412.00"
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: invoice
+  tier: standard
+  max_tokens: 512
+- id: cr_boundary_pairs__b1
+  suite: classify
+  description: Boundary pair — route legal vs hr
+  prompt: 'Should this go to legal or hr? Reply with ONLY one word: legal or hr.
+
+
+    --- item ---
+
+    "An employee asked whether the non-compete in their offer letter is enforceable."'
+  asserts:
+  - type: exact_match
+    value: legal
+  tier: hard
+  max_tokens: 256
+- id: cr_boundary_pairs__b2
+  suite: classify
+  description: Boundary pair — billing vs account (a charge problem on a closed account)
+  prompt: 'Should this go to billing or account? Reply with ONLY one word: billing or account.
+
+
+    --- item ---
+
+    "My account was closed last month but I was still charged the monthly fee yesterday."'
+  asserts:
+  - type: exact_match
+    value: billing
+  tier: hard
+  max_tokens: 256
+- id: cr_boundary_pairs__b3
+  suite: classify
+  description: Boundary pair — bug report vs feature request
+  prompt: 'Is this a bug or a feature request? Reply with ONLY one word: bug or feature.
+
+
+    --- item ---
+
+    "Since the update, the export button produces an empty file. It worked last week."'
+  asserts:
+  - type: exact_match
+    value: bug
+  tier: hard
+  max_tokens: 256
+- id: cr_boundary_pairs__b4
+  suite: classify
+  description: Boundary pair — complaint vs question (rhetorical frustration with a real question)
+  prompt: 'Is this a complaint or a question? Reply with ONLY one word: complaint or question.
+
+
+    --- item ---
+
+    "Your hold music is awful, by the way - what time does the office open on Saturdays?"'
+  asserts:
+  - type: exact_match
+    value: question
+  tier: hard
+  max_tokens: 256
+- id: cr_hier_route__pair
+  suite: classify
+  description: Two-level routing — unit exact (l1, l2) pair
+  prompt: 'Route this ticket in two levels. Level 1: support or sales. Level 2 depends on level 1:
+
+    - support -> password, billing, technical
+
+    - sales -> pricing, demo, partnership
+
+    Reply with ONLY a JSON object of exactly this shape: {"l1": "<level 1>", "l2": "<level 2>"}
+
+
+    --- ticket ---
+
+    "The export to CSV produces an empty file since yesterday."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and (data.get('l1'), data.get('l2')) == ('support', 'technical')
+  tier: standard
+  max_tokens: 512
+- id: cr_hier_route__l1
+  suite: classify
+  description: Two-level routing — unit level-1 partial credit
+  prompt: 'Route this ticket in two levels. Level 1: support or sales. Level 2 depends on level 1:
+
+    - support -> password, billing, technical
+
+    - sales -> pricing, demo, partnership
+
+    Reply with ONLY a JSON object of exactly this shape: {"l1": "<level 1>", "l2": "<level 2>"}
+
+
+    --- ticket ---
+
+    "The export to CSV produces an empty file since yesterday."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('l1') == 'support'
+  tier: standard
+  max_tokens: 512
+- id: cr_abstain
+  suite: classify
+  description: Off-taxonomy input must land on 'other' (no forced fit)
+  prompt: 'Classify this message into exactly one of: billing, shipping, technical, other.
+
+    Reply with ONLY the category word.
+
+
+    --- message ---
+
+    "Happy birthday to the whole team, and thanks for a great year!"
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: other
+  tier: standard
+  max_tokens: 512
+- id: cr_abstain_control
+  suite: classify
+  description: 'Abstain control: an in-taxonomy item must NOT collapse to ''other'''
+  prompt: 'Classify this message into exactly one of: billing, shipping, technical, other.
+
+    Reply with ONLY the category word.
+
+
+    --- message ---
+
+    "My parcel still has not arrived, ten days after it was shipped."
+
+    --- end ---'
+  asserts:
+  - type: exact_match
+    value: shipping
+  tier: standard
+  max_tokens: 512
+- id: cr_batch_table__i1
+  suite: classify
+  description: Batch classification table — unit item i1
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i1') == 'billing'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i2
+  suite: classify
+  description: Batch classification table — unit item i2
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i2') == 'shipping'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i3
+  suite: classify
+  description: Batch classification table — unit item i3
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i3') == 'technical'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i4
+  suite: classify
+  description: Batch classification table — unit item i4
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i4') == 'account'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i5
+  suite: classify
+  description: Batch classification table — unit item i5
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i5') == 'billing'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i6
+  suite: classify
+  description: Batch classification table — unit item i6
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i6') == 'shipping'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i7
+  suite: classify
+  description: Batch classification table — unit item i7
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i7') == 'technical'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i8
+  suite: classify
+  description: Batch classification table — unit item i8
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i8') == 'account'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i9
+  suite: classify
+  description: Batch classification table — unit item i9
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i9') == 'other'
+  tier: standard
+  max_tokens: 768
+- id: cr_batch_table__i10
+  suite: classify
+  description: Batch classification table — unit item i10
+  prompt: 'Classify each of these 10 messages into exactly one of: billing, shipping, technical, account, other.
+
+    Reply with ONLY a JSON object mapping each item id to its category, like {"i1": "billing", "i2": "shipping"}.
+
+
+    [i1] My card was charged twice this month.
+
+    [i2] The parcel arrived with a torn box.
+
+    [i3] The app freezes when I press save.
+
+    [i4] How do I change the email on my account?
+
+    [i5] I was billed for a plan I cancelled.
+
+    [i6] Tracking shows the package in the wrong city.
+
+    [i7] The login page shows a blank screen.
+
+    [i8] Please update the name on my profile.
+
+    [i9] Do you offer a discount for schools?
+
+    [i10] The invoice total does not match the quote.'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('i10') == 'billing'
+  tier: standard
+  max_tokens: 768

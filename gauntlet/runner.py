@@ -9,8 +9,9 @@ from pathlib import Path
 
 from gauntlet.agent_loop import LoopOutcome, run_agent_loop
 from gauntlet.client import GauntletClient
+from gauntlet.methodology import METHODOLOGY_VERSION
 from gauntlet.sandbox import ToolSandbox, tools_for
-from gauntlet.scorer import Scorer
+from gauntlet.scorer import Scorer, state_predicate_check
 from gauntlet.state_check import evaluate_state_asserts
 from gauntlet.task import Task
 from gauntlet.taskgen.enrich import enrich_task
@@ -44,8 +45,44 @@ async def run_task(client: GauntletClient, task: Task, seed: int = 0) -> dict:
             )
         except TimeoutError:
             outcome = LoopOutcome(terminated="timeout", final_text="[timeout]")
-        score = scorer.score(outcome.final_text, task.to_assert_dicts()) if outcome.final_text else None
+        # state_predicate asserts grade the sandbox itself (cheapest flight
+        # actually offered, file absence): split them out of the text rubric
+        # and evaluate them against this rep's sandbox, then fold them into
+        # the state half with their own weights and must_pass gates.
+        text_asserts, sp_asserts = scorer.split_state_predicates(task.to_assert_dicts())
+        score = scorer.score(outcome.final_text, text_asserts) if outcome.final_text else None
         state = evaluate_state_asserts(sandbox, task.state_asserts) if task.state_asserts else None
+        if sp_asserts:
+            sp_earned = 0.0
+            sp_total = 0.0
+            sp_failed: list[str] = []
+            sp_gated = False
+            for a in sp_asserts:
+                w = float(a.get("weight", 1.0))
+                sp_total += w
+                r = state_predicate_check(sandbox, a["expr"], output=outcome.final_text)
+                if r.passed:
+                    sp_earned += w
+                else:
+                    sp_failed.extend(r.failed or [f"state_predicate: {a['expr']}"])
+                    if a.get("must_pass"):
+                        sp_gated = True
+            sp_result = {
+                "score": 0.0 if sp_gated else (sp_earned / sp_total if sp_total else 1.0),
+                "passed": not sp_failed,
+                "failed": sp_failed,
+                "gated": sp_gated,
+            }
+            if state is None:
+                state = sp_result
+            else:
+                gated = state["gated"] or sp_gated
+                state = {
+                    "score": 0.0 if gated else (state["score"] + sp_result["score"]) / 2,
+                    "passed": state["passed"] and sp_result["passed"],
+                    "failed": state["failed"] + sp_result["failed"],
+                    "gated": gated,
+                }
 
         # combine text rubric + state rubric. A must_pass gate that failed forces
         # the whole task to 0: averaging let a gated text assert still earn 0.5
@@ -116,14 +153,16 @@ async def run_suite(client: GauntletClient, tasks: list[Task], concurrency: int 
 
 
 def write_results(results: list[dict], meta: dict, outdir: Path) -> Path:
+    from gauntlet.provenance import finish_provenance
+
     outdir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     path = outdir / f"{meta.get('model', 'model').replace('/', '_')}_{stamp}.json"
     payload = {
         "meta": {
-            **meta,
+            **finish_provenance(meta),
             "timestamp": stamp,
-            "gauntlet_version": meta.get("methodology", "0.1.0"),
+            "gauntlet_version": meta.get("methodology") or METHODOLOGY_VERSION,
         },
         "results": results,
     }

@@ -21,6 +21,9 @@ jobs:
       - name: Hygiene gate (no personal data in repo)
         run: bash scripts/hygiene-check.sh
 
+      - name: Image privacy check (no PII in shipped images)
+        run: python3 scripts/image_privacy_check.py .
+
       - name: Lint
         # Scope: the shipped package and its tooling. `extra-suites/`, the
         # top-level one-off helper scripts and the vendored llama.cpp tree are

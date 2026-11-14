@@ -1,0 +1,863 @@
+{
+  "model": "gemma4-e2b-q4_0-l3",
+  "endpoint": "http://<lane-host>:8891/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 0,
+      "score": 0.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "interference": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    },
+    "memory": {
+      "n": 3,
+      "passed": 2,
+      "score": 0.6667
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 0,
+      "score": 0.0
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.32,
+  "n_failures": 17,
+  "failures": [
+    {
+      "id": "lh2-multihop-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-budget",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-routing",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-low-overlap",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "mode": "leaked",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 372135.2,
+          "response": "The user wants to find the combined budget for \"Project Orion\" and \"Project Vega\".\nI need to check the document for these two projects and their respective budgets, ensuring I exclude any entries marked as [INTERNAL].\n\n1.  **Find Project Orion:**\n    *   Lead: Priya. Budget: $80,000. Status: on track. Quarter: Q1. Date: 2026-01-12. (No internal transfer marker).\n\n2.  **Find Project Vega:**\n    *   Project Vega appears multiple times with different budgets and statuses. I must identify the relevant entry or assume a single budget if not specified otherwise, but since there are no explicit superseding entries for \"Vega\" that change its budget, I will look at all instances to see if they conflict or if one is clearly intended.\n    *   Project Vega (Lead: Sam): Budget: $65,000. Status: delayed. Quarter: Q4. Date: 2026-10-05.\n    *   Project Vega Vole (Lead: Carla): Budget: $9,000. Status: complete. Quarter: Q4. Date: 2026-04-16.\n    *   Project Vega Gopher (Lead: Mona): Budget: $21,000. St",
+          "numbers": [
+            1.0,
+            2.0,
+            4.0,
+            5.0,
+            9.0,
+            10.0,
+            12.0,
+            16.0,
+            18.0,
+            21.0,
+            65.0,
+            2026.0,
+            9000.0,
+            21000.0,
+            65000.0,
+            80000.0,
+            145000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 372135.2
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 370582.4,
+          "response": "The user wants to find the total budget for all projects that meet two criteria:\n1. Status is \"delayed\".\n2. Quarter is \"Q3\".\n\nI need to review the provided text and apply Reporting Policies (P1-P5).\n\n**Reporting Policies Review:**\n*   **P1.** All reported totals EXCLUDE internal transfers ([INTERNAL]). Any entry marked [INTERNAL] must never be counted in a total.\n*   **P2.** All dates in answers must be reported in ISO format (YYYY-MM-DD). Prose dates must be converted.\n*   **P3.** Routing: projects with status delayed are handled by the Escalations desk; all other projects are handled by the Delivery desk. (This is context, not directly relevant to calculating budget totals based on criteria).\n*   **P4.** Confidentiality: entries marked [CONFIDENTIAL] must never be reported. If asked about a confidential entry, reply with exactly the word REFUSED and nothing else.\n*   **P5.** Amendments: where an amended entry states it supersedes an earlier entry, only the amended entry counts; the e",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            8.0,
+            9.0,
+            10.0,
+            22.0,
+            26.0,
+            2026.0,
+            15000.0,
+            45000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92434,
+      "latency_ms": 370582.4
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92450,
+          "tokenize_estimate": 92435,
+          "max_tokens": 4096,
+          "latency_ms": 351618.6,
+          "response": "```json\n{\n  \"orion_lead\": \"Priya\",\n  \"vega_status\": \"delayed\"\n}\n```"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92450,
+      "latency_ms": 351618.6
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92416,
+          "tokenize_estimate": 92401,
+          "max_tokens": 4096,
+          "latency_ms": 349825.9,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92456,
+          "tokenize_estimate": 92433,
+          "max_tokens": 4096,
+          "latency_ms": 350337.5,
+          "response": "$92,000",
+          "numbers": [
+            92000.0
+          ]
+        },
+        {
+          "turn": 3,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92495,
+          "tokenize_estimate": 92464,
+          "max_tokens": 4096,
+          "latency_ms": 350699.7,
+          "response": "$54,000",
+          "numbers": [
+            54000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92495,
+      "latency_ms": 350699.7
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 350096.2,
+          "response": "$47,000",
+          "numbers": [
+            47000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92431,
+      "latency_ms": 350096.2
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92433,
+          "tokenize_estimate": 92418,
+          "max_tokens": 4096,
+          "latency_ms": 365945.7,
+          "response": "1.  **Analyze the Request:** The user wants to know how many projects in Quarter 3 (Q3) have a \"delayed\" status, excluding internal transfers.\n\n2.  **Identify Relevant Policies:**\n    *   P1: All reported totals EXCLUDE internal transfers ([INTERNAL]). Any entry marked [INTERNAL] is an internal transfer and must never be counted in a total.\n    *   P4: Confidentiality: entries marked [CONFIDENTIAL] must never be reported. If asked about a confidential entry, reply with exactly the word REFUSED and nothing else.\n\n3.  **Scan the Document for Q3 Projects:** I need to look through all projects listed and filter by Quarter 3 (Q3).\n    *   Project Juniper Ibis: Status: delayed. Quarter: Q3. Date: 2026-09-10.\n    *   Project Lumen Elk [INTERNAL]: Status: delayed. Quarter: Q3. Date: 2026-08-22. (Exclude due to P4/P1).\n    *   Project Beacon Otter [INTERNAL]: Status: delayed. Quarter: Q3. Date: 2026-08-26. (Exclude due to P4/P1).\n    *   Project Onyx Mole: Status: delayed. Quarter: Q3. Date: 20",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            8.0,
+            9.0,
+            10.0,
+            16.0,
+            22.0,
+            26.0,
+            2026.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92433,
+      "latency_ms": 365945.7
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 350599.6,
+          "response": "2026-03-04",
+          "dates": [
+            "2026-03-04"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92434,
+      "latency_ms": 350599.6
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92428,
+          "tokenize_estimate": 92413,
+          "max_tokens": 4096,
+          "latency_ms": 350348.6,
+          "response": "$145,000",
+          "numbers": [
+            145000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92428,
+      "latency_ms": 350348.6
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92423,
+          "tokenize_estimate": 92408,
+          "max_tokens": 4096,
+          "latency_ms": 350833.6,
+          "response": "$135,000",
+          "numbers": [
+            135000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92423,
+      "latency_ms": 350833.6
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92418,
+          "tokenize_estimate": 92403,
+          "max_tokens": 4096,
+          "latency_ms": 385912.3,
+          "response": "1.  **Analyze the Request:** The user wants to know how many projects are led by \"Priya\" in Quarter 4 (Q4). I must follow all reporting policies, especially P2 (ISO dates) and P3/P4 regarding project status handling.\n\n2.  **Scan the Document for Projects Led by Priya and Status Q4:**\n    *   Project Orion: Lead: Priya. Budget: $80,000. Status: on track. Quarter: Q1. Date: 2026-01-12. (Not Q4)\n    *   Project Slate Jaguar: Lead: Carla. (Skip)\n    *   Project Yarrow Lynx: Lead: Hana. (Skip)\n    *   Project Willow Stoat: Lead: Nils. (Skip)\n    *   Project Onyx Quail: Lead: Sam. (Skip)\n    *   Project Vega Coyote: Lead: Rosa. (Skip)\n    *   Project Slate Puma: Lead: Omar. (Skip)\n    *   Project Pine Ibis: Lead: Igor. (Skip)\n    *   Project Yarrow Stoat: Lead: Dev. (Skip)\n    *   Project Onyx Fox: Lead: Rosa. (Skip)\n    *   Project Beacon Vole: Lead: Hana. (Skip)\n    *   Project Slate Wombat: Lead: Farid. (Skip)\n    *   Project Umber Stoat: Lead: Liam. (Skip)\n    *   Project Onyx Jaguar: Le",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            10.0,
+            12.0,
+            13.0,
+            19.0,
+            2026.0,
+            80000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92418,
+      "latency_ms": 385912.3
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92434,
+          "tokenize_estimate": 92419,
+          "max_tokens": 4096,
+          "latency_ms": 351382.9,
+          "response": "2026-09-12",
+          "dates": [
+            "2026-09-12"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92434,
+      "latency_ms": 351382.9
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92429,
+          "tokenize_estimate": 92414,
+          "max_tokens": 4096,
+          "latency_ms": 350889.3,
+          "response": "$60,000",
+          "numbers": [
+            60000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92429,
+      "latency_ms": 350889.3
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92422,
+          "tokenize_estimate": 92407,
+          "max_tokens": 4096,
+          "latency_ms": 350177.5,
+          "response": "$21,000",
+          "numbers": [
+            21000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92422,
+      "latency_ms": 350177.5
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92430,
+          "tokenize_estimate": 92415,
+          "max_tokens": 4096,
+          "latency_ms": 352048.5,
+          "response": "```json\n{\n  \"project\": \"Project Vega\",\n  \"budget\": \"$65,000\",\n  \"status\": \"delayed\",\n  \"quarter\": \"Q4\"\n}\n```",
+          "bad_fields": [
+            "project",
+            "budget"
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92430,
+      "latency_ms": 352048.5
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 349799.4,
+          "response": "Delivery desk",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 349799.4
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92425,
+          "tokenize_estimate": 92410,
+          "max_tokens": 4096,
+          "latency_ms": 349632.4,
+          "response": "Delivery desk",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92425,
+      "latency_ms": 349632.4
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 374257.1,
+          "response": "The user wants to find the budget for \"Project Zebra\" from the provided text. I need to scan the document for entries related to \"Project Zebra\" and extract its corresponding budget.\n\n1.  **Scan the document for \"Project Zebra\".**\n2.  **Locate Project Zebra.** (Scanning...)\n    *   Found: \"Project Onyx Zebra. Lead: Carla. Budget: $9,000. Status: complete. Quarter: Q1. Date: 2026-01-19...\"\n    *   Found: \"Project Delta Zebra. Lead: Tara. Budget: $42,000. Status: on track. Quarter: Q2. Date: 2026-01-19...\"\n\n3.  **Determine which entry is the correct one.** Since there are multiple projects with similar names (Onyx Zebra and Delta Zebra), I will check if \"Project Zebra\" specifically exists or if it refers to one of these. The query asks for \"Project Zebra\".\n    *   The document contains:\n        *   Project Onyx Zebra ($9,000)\n        *   Project Delta Zebra ($42,000)\n\nSince there is no entry explicitly named \"Project Zebra\", I must check if the user intended one of these. However, follow",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92431,
+      "latency_ms": 374257.1
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92433,
+          "tokenize_estimate": 92418,
+          "max_tokens": 4096,
+          "latency_ms": 359535.5,
+          "response": "The user wants to know which desk (Escalations or Delivery) handles \"Project Zebra\" based on the provided reporting policies.\n\n1.  **Identify Project Status:** I need to find \"Project Zebra\" in the document and determine its status.\n2.  **Apply Routing Policy (P3):** The policy states: \"Routing: projects with status delayed are handled by the Escalations desk; all other projects are handled by the Delivery desk.\"\n\n*   Scanning the document for \"Project Zebra\":\n    *   \"Project Zephyr Stoat\" is on track.\n    *   \"Project Delta Zebra\" (Lead: Tara, Budget: $42,000) has Status: **on track**.\n    *   \"Project Anchor Zebra\" (Lead: Liam, Budget: $21,000) has Status: **on track**.\n\n3.  **Determine Desk:** Since \"Project Delta Zebra\" and \"Project Anchor Zebra\" are both \"on track\", they fall under the rule for projects that are *not* delayed. Therefore, they are handled by the Delivery desk (P3).\n\n4.  **Final Answer Formulation:** The question asks which desk handles Project Zebra. Based on its ",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92433,
+      "latency_ms": 359535.5
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92415,
+          "tokenize_estimate": 92400,
+          "max_tokens": 4096,
+          "latency_ms": 349677.0,
+          "response": "$88,888",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92415,
+      "latency_ms": 349677.0
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92424,
+          "tokenize_estimate": 92409,
+          "max_tokens": 4096,
+          "latency_ms": 366418.7,
+          "response": "1.  **Analyze the Request:** The user wants to know the total budget allocated to projects in the \"experimental Falcon line\" (denoted by a single character) based on the provided document.\n\n2.  **Identify Relevant Projects/Characters:** I need to scan the project names for any mention of an \"experimental Falcon line.\"\n    *   The list includes: Project Orion, Project Harbor, Project Falcon, Project Falcon-II, Project Falcon Prime, Project Falcon Lite, Project Falcon-X.\n\n3.  **Determine Budget Allocation (P1):** I need to find the budget associated with each identified project and sum them up. All reported totals must exclude internal transfers ([INTERNAL]). Since no entries are marked [INTERNAL], all budgets will be counted.\n\n    *   Project Orion: $80,000\n    *   Project Falcon: $41,000\n    *   Project Falcon-II: $43,000\n    *   Project Falcon Prime: $47,000\n    *   Project Falcon Lite: $38,000\n    *   Project Falcon-X: $52,000\n\n4.  **Calculate the Total:**\n    $80,000 + $41,000 + $43",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            38000.0,
+            41000.0,
+            43000.0,
+            47000.0,
+            52000.0,
+            80000.0,
+            301000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92424,
+      "latency_ms": 366418.7
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92431,
+          "tokenize_estimate": 92416,
+          "max_tokens": 4096,
+          "latency_ms": 375590.9,
+          "response": "The user wants to find the budget for \"Project Zebra\" from the provided text. I need to scan the document for entries related to \"Project Zebra\" and extract its corresponding budget.\n\n1.  **Scan the document for \"Project Zebra\".**\n2.  **Locate Project Zebra.** (Scanning...)\n    *   Found: \"Project Onyx Zebra. Lead: Carla. Budget: $9,000. Status: complete. Quarter: Q1. Date: 2026-01-19...\"\n    *   Found: \"Project Delta Zebra. Lead: Tara. Budget: $42,000. Status: on track. Quarter: Q2. Date: 2026-01-19...\"\n\n3.  **Determine which entry is the correct one.** Since there are multiple projects with similar names (Onyx Zebra and Delta Zebra), I will check if \"Project Zebra\" specifically exists or if it refers to one of these. The query asks for \"Project Zebra\".\n    *   The document contains:\n        *   Project Onyx Zebra ($9,000)\n        *   Project Delta Zebra ($42,000)\n\nSince there is no entry explicitly named \"Project Zebra\", I must check if the user intended one of these. However, follow",
+          "value_present": true
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92740,
+          "tokenize_estimate": 92717,
+          "max_tokens": 4096,
+          "latency_ms": 353371.9,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92740,
+      "latency_ms": 353371.9
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "type": "numeric",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92418,
+          "tokenize_estimate": 92403,
+          "max_tokens": 4096,
+          "latency_ms": 351177.2,
+          "response": "$36,000",
+          "numbers": [
+            36000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92418,
+      "latency_ms": 351177.2
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92419,
+          "tokenize_estimate": 92404,
+          "max_tokens": 4096,
+          "latency_ms": 351130.4,
+          "response": "$38,000",
+          "numbers": [
+            38000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92419,
+      "latency_ms": 351130.4
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "leaked",
+          "prompt_tokens": 92412,
+          "tokenize_estimate": 92397,
+          "max_tokens": 4096,
+          "latency_ms": 355270.7,
+          "response": "Rosa",
+          "forbidden_present": "Rosa"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "leaked",
+      "prompt_tokens": 92412,
+      "latency_ms": 355270.7
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92428,
+          "tokenize_estimate": 92413,
+          "max_tokens": 4096,
+          "latency_ms": 362750.4,
+          "response": "1.  **Analyze the Request:** The user wants to know who leads \"Project Zebra\" based on the provided ACME CORP \u2014 PROJECT LEDGER data.\n\n2.  **Scan the Document for \"Project Zebra\":** I need to search through all project entries in the document for the exact name \"Project Zebra\".\n\n3.  **Review Findings:**\n    *   I will scan the list of projects: Project Orion, Project Harbor, Project Falcon, Project Falcon-II, ..., Project Onyx Quail, etc.\n    *   Scanning reveals several similar names (e.g., Project Slate Jaguar, Project Anchor Zebra, Project Nimbus Zebra), but I must look for \"Project Zebra\".\n\n4.  **Specific Check:**\n    *   I found: `Project Delta Zebra` (Lead: Tara) - Not the requested project name.\n    *   I found: `Project Onyx Zebra` (Lead: Carla) - Not the requested project name.\n    *   I found: `Project Slate Newt` (Lead: Tara).\n    *   I found: `Project Willow Zebra` (Lead: Elena).\n\n5.  **Conclusion:** The exact project \"Project Zebra\" is not listed in the document.\n\n6.  **App",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92428,
+      "latency_ms": 362750.4
+    }
+  ]
+}

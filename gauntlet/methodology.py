@@ -9,12 +9,34 @@ methodology version it was produced under.
 
 from __future__ import annotations
 
-METHODOLOGY_VERSION = "0.5.1"
+METHODOLOGY_VERSION = "0.6.0"
 
 # Published weights. They sum to 1.0 over the suites the gauntlet scores.
 # realworld is new in 0.4: multi-constraint everyday agent work, graded on
 # state/arithmetic, not keyword presence.
 SUITE_WEIGHTS: dict[str, float] = {
+    # Core block, scaled to 0.55 (epoch 0.6.0, design P2 section 2.6).
+    "tooluse": 0.14,
+    "realworld": 0.06,
+    "structured": 0.07,
+    "retrieval": 0.07,
+    "coding": 0.06,
+    "instruction": 0.05,
+    "adversarial": 0.05,
+    "agent_chains": 0.05,
+    # Agent block, 0.45: real-world job suites new in 0.6.0.
+    "email": 0.12,
+    "support": 0.09,
+    "classify": 0.08,
+    "docintake": 0.06,
+    "summarize": 0.05,
+    "calendar": 0.05,
+}
+
+# The pre-0.6.0 table, kept by reference for the frozen 0.4.0-0.5.1 epoch
+# entries below (they aliased the live dict, so redefining SUITE_WEIGHTS
+# must not rewrite what those epochs mean).
+_WEIGHTS_0_5: dict[str, float] = {
     "tooluse": 0.26,
     "structured": 0.12,
     "retrieval": 0.12,
@@ -59,7 +81,7 @@ def methodology_line(task_count: int) -> str:
 # each row is recomputed with its own epoch's table, and rows from different
 # epochs are never ranked against each other.
 # ---------------------------------------------------------------------------
-EPOCH_ORDER = ("v0.3.1", "0.4.0", "0.5.0", "0.5.1")
+EPOCH_ORDER = ("v0.3.1", "0.4.0", "0.5.0", "0.5.1", "0.6.0")
 
 
 def _count_current_tasks() -> int:
@@ -100,32 +122,42 @@ EPOCHS: dict[str, dict] = {
         ),
     },
     "0.4.0": {
-        "weights": SUITE_WEIGHTS,
+        "weights": _WEIGHTS_0_5,
         # FROZEN: 84 = 77 YAML tasks + 7 generated retrieval tasks as they were
         # when this epoch was authored. A live-derived count let a later task
         # addition retroactively change what an old epoch means.
         "tasks": 84,
         "label": "CLI 8-suite weights ("
-        + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
+        + " / ".join(f"{k} {v:.2f}" for k, v in _WEIGHTS_0_5.items())
         + "), 84 tasks",
     },
     "0.5.0": {
-        "weights": SUITE_WEIGHTS,
+        "weights": _WEIGHTS_0_5,
         # FROZEN at 94: the epoch was measured with 94 tasks. It used to read
         # CURRENT_TASK_COUNT, which would have redefined a measured epoch the
         # moment 0.5.1 added a task (the same defect 0.4.0 documents).
         "tasks": 94,
         "label": "CLI 8-suite weights ("
-        + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
+        + " / ".join(f"{k} {v:.2f}" for k, v in _WEIGHTS_0_5.items())
         + "), 94 tasks",
     },
     "0.5.1": {
+        "weights": _WEIGHTS_0_5,
+        # FROZEN at 105: the count CURRENT_TASK_COUNT returned in this epoch
+        # (before the 0.6.0 suites landed; the live counter now includes them).
+        "tasks": 105,
+        "label": "CLI 8-suite weights ("
+        + " / ".join(f"{k} {v:.2f}" for k, v in _WEIGHTS_0_5.items())
+        + "), 105 tasks (realworld multi-answer scenarios scored as "
+        "sub-answer units)",
+    },
+    "0.6.0": {
         "weights": SUITE_WEIGHTS,
         "tasks": CURRENT_TASK_COUNT,
-        "label": "CLI 8-suite weights ("
+        "label": "14-suite weights, core block 0.55 + agent block 0.45 ("
         + " / ".join(f"{k} {v:.2f}" for k, v in SUITE_WEIGHTS.items())
-        + f"), {CURRENT_TASK_COUNT} tasks (realworld multi-answer scenarios scored as "
-        "sub-answer units)",
+        + f"), {CURRENT_TASK_COUNT} tasks (six job suites added: email / support / "
+        "classify / docintake / summarize / calendar)",
     },
 }
 

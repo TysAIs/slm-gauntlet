@@ -2,18 +2,18 @@
 """Render gauntlet model cards (HTML from scripts/make_cards.py) to PNG.
 
 Why this exists: make_cards.py writes self-contained HTML, but the published
-PNGs in results/_published/cards/ were produced by hand and went stale (still
+PNGs published under results/ were produced by hand and went stale (still
 the 61-task scores after v0.3.1 moved to 71 tasks). A card pipeline that needs a
 human with a browser is not a pipeline.
 
-Requires playwright + a chromium build (/usr/bin/python3 has playwright on repo-host;
+Requires playwright + a chromium build (/usr/bin/python3 has playwright on the repo host;
 browsers live in ~/.cache/ms-playwright). No network: cards are self-contained.
 
 Usage
   /usr/bin/python3 scripts/render_card_png.py results/cards/card_a.html ...
-  /usr/bin/python3 scripts/render_card_png.py --manifest results/_published/cards/manifest.json
+  /usr/bin/python3 scripts/render_card_png.py --all
   /usr/bin/python3 scripts/render_card_png.py --all          # every results/cards/*.html
-Options: --outdir (default results/_published/cards), --prefix (default png_card_),
+Options: --outdir (default results/cards), --prefix (default card_),
          --size 1080, --timeout-ms 15000, --json-out <path>
 
 Every render is verified: PNG magic + IHDR geometry must be exactly 1080x1080 and
@@ -73,8 +73,8 @@ def main() -> int:
     ap.add_argument("html", nargs="*")
     ap.add_argument("--manifest")
     ap.add_argument("--all", action="store_true", help="render every results/cards/*.html")
-    ap.add_argument("--outdir", default="results/_published/cards")
-    ap.add_argument("--prefix", default="png_card_")
+    ap.add_argument("--outdir", default="results/cards")
+    ap.add_argument("--prefix", default="card_")
     ap.add_argument("--size", type=int, default=1080)
     ap.add_argument("--timeout-ms", type=int, default=15000)
     ap.add_argument("--min-bytes", type=int, default=20000)

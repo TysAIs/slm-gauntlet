@@ -1,0 +1,650 @@
+# Summarization fidelity suite (epoch 0.6.0, design P2 section 2.4).
+#
+# Doctrine: a summary is graded on SELECTION, EXTRACTION and COVERAGE -
+# never on similarity to a reference summary. Every fixture plants its
+# checkable facts; invented content fails an entity gate (a predicate over
+# the numbers/dates in the output: every one must occur in the source).
+# The exaggeration-trap headline (H2) is the canonical near-miss.
+#
+# Fixtures are synthetic; scripts/gen_summarize_tasks.py recomputes the
+# planted sets (decisions, on-topic sentences, changelog triples) from the
+# fixture data and asserts equality with this file.
+# Validity proof: tests/test_validity_summarize.py.
+- id: sum_meeting_decisions__set
+  suite: summarize
+  description: Extract the decisions from meeting notes — unit exact decision set (invented decision gates the set)
+  prompt: 'Extract ONLY the decisions from these meeting notes. Reply with ONLY a JSON array containing the decision
+    sentences, copied exactly as written (without their [S#] labels), in the order they appear.
+
+
+    --- notes ---
+
+    [S1] The team reviewed the draft roadmap for the spring release.
+
+    [S2] Decision: the launch date moves to 2026-04-15.
+
+    [S3] Ana presented the new onboarding flow and its metrics.
+
+    [S4] Decision: the support rota gains a weekend shift.
+
+    [S5] The group discussed venue options for the offsite.
+
+    [S6] Decision: the legacy export feature is retired on 2026-05-01.
+
+    [S7] Ben showed photos from the user study sessions.
+
+    [S8] The meeting closed with a round of thanks.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: 'data is not None and set(data) == {''Decision: the launch date moves to 2026-04-15.'', ''Decision: the
+      support rota gains a weekend shift.'', ''Decision: the legacy export feature is retired on 2026-05-01.''}'
+  tier: standard
+  max_tokens: 768
+- id: sum_meeting_decisions__count
+  suite: summarize
+  description: Extract the decisions — unit exactly three decisions
+  prompt: 'Extract ONLY the decisions from these meeting notes. Reply with ONLY a JSON array containing the decision
+    sentences, copied exactly as written (without their [S#] labels), in the order they appear.
+
+
+    --- notes ---
+
+    [S1] The team reviewed the draft roadmap for the spring release.
+
+    [S2] Decision: the launch date moves to 2026-04-15.
+
+    [S3] Ana presented the new onboarding flow and its metrics.
+
+    [S4] Decision: the support rota gains a weekend shift.
+
+    [S5] The group discussed venue options for the offsite.
+
+    [S6] Decision: the legacy export feature is retired on 2026-05-01.
+
+    [S7] Ben showed photos from the user study sessions.
+
+    [S8] The meeting closed with a round of thanks.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and len(data) == 3
+  tier: standard
+  max_tokens: 768
+- id: sum_sentence_select__set
+  suite: summarize
+  description: Select the on-topic sentences — unit exact id set
+  prompt: 'From this article, select the sentences that state FACTS ABOUT THE BRIDGE REPAIR PROJECT (its budget,
+    schedule, or scope). There are exactly 3.
+
+    Reply with ONLY a JSON array of their ids, like ["S1", "S4"].
+
+
+    --- article ---
+
+    [S1] The reservoir level rose slightly after the spring rain.
+
+    [S2] The committee approved the budget of 48,000 for the bridge repair.
+
+    [S3] Local schools announced a photography contest for students.
+
+    [S4] Construction on the bridge begins on 2026-04-06 and lasts 6 weeks.
+
+    [S5] A farmers market opens in the square every Saturday.
+
+    [S6] The mayor thanked the volunteers at a short ceremony.
+
+    [S7] The repair budget covers materials and two inspection visits.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and set(data) == {'S2', 'S4', 'S7'}
+  tier: standard
+  max_tokens: 768
+- id: sum_sentence_select__count
+  suite: summarize
+  description: Select the on-topic sentences — unit exactly three ids
+  prompt: 'From this article, select the sentences that state FACTS ABOUT THE BRIDGE REPAIR PROJECT (its budget,
+    schedule, or scope). There are exactly 3.
+
+    Reply with ONLY a JSON array of their ids, like ["S1", "S4"].
+
+
+    --- article ---
+
+    [S1] The reservoir level rose slightly after the spring rain.
+
+    [S2] The committee approved the budget of 48,000 for the bridge repair.
+
+    [S3] Local schools announced a photography contest for students.
+
+    [S4] Construction on the bridge begins on 2026-04-06 and lasts 6 weeks.
+
+    [S5] A farmers market opens in the square every Saturday.
+
+    [S6] The mayor thanked the volunteers at a short ceremony.
+
+    [S7] The repair budget covers materials and two inspection visits.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and len(data) == 3
+  tier: standard
+  max_tokens: 768
+- id: sum_headline_pick
+  suite: summarize
+  description: Pick the accurate headline (exaggeration trap is the near-miss)
+  prompt: 'Pick the headline that accurately summarises the article''s main news. Reply with ONLY its id.
+
+
+    --- article ---
+
+    [S1] The reservoir level rose slightly after the spring rain.
+
+    [S2] The committee approved the budget of 48,000 for the bridge repair.
+
+    [S3] Local schools announced a photography contest for students.
+
+    [S4] Construction on the bridge begins on 2026-04-06 and lasts 6 weeks.
+
+    [S5] A farmers market opens in the square every Saturday.
+
+    [S6] The mayor thanked the volunteers at a short ceremony.
+
+    [S7] The repair budget covers materials and two inspection visits.
+
+    --- options ---
+
+    [H1] City council approves bridge repair budget
+
+    [H2] Bridge repair will bankrupt the city, engineers warn
+
+    [H3] Farmers market opens in the square
+
+    [H4] Reservoir levels rise after spring rain'
+  asserts:
+  - type: exact_match
+    value: H1
+  tier: standard
+  max_tokens: 768
+- id: sum_brief_coverage
+  suite: summarize
+  description: Status brief with planted-fact coverage + entity gate + bullet cap (RubricAssert-style)
+  prompt: 'Write a brief of AT MOST 5 bullet lines (each starting with "- ") covering this status note.
+
+
+    --- note ---
+
+    Project Harborlight status, week of 2026-03-02. The migration to the new database finished on 2026-03-04, two
+    days ahead of plan. Ana Ruiz leads the remaining API work. The open risk is the payment gateway: its sandbox
+    tests failed twice this week. Budget spent so far is 61 percent of the total. The next milestone is the beta
+    release on 2026-03-20.
+
+    --- end ---
+
+
+    Your brief must mention, in your own words: the database migration finishing (write "migration"), Ana Ruiz leading
+    the API work (write "Ana Ruiz" and "API"), the payment gateway risk (write "payment gateway"), and the beta
+    release date 2026-03-20.
+
+    Use ONLY facts and numbers from the note - invent nothing.'
+  asserts:
+  - type: contains_any
+    values:
+    - migration
+    weight: 1.0
+  - type: contains_all
+    values:
+    - Ana Ruiz
+    - API
+    weight: 1.0
+  - type: contains_any
+    values:
+    - payment gateway
+    weight: 1.0
+  - type: contains_any
+    values:
+    - '2026-03-20'
+    weight: 1.0
+  - type: predicate
+    expr: not [t for t in re.findall(r'\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}|\$?\d[\d,]*\.\d+|\d[\d,]*', out) if t.replace(',',
+      '') not in ('2026-03-02', '2026-03-04', '2026-03-20', '61')]
+    weight: 1.0
+    must_pass: true
+  - type: predicate
+    expr: len([l for l in out.splitlines() if l.strip().startswith('-')]) <= 5
+    weight: 1.0
+  tier: standard
+  max_tokens: 512
+- id: sum_tldr_lock
+  suite: summarize
+  description: TL;DR under a hard word cap with two required points + entity gate
+  prompt: 'Write a TL;DR of this news in AT MOST 30 words.
+
+
+    --- news ---
+
+    The city library will extend its opening hours from April. On weekdays it will close at 21:00 instead of 19:00,
+    and it will also open on Sundays from 10:00 to 14:00. The change follows a survey in which 1,240 residents asked
+    for longer hours. Two part-time staff will be hired to cover the extra shifts.
+
+    --- end ---
+
+
+    It must state that the library extends its opening hours (write "hours") and that it will open on Sundays (write
+    "Sunday" or "Sundays"). Use only facts from the news.'
+  asserts:
+  - type: predicate
+    expr: len(out.split()) <= 30
+    weight: 1.0
+  - type: contains_any
+    values:
+    - hours
+    weight: 1.0
+  - type: contains_any
+    values:
+    - Sunday
+    - Sundays
+    weight: 1.0
+  - type: predicate
+    expr: len(set(re.findall(r'\b(library|hours|sundays?|open|close|staff|residents|survey|weekday|shifts)\b', out.lower()))) >= 3
+    weight: 1.0
+    must_pass: true
+  - type: predicate
+    expr: not [t for t in re.findall(r'\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}|\$?\d[\d,]*\.\d+|\d[\d,]*', out) if t.replace(',',
+      '') not in ('21:00', '19:00', '10:00', '14:00', '1240')]
+    weight: 1.0
+    must_pass: true
+  tier: standard
+  max_tokens: 256
+- id: sum_multidoc_status__api
+  suite: summarize
+  description: Multi-doc status roll-up — unit api
+  prompt: 'Three project status snippets follow. Build one status record. Reply with ONLY a JSON object of exactly
+    this shape:
+
+    {"api": "<status>", "web": "<status>", "mobile": "<status>", "overall": "<status>"}
+
+    Each project status is the word used in its snippet (done, in progress, or blocked). overall is "at risk" if
+    ANY project is blocked, otherwise "on track".
+
+
+    --- api ---
+
+    Status: done. The endpoints shipped last week.
+
+    --- web ---
+
+    Status: in progress. The redesign lands next week.
+
+    --- mobile ---
+
+    Status: blocked. Waiting on the store review.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('api') == 'done'
+  tier: standard
+  max_tokens: 768
+- id: sum_multidoc_status__web
+  suite: summarize
+  description: Multi-doc status roll-up — unit web
+  prompt: 'Three project status snippets follow. Build one status record. Reply with ONLY a JSON object of exactly
+    this shape:
+
+    {"api": "<status>", "web": "<status>", "mobile": "<status>", "overall": "<status>"}
+
+    Each project status is the word used in its snippet (done, in progress, or blocked). overall is "at risk" if
+    ANY project is blocked, otherwise "on track".
+
+
+    --- api ---
+
+    Status: done. The endpoints shipped last week.
+
+    --- web ---
+
+    Status: in progress. The redesign lands next week.
+
+    --- mobile ---
+
+    Status: blocked. Waiting on the store review.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('web') == 'in progress'
+  tier: standard
+  max_tokens: 768
+- id: sum_multidoc_status__mobile
+  suite: summarize
+  description: Multi-doc status roll-up — unit mobile
+  prompt: 'Three project status snippets follow. Build one status record. Reply with ONLY a JSON object of exactly
+    this shape:
+
+    {"api": "<status>", "web": "<status>", "mobile": "<status>", "overall": "<status>"}
+
+    Each project status is the word used in its snippet (done, in progress, or blocked). overall is "at risk" if
+    ANY project is blocked, otherwise "on track".
+
+
+    --- api ---
+
+    Status: done. The endpoints shipped last week.
+
+    --- web ---
+
+    Status: in progress. The redesign lands next week.
+
+    --- mobile ---
+
+    Status: blocked. Waiting on the store review.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('mobile') == 'blocked'
+  tier: standard
+  max_tokens: 768
+- id: sum_multidoc_status__overall
+  suite: summarize
+  description: Multi-doc status roll-up — unit overall
+  prompt: 'Three project status snippets follow. Build one status record. Reply with ONLY a JSON object of exactly
+    this shape:
+
+    {"api": "<status>", "web": "<status>", "mobile": "<status>", "overall": "<status>"}
+
+    Each project status is the word used in its snippet (done, in progress, or blocked). overall is "at risk" if
+    ANY project is blocked, otherwise "on track".
+
+
+    --- api ---
+
+    Status: done. The endpoints shipped last week.
+
+    --- web ---
+
+    Status: in progress. The redesign lands next week.
+
+    --- mobile ---
+
+    Status: blocked. Waiting on the store review.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('overall') == 'at risk'
+  tier: standard
+  max_tokens: 768
+- id: sum_changelog__set
+  suite: summarize
+  description: Config changelog — unit set of (field, from, to) triples
+  prompt: 'List what changed between version A and version B. Reply with ONLY a JSON array of objects of exactly
+    this shape:
+
+    {"field": "<what changed>", "from": "<old value>", "to": "<new value>"}
+
+    Include exactly the changed fields, in the order they appear in the document.
+
+
+    --- version A ---
+
+    timeout: 30 seconds
+
+    retries: 2
+
+    theme: light
+
+    logging: basic
+
+
+    --- version B ---
+
+    timeout: 60 seconds
+
+    retries: 2
+
+    theme: dark
+
+    logging: basic
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and {(d.get('field'), d.get('from'), d.get('to')) for d in data} == {('timeout', '30
+      seconds', '60 seconds'), ('theme', 'light', 'dark')}
+  tier: standard
+  max_tokens: 768
+- id: sum_changelog__count
+  suite: summarize
+  description: Config changelog — unit exactly the changed fields
+  prompt: 'List what changed between version A and version B. Reply with ONLY a JSON array of objects of exactly
+    this shape:
+
+    {"field": "<what changed>", "from": "<old value>", "to": "<new value>"}
+
+    Include exactly the changed fields, in the order they appear in the document.
+
+
+    --- version A ---
+
+    timeout: 30 seconds
+
+    retries: 2
+
+    theme: light
+
+    logging: basic
+
+
+    --- version B ---
+
+    timeout: 60 seconds
+
+    retries: 2
+
+    theme: dark
+
+    logging: basic
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and len(data) == 2
+  tier: standard
+  max_tokens: 768
+- id: sum_speaker_map__ana
+  suite: summarize
+  description: Speaker stance map — unit Ana
+  prompt: 'Map each speaker to their stance on the proposal. Stances: support, oppose, neutral.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"Ana": "<stance>", "Ben": "<stance>", "Cleo": "<stance>"}
+
+
+    --- transcript ---
+
+    Ana: "I am in favour - the proposal solves the scheduling problem."
+
+    Ben: "I cannot agree to this; the cost is far too high for us."
+
+    Cleo: "I see points on both sides and have not decided yet."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('Ana') == 'support'
+  tier: standard
+  max_tokens: 768
+- id: sum_speaker_map__ben
+  suite: summarize
+  description: Speaker stance map — unit Ben
+  prompt: 'Map each speaker to their stance on the proposal. Stances: support, oppose, neutral.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"Ana": "<stance>", "Ben": "<stance>", "Cleo": "<stance>"}
+
+
+    --- transcript ---
+
+    Ana: "I am in favour - the proposal solves the scheduling problem."
+
+    Ben: "I cannot agree to this; the cost is far too high for us."
+
+    Cleo: "I see points on both sides and have not decided yet."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('Ben') == 'oppose'
+  tier: standard
+  max_tokens: 768
+- id: sum_speaker_map__cleo
+  suite: summarize
+  description: Speaker stance map — unit Cleo
+  prompt: 'Map each speaker to their stance on the proposal. Stances: support, oppose, neutral.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"Ana": "<stance>", "Ben": "<stance>", "Cleo": "<stance>"}
+
+
+    --- transcript ---
+
+    Ana: "I am in favour - the proposal solves the scheduling problem."
+
+    Ben: "I cannot agree to this; the cost is far too high for us."
+
+    Cleo: "I see points on both sides and have not decided yet."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('Cleo') == 'neutral'
+  tier: standard
+  max_tokens: 768
+- id: sum_numbers_guard
+  suite: summarize
+  description: 'Numbers-guard brief: the entity gate IS the task (every number must exist in the source)'
+  prompt: 'Write a brief of this note in 2 or 3 sentences.
+
+
+    --- note ---
+
+    Quarterly note. Revenue reached 1.25 million, up from 1.10 million last quarter. The team grew to 42 people.
+    Churn stayed at 3.5 percent. The office lease runs until 2027.
+
+    --- end ---
+
+
+    Every number you write must come from the note exactly as written there. Invent no numbers.'
+  asserts:
+  - type: predicate
+    expr: not [t for t in re.findall(r'\d{4}-\d{2}-\d{2}|\d{1,2}:\d{2}|\$?\d[\d,]*\.\d+|\d[\d,]*', out) if t.replace(',',
+      '') not in ('1.25', '1.10', '42', '3.5', '2027')]
+    weight: 1.0
+    must_pass: true
+  - type: predicate
+    expr: len(out.split()) >= 10
+    weight: 1.0
+  - type: predicate
+    expr: sum(1 for t in ('1.25', '1.10', '42', '3.5', '2027') if t in out.replace(',', '')) >= 3
+    weight: 1.0
+    must_pass: true
+  - type: predicate
+    expr: len([s for s in re.split(r'[.!?]+', out) if s.strip()]) >= 2
+    weight: 1.0
+  tier: hard
+  max_tokens: 384
+- id: sum_thread_catchup__decision
+  suite: summarize
+  description: Thread catch-up — unit decision copied exactly (gate)
+  prompt: 'Catch up a teammate on this thread. Reply with ONLY a JSON object of exactly this shape:
+
+    {"topic": "<the thread''s main topic, a few words>", "decision": "<the decision stated in the thread, copied
+    exactly, or null if there is none>", "open_questions": <count of questions or requests in the thread that nobody
+    answered>}
+
+
+    --- thread ---
+
+    Sam: I set up the staging server yesterday.
+
+    Ana: The staging deploy works, but the login page is blank for some users.
+
+    Sam: That is the known cache bug, I am on it.
+
+    Ana: Decision: we hold the release until the login page is fixed.
+
+    Ben: Marketing still needs the final screenshots by Friday.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('decision') == 'we hold the release until the login page is fixed'
+    must_pass: true
+  tier: hard
+  max_tokens: 768
+- id: sum_thread_catchup__open
+  suite: summarize
+  description: Thread catch-up — unit open-question count (screenshots request unanswered)
+  prompt: 'Catch up a teammate on this thread. Reply with ONLY a JSON object of exactly this shape:
+
+    {"topic": "<the thread''s main topic, a few words>", "decision": "<the decision stated in the thread, copied
+    exactly, or null if there is none>", "open_questions": <count of questions or requests in the thread that nobody
+    answered>}
+
+
+    --- thread ---
+
+    Sam: I set up the staging server yesterday.
+
+    Ana: The staging deploy works, but the login page is blank for some users.
+
+    Sam: That is the known cache bug, I am on it.
+
+    Ana: Decision: we hold the release until the login page is fixed.
+
+    Ben: Marketing still needs the final screenshots by Friday.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('open_questions') == 1
+  tier: hard
+  max_tokens: 768
+- id: sum_thread_catchup__topic
+  suite: summarize
+  description: Thread catch-up — unit topic names the release/login subject
+  prompt: 'Catch up a teammate on this thread. Reply with ONLY a JSON object of exactly this shape:
+
+    {"topic": "<the thread''s main topic, a few words>", "decision": "<the decision stated in the thread, copied
+    exactly, or null if there is none>", "open_questions": <count of questions or requests in the thread that nobody
+    answered>}
+
+
+    --- thread ---
+
+    Sam: I set up the staging server yesterday.
+
+    Ana: The staging deploy works, but the login page is blank for some users.
+
+    Sam: That is the known cache bug, I am on it.
+
+    Ana: Decision: we hold the release until the login page is fixed.
+
+    Ben: Marketing still needs the final screenshots by Friday.
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and ('login' in data.get('topic', '') or 'release' in data.get('topic', ''))
+  tier: hard
+  max_tokens: 768

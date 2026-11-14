@@ -1,0 +1,806 @@
+# Document intake suite (epoch 0.6.0, design P2 section 2.3).
+#
+# AP/AR and records intake: invoices, receipts, forms, tables, clauses -
+# including noisy OCR, redacted fields, and non-US number/date formats.
+# Stated values are graded as stated (doc_totals_audit is the one task
+# where recomputation IS the job). Redacted or unreadable fields must come
+# back null; inventing a value fails a must_pass gate.
+#
+# doc_vision_bridge is NOT in this file: it is a cross-listed pointer to
+# the OCR board's image fixtures. A text-only model must never score 0 for
+# lacking vision, so the bridge ships as documentation, not a task.
+#
+# Fixtures are synthetic; scripts/gen_docintake_tasks.py recomputes the
+# receipt/audit arithmetic and regenerates the OCR noise (seeded) and
+# asserts equality with this file.
+# Validity proof: tests/test_validity_docintake.py.
+- id: doc_invoice_record__vendor
+  suite: docintake
+  description: Invoice to record — unit vendor
+  prompt: 'Extract this invoice into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "currency":
+    "<3-letter code>"}
+
+    Use the values STATED in the document.
+
+
+    --- invoice ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-4471
+
+    Date: 2026-03-01
+
+    Items: design work 300.00, hosting 112.00
+
+    Total due: 412.00 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('vendor') == 'Northwind Traders'
+  tier: standard
+  max_tokens: 768
+- id: doc_invoice_record__invoice_no
+  suite: docintake
+  description: Invoice to record — unit invoice_no
+  prompt: 'Extract this invoice into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "currency":
+    "<3-letter code>"}
+
+    Use the values STATED in the document.
+
+
+    --- invoice ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-4471
+
+    Date: 2026-03-01
+
+    Items: design work 300.00, hosting 112.00
+
+    Total due: 412.00 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('invoice_no') == 'INV-4471'
+  tier: standard
+  max_tokens: 768
+- id: doc_invoice_record__date
+  suite: docintake
+  description: Invoice to record — unit date
+  prompt: 'Extract this invoice into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "currency":
+    "<3-letter code>"}
+
+    Use the values STATED in the document.
+
+
+    --- invoice ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-4471
+
+    Date: 2026-03-01
+
+    Items: design work 300.00, hosting 112.00
+
+    Total due: 412.00 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('date') == '2026-03-01'
+  tier: standard
+  max_tokens: 768
+- id: doc_invoice_record__total
+  suite: docintake
+  description: Invoice to record — unit STATED total (not recomputed)
+  prompt: 'Extract this invoice into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "currency":
+    "<3-letter code>"}
+
+    Use the values STATED in the document.
+
+
+    --- invoice ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-4471
+
+    Date: 2026-03-01
+
+    Items: design work 300.00, hosting 112.00
+
+    Total due: 412.00 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('total')) == 412.0
+  tier: standard
+  max_tokens: 768
+- id: doc_invoice_record__currency
+  suite: docintake
+  description: Invoice to record — unit currency
+  prompt: 'Extract this invoice into a record. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "currency":
+    "<3-letter code>"}
+
+    Use the values STATED in the document.
+
+
+    --- invoice ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-4471
+
+    Date: 2026-03-01
+
+    Items: design work 300.00, hosting 112.00
+
+    Total due: 412.00 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('currency') == 'USD'
+  tier: standard
+  max_tokens: 768
+- id: doc_receipt_lines__lines
+  suite: docintake
+  description: Receipt lines — unit set of (item, qty, unit_price)
+  prompt: 'Extract this receipt. Reply with ONLY a JSON object of exactly this shape:
+
+    {"lines": [{"item": "<name>", "qty": <int>, "unit_price": <number>}, ...], "total": <number>}
+
+    --- receipt ---
+
+    USB cable x2 @ 9.50 = 19.00
+
+    Notebook A5 x3 @ 4.25 = 12.75
+
+    Pen set x1 @ 6.00 = 6.00
+
+    TOTAL: 37.75
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and {(d.get('item'), d.get('qty'), float(d.get('unit_price'))) for d in data.get('lines',
+      [])} == {('USB cable', 2, 9.5), ('Notebook A5', 3, 4.25), ('Pen set', 1, 6.0)}
+  tier: standard
+  max_tokens: 768
+- id: doc_receipt_lines__total
+  suite: docintake
+  description: Receipt lines — unit stated total
+  prompt: 'Extract this receipt. Reply with ONLY a JSON object of exactly this shape:
+
+    {"lines": [{"item": "<name>", "qty": <int>, "unit_price": <number>}, ...], "total": <number>}
+
+    --- receipt ---
+
+    USB cable x2 @ 9.50 = 19.00
+
+    Notebook A5 x3 @ 4.25 = 12.75
+
+    Pen set x1 @ 6.00 = 6.00
+
+    TOTAL: 37.75
+
+    --- end ---'
+  asserts:
+  - type: line_value
+    label: TOTAL
+    equals: 37.75
+  tier: standard
+  max_tokens: 768
+- id: doc_noisy_ocr__record
+  suite: docintake
+  description: Noisy OCR invoice — unit de-noised key fields
+  prompt: 'This invoice was OCR-scanned and contains typical OCR errors (0 read as O, 1 read as l, and similar).
+
+    Extract it. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "reference":
+    "<reference or null>"}
+
+    Correct the OCR errors in the values. If a field is unreadable, use null - never invent a value.
+
+
+    --- scanned invoice ---
+
+    Vend0r: Harbor Studio
+
+    Inv0ice N0: 1NV-2081
+
+    Date: 2O26-O3-O4
+
+    Tota1: 96.5O USD
+
+    Reference: (smudged, unreadab1e)
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('invoice_no') == 'INV-2081' and data.get('date') == '2026-03-04' and float(data.get('total'))
+      == 96.5
+  tier: hard
+  max_tokens: 768
+- id: doc_noisy_ocr__ambiguous_null
+  suite: docintake
+  description: Noisy OCR invoice — unit unreadable field stays null (gate)
+  prompt: 'This invoice was OCR-scanned and contains typical OCR errors (0 read as O, 1 read as l, and similar).
+
+    Extract it. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "reference":
+    "<reference or null>"}
+
+    Correct the OCR errors in the values. If a field is unreadable, use null - never invent a value.
+
+
+    --- scanned invoice ---
+
+    Vend0r: Harbor Studio
+
+    Inv0ice N0: 1NV-2081
+
+    Date: 2O26-O3-O4
+
+    Tota1: 96.5O USD
+
+    Reference: (smudged, unreadab1e)
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('reference') is None
+    must_pass: true
+  tier: hard
+  max_tokens: 768
+- id: doc_noisy_ocr__vendor
+  suite: docintake
+  description: Noisy OCR invoice — unit vendor survives the noise
+  prompt: 'This invoice was OCR-scanned and contains typical OCR errors (0 read as O, 1 read as l, and similar).
+
+    Extract it. Reply with ONLY a JSON object of exactly this shape:
+
+    {"vendor": "<vendor name>", "invoice_no": "<invoice number>", "date": "<YYYY-MM-DD>", "total": <number>, "reference":
+    "<reference or null>"}
+
+    Correct the OCR errors in the values. If a field is unreadable, use null - never invent a value.
+
+
+    --- scanned invoice ---
+
+    Vend0r: Harbor Studio
+
+    Inv0ice N0: 1NV-2081
+
+    Date: 2O26-O3-O4
+
+    Tota1: 96.5O USD
+
+    Reference: (smudged, unreadab1e)
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('vendor') == 'Harbor Studio'
+  tier: hard
+  max_tokens: 768
+- id: doc_form_fields__full_name
+  suite: docintake
+  description: Typo-labelled form — unit full_name
+  prompt: 'Extract the fields from this form. The form''s labels contain small spelling mistakes; match them to
+    the fields anyway.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"full_name": "<name>", "email": "<email>", "phone": "<phone>", "company": "<company>"}
+
+
+    --- form ---
+
+    Full Nmae: Ana Ruiz
+
+    Emai1 Address: ana.ruiz@example.com
+
+    Phnoe: 555-0142
+
+    Compnay: Harbor Studio
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('full_name') == 'Ana Ruiz'
+  tier: standard
+  max_tokens: 768
+- id: doc_form_fields__email
+  suite: docintake
+  description: Typo-labelled form — unit email
+  prompt: 'Extract the fields from this form. The form''s labels contain small spelling mistakes; match them to
+    the fields anyway.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"full_name": "<name>", "email": "<email>", "phone": "<phone>", "company": "<company>"}
+
+
+    --- form ---
+
+    Full Nmae: Ana Ruiz
+
+    Emai1 Address: ana.ruiz@example.com
+
+    Phnoe: 555-0142
+
+    Compnay: Harbor Studio
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('email') == 'ana.ruiz@example.com'
+  tier: standard
+  max_tokens: 768
+- id: doc_form_fields__phone
+  suite: docintake
+  description: Typo-labelled form — unit phone
+  prompt: 'Extract the fields from this form. The form''s labels contain small spelling mistakes; match them to
+    the fields anyway.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"full_name": "<name>", "email": "<email>", "phone": "<phone>", "company": "<company>"}
+
+
+    --- form ---
+
+    Full Nmae: Ana Ruiz
+
+    Emai1 Address: ana.ruiz@example.com
+
+    Phnoe: 555-0142
+
+    Compnay: Harbor Studio
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('phone') == '555-0142'
+  tier: standard
+  max_tokens: 768
+- id: doc_form_fields__company
+  suite: docintake
+  description: Typo-labelled form — unit company
+  prompt: 'Extract the fields from this form. The form''s labels contain small spelling mistakes; match them to
+    the fields anyway.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"full_name": "<name>", "email": "<email>", "phone": "<phone>", "company": "<company>"}
+
+
+    --- form ---
+
+    Full Nmae: Ana Ruiz
+
+    Emai1 Address: ana.ruiz@example.com
+
+    Phnoe: 555-0142
+
+    Compnay: Harbor Studio
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('company') == 'Harbor Studio'
+  tier: standard
+  max_tokens: 768
+- id: doc_table_csv
+  suite: docintake
+  description: Table to normalised CSV — exact match
+  prompt: 'Convert this table into CSV. Reply with ONLY the CSV text: a header row name,age,city followed by one
+    row per person, in the same order, with no extra spaces.
+
+
+    name | age | city
+
+    Ana Ruiz | 41 | Denver
+
+    Ben Osei | 35 | Austin
+
+    Cleo Park | 29 | Miami'
+  asserts:
+  - type: exact_match
+    value: 'name,age,city
+
+      Ana Ruiz,41,Denver
+
+      Ben Osei,35,Austin
+
+      Cleo Park,29,Miami'
+  tier: standard
+  max_tokens: 768
+- id: doc_redacted__fields
+  suite: docintake
+  description: Redacted record — unit visible fields
+  prompt: 'Extract this record. Fields covered by a redaction marker [REDACTED] are unknown: output null for them
+    and never invent a value.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"name": "<name>", "email": "<email or null>", "phone": "<phone or null>", "plan": "<plan>"}
+
+
+    --- record ---
+
+    Name: Ana Ruiz
+
+    Email: [REDACTED]
+
+    Phone: 555-0142
+
+    Plan: Pro annual
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('name') == 'Ana Ruiz' and data.get('phone') == '555-0142' and data.get('plan')
+      == 'Pro annual'
+  tier: standard
+  max_tokens: 768
+- id: doc_redacted__null_gate
+  suite: docintake
+  description: Redacted record — unit redacted field is null, never invented (gate)
+  prompt: 'Extract this record. Fields covered by a redaction marker [REDACTED] are unknown: output null for them
+    and never invent a value.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"name": "<name>", "email": "<email or null>", "phone": "<phone or null>", "plan": "<plan>"}
+
+
+    --- record ---
+
+    Name: Ana Ruiz
+
+    Email: [REDACTED]
+
+    Phone: 555-0142
+
+    Plan: Pro annual
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('email') is None
+    must_pass: true
+  tier: standard
+  max_tokens: 768
+- id: doc_locale_formats__total
+  suite: docintake
+  description: German-format invoice — unit total normalised
+  prompt: 'Extract this invoice. Amounts use the German format (dot = thousands separator, comma = decimal mark)
+    and dates are written DD.MM.YYYY.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"total": <number, plain format like 1234.56>, "date": "<YYYY-MM-DD>", "tax": <number, plain format>}
+
+
+    --- invoice ---
+
+    Rechnungsdatum: 04.03.2026
+
+    Enthaltene Steuer: 197,44
+
+    Gesamtbetrag: 1.234,56 EUR
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('total')) == 1234.56
+  tier: hard
+  max_tokens: 768
+- id: doc_locale_formats__date
+  suite: docintake
+  description: German-format invoice — unit date to ISO
+  prompt: 'Extract this invoice. Amounts use the German format (dot = thousands separator, comma = decimal mark)
+    and dates are written DD.MM.YYYY.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"total": <number, plain format like 1234.56>, "date": "<YYYY-MM-DD>", "tax": <number, plain format>}
+
+
+    --- invoice ---
+
+    Rechnungsdatum: 04.03.2026
+
+    Enthaltene Steuer: 197,44
+
+    Gesamtbetrag: 1.234,56 EUR
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('date') == '2026-03-04'
+  tier: hard
+  max_tokens: 768
+- id: doc_locale_formats__tax
+  suite: docintake
+  description: German-format invoice — unit tax normalised
+  prompt: 'Extract this invoice. Amounts use the German format (dot = thousands separator, comma = decimal mark)
+    and dates are written DD.MM.YYYY.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"total": <number, plain format like 1234.56>, "date": "<YYYY-MM-DD>", "tax": <number, plain format>}
+
+
+    --- invoice ---
+
+    Rechnungsdatum: 04.03.2026
+
+    Enthaltene Steuer: 197,44
+
+    Gesamtbetrag: 1.234,56 EUR
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('tax')) == 197.44
+  tier: hard
+  max_tokens: 768
+- id: doc_clause_find__notice
+  suite: docintake
+  description: Contract clause extraction — unit notice period (12-month cap is the distractor)
+  prompt: 'Answer from this contract excerpt. Reply with ONLY a JSON object of exactly this shape:
+
+    {"notice_period_days": <int>, "renewal_years": <int>}
+
+
+    --- contract excerpt ---
+
+    "Section 4 (Term): the initial term renews automatically for successive periods of 2 years unless either party
+    objects.
+
+    Section 7 (Termination): either party may terminate this agreement by giving written notice at least 90 days
+    before the end of the current term.
+
+    Section 9 (Liability): liability is capped at the fees paid in the preceding 12 months."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('notice_period_days') == 90
+  tier: standard
+  max_tokens: 768
+- id: doc_clause_find__renewal
+  suite: docintake
+  description: Contract clause extraction — unit renewal period
+  prompt: 'Answer from this contract excerpt. Reply with ONLY a JSON object of exactly this shape:
+
+    {"notice_period_days": <int>, "renewal_years": <int>}
+
+
+    --- contract excerpt ---
+
+    "Section 4 (Term): the initial term renews automatically for successive periods of 2 years unless either party
+    objects.
+
+    Section 7 (Termination): either party may terminate this agreement by giving written notice at least 90 days
+    before the end of the current term.
+
+    Section 9 (Liability): liability is capped at the fees paid in the preceding 12 months."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('renewal_years') == 2
+  tier: standard
+  max_tokens: 768
+- id: doc_two_invoices__set
+  suite: docintake
+  description: Two invoices, no cross-contamination — unit record set
+  prompt: 'Two invoices follow. Extract EACH one separately. Reply with ONLY a JSON array of two objects, in document
+    order, each of exactly this shape:
+
+    {"vendor": "<vendor>", "invoice_no": "<number>", "total": <number>}
+
+
+    --- invoice 1 ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-100
+
+    Total: 250.00 USD
+
+
+    --- invoice 2 ---
+
+    Vendor: Harbor Studio
+
+    Invoice No: INV-200
+
+    Total: 80.50 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and {(d.get('vendor'), d.get('invoice_no'), float(d.get('total'))) for d in data} ==
+      {('Northwind Traders', 'INV-100', 250.0), ('Harbor Studio', 'INV-200', 80.5)}
+  tier: hard
+  max_tokens: 768
+- id: doc_two_invoices__count
+  suite: docintake
+  description: Two invoices — unit exactly two records
+  prompt: 'Two invoices follow. Extract EACH one separately. Reply with ONLY a JSON array of two objects, in document
+    order, each of exactly this shape:
+
+    {"vendor": "<vendor>", "invoice_no": "<number>", "total": <number>}
+
+
+    --- invoice 1 ---
+
+    Vendor: Northwind Traders
+
+    Invoice No: INV-100
+
+    Total: 250.00 USD
+
+
+    --- invoice 2 ---
+
+    Vendor: Harbor Studio
+
+    Invoice No: INV-200
+
+    Total: 80.50 USD
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and len(data) == 2
+  tier: hard
+  max_tokens: 768
+- id: doc_handwriting_transcript__fields
+  suite: docintake
+  description: Handwritten note — unit time and room (room written as 'Room 4B')
+  prompt: 'Transcribe this photographed handwritten note into structured fields. The note uses abbreviations; expand
+    them with this table:
+
+    appt = appointment, mtg = meeting, w/ = with, rm = room, tom = tomorrow.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"event": "<expanded event description>", "time": "<HH:MM>", "room": "<room>"}
+
+
+    --- note (transcribed handwriting) ---
+
+    "appt w/ Ana - project mtg, 14:30, rm 4B. Bring the draft."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and data.get('time') == '14:30' and data.get('room') == 'Room 4B'
+  tier: standard
+  max_tokens: 768
+- id: doc_handwriting_transcript__expansion
+  suite: docintake
+  description: Handwritten note — unit abbreviations expanded per the given table
+  prompt: 'Transcribe this photographed handwritten note into structured fields. The note uses abbreviations; expand
+    them with this table:
+
+    appt = appointment, mtg = meeting, w/ = with, rm = room, tom = tomorrow.
+
+    Reply with ONLY a JSON object of exactly this shape:
+
+    {"event": "<expanded event description>", "time": "<HH:MM>", "room": "<room>"}
+
+
+    --- note (transcribed handwriting) ---
+
+    "appt w/ Ana - project mtg, 14:30, rm 4B. Bring the draft."
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and 'appointment with Ana' in data.get('event', '') and 'meeting' in data.get('event',
+      '')
+  tier: standard
+  max_tokens: 768
+- id: doc_totals_audit__stated
+  suite: docintake
+  description: Totals audit — unit stated total
+  prompt: 'Audit this invoice''s arithmetic. Reply with ONLY a JSON object of exactly this shape:
+
+    {"stated_total": <number>, "computed_total": <number>, "discrepancy": <number>}
+
+    computed_total is the sum of the line items; discrepancy is stated_total minus computed_total.
+
+
+    --- invoice ---
+
+    Design work: 300.00
+
+    Hosting: 112.00
+
+    Support: 45.00
+
+    Total due: 467.00
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('stated_total')) == 467.0
+  tier: hard
+  max_tokens: 768
+- id: doc_totals_audit__computed
+  suite: docintake
+  description: Totals audit — unit computed total
+  prompt: 'Audit this invoice''s arithmetic. Reply with ONLY a JSON object of exactly this shape:
+
+    {"stated_total": <number>, "computed_total": <number>, "discrepancy": <number>}
+
+    computed_total is the sum of the line items; discrepancy is stated_total minus computed_total.
+
+
+    --- invoice ---
+
+    Design work: 300.00
+
+    Hosting: 112.00
+
+    Support: 45.00
+
+    Total due: 467.00
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('computed_total')) == 457.0
+  tier: hard
+  max_tokens: 768
+- id: doc_totals_audit__discrepancy
+  suite: docintake
+  description: Totals audit — unit discrepancy (stated minus computed)
+  prompt: 'Audit this invoice''s arithmetic. Reply with ONLY a JSON object of exactly this shape:
+
+    {"stated_total": <number>, "computed_total": <number>, "discrepancy": <number>}
+
+    computed_total is the sum of the line items; discrepancy is stated_total minus computed_total.
+
+
+    --- invoice ---
+
+    Design work: 300.00
+
+    Hosting: 112.00
+
+    Support: 45.00
+
+    Total due: 467.00
+
+    --- end ---'
+  asserts:
+  - type: predicate
+    expr: data is not None and float(data.get('discrepancy')) == 10.0
+  tier: hard
+  max_tokens: 768

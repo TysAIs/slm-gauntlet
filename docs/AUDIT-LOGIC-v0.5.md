@@ -1,7 +1,7 @@
 # Gauntlet logic audit — scoring, judging, task validity (phase 1)
 
 Date: 2026-11-05 (MST)
-Auditor: audit-lane lane. Hardware for every live number below: PVE GTX 1070 Ti test box,
+Auditor: internal audit lane. Hardware for every live number below: PVE GTX 1070 Ti test box,
 provider `<lane>` (the PVE test box's `llama-server` on tailnet port 8891). No GB10 node was touched.
 Baseline commit audited: `cbf748e` (working tree clean, 90/90 tests green).
 Extended 2026-11-07 with F16 (transport failures published as scores) and the phase-2
@@ -27,8 +27,8 @@ lives in `results/_published/audit_v0.4/AUDIT.md`.
 
 | # | Finding | Severity | Verdict |
 |---|---|---|---|
-| F1 | The published score is binary pass@1, but three places document it as task-level partial credit. Re-scoring the existing corpus on the rubric moves rows up by a mean of **+7.1 pp** (max +24.9 pp). | S1 — changes published numbers | FIX (doc corrected now; re-score needs Operator's wording call) |
-| F2 | Nothing in `gauntlet/` enforces a thermal ceiling, and the only watchdog in the repo is hardcoded at **84 C**, below Operator's 89 C ruling. | S1 — hardware safety + explicit ruling | FIX (applied) |
+| F1 | The published score is binary pass@1, but three places document it as task-level partial credit. Re-scoring the existing corpus on the rubric moves rows up by a mean of **+7.1 pp** (max +24.9 pp). | S1 — changes published numbers | FIX (doc corrected now; re-score needs the operator's wording call) |
+| F2 | Nothing in `gauntlet/` enforces a thermal ceiling, and the only watchdog in the repo is hardcoded at **84 C**, below the operator's 89 C ruling. | S1 — hardware safety + explicit ruling | FIX (applied) |
 | F3 | `state_path` accepted a **missing** key as `False` (because `False == 0`), so `equals: false` passed on a sandbox that never set it. | S2 — silent false pass | FIX (applied) |
 | F4 | A run covering a subset of suites publishes a full-looking "capability score" (weights renormalize). A 2-task run printed **0.455**, another printed **1.000**. | S2 — misleading headline | FIX (coverage stamp; applied in the run summary) |
 | F5 | Graded answers leak into prompts: 27 assert values (28 before the fix) already appear verbatim in the prompt they grade. Live: a model answered `The tide is always there.` and passed `if_multi_constraint` (2 asserts). | S2 — task validity | FIX for real leaks (`rw_timezone_meeting`); KEEP-WITH-NOTE where verbatim copy *is* the task |
@@ -73,18 +73,18 @@ the log it came from, and its docstring says the recomputation is partial credit
 
 Verdict FIX. The docstring is corrected in this commit (no number moves). Publishing the rubric
 number instead would raise rows by up to 25 pp, so it is a **publicity decision, not a bug fix** —
-see "Needs Operator" below.
+see "Needs the operator" below.
 
 ### F2 — thermal rule
 
-Operator's ruling (2026-11-04): abort at **89 C**; the 1070 Ti is rated to 94 C.
+The operator's ruling (2026-11-04): abort at **89 C**; the 1070 Ti is rated to 94 C.
 
 What the code does:
 * `gauntlet/` contains **no** `nvidia-smi` call — `gauntlet run` will happily cook the card.
 * The only watchdog in the repo is embedded in `extra-suites/longhorizon-v2/sweep_driver.sh:25`:
   `if [ "$t" -ge 84 ]; then touch /tmp/lh2_ABORT; pkill ...` — the pre-ruling threshold, still 84 C.
 
-Live probe around a real 2-task run on `<lane>` (2026-11-05 14:54 MST):
+Live probe around a real 2-task run on the test lane (2026-11-05 14:54 MST):
 
 ```
 PRE  38, 8.94 W
@@ -133,7 +133,7 @@ must actually be present).
 ### F4 — partial coverage publishes a full-looking score
 
 `gauntlet/report.py:29-31` renormalizes weights over suites present, and the printed summary has
-no coverage field. Live, both from `<lane>` runs today:
+no coverage field. Live, both from the test lane's runs today:
 
 ```
 2 tasks (instruction 1.0, realworld 0.0) -> "subagent_capability_score": 0.455
@@ -339,7 +339,7 @@ Methodology version stays `0.4.0`: the only semantic change that could move a sc
 `flaky`/gate/state fixes, and bumping the epoch now would empty the headline table (every existing
 card is pre-bump). The epoch bump belongs with the phase-6 re-run, when 0.5.0 rows exist.
 
-## Needs Operator (published claim, one line)
+## Needs the operator (published claim, one line)
 
 > Correction: the published gauntlet table is binary pass@1, not partial credit (the pipeline
 > docstring said partial credit). Re-scoring the same logs on the rubric raises rows by up to
@@ -352,7 +352,7 @@ cd ~/TysAIs/slm-gauntlet
 .venv/bin/python scripts/probe_logic_audit.py                 # F3, F4, F9 + F5 scan
 .venv/bin/python scripts/audit_corpus_rubric_delta.py         # F1 corpus delta (522 logs)
 .venv/bin/python -m pytest tests -q                            # baseline
-# live probe, test box only, provider <lane> (tailnet address, port 8891):
+# live probe, test box only, provider `<lane>` (tailnet address, port 8891):
 GRUNT=http://<test-box>:8891
 .venv/bin/python -m gauntlet.cli run --endpoint $GRUNT/v1 \
     --model "$(curl -s $GRUNT/props | jq -r .model_path)" \

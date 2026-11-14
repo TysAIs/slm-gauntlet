@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Swap-and-measure sweep driver for the PVE GTX 1070 Ti test box (provider <lane>).
+"""Swap-and-measure sweep driver for the PVE GTX 1070 Ti test box (provider `<lane>`).
 
 WHY THIS EXISTS
 The gauntlet corpus was produced by per-model hand runs and a Mac-era night queue that
@@ -103,9 +103,9 @@ VRAM_GATE_MIN_MIB = 4800
 VRAM_GATE_TIMEOUT_S = 45
 
 # Sustained-load pins for the box's GTX 1070 Ti. Measured 2026-11-07 on this card with
-# the identical 13-minute 4-stream thermal test (receipt:
-# audit-lane/missions/work/2026-11-07-1070ti-sustained-policy.md): at the default 180 W
-# limit the card regulates to its own 83 C target temperature and SW thermal slowdown was
+# the identical 13-minute 4-stream thermal test (receipt: the 2026-11-07 sustained-power
+# policy note). At the default 180 W limit the card regulates to its own 83 C target
+# temperature and SW thermal slowdown was
 # active on 29.1% of loaded samples, with SM clock wandering 1632-1835 MHz - so whichever
 # config landed in a throttled minute scored lower than the same config scored cool.
 # Locked GPU clocks (-lgc) and application clocks (-ac) are NOT supported on this GeForce
@@ -153,11 +153,16 @@ class Lane:
             return json.loads(fh.read().decode())
 
 
+# Engine (2026-11-08, gauntlet P4): the dory-capable build is the single
+# primary (operator build policy, Oct 28); the a2878d3 build stays on disk as rollback.
+ENGINE_BIN = "/opt/llama.cpp-dory/build/bin/llama-server"
+
+
 def serve_argv(entry: dict) -> list[str]:
     """The exact ExecStart for a config. One function so the drop-in, the captured log
     header and any isolated re-run all agree on the command."""
     argv = [
-        "/opt/llama.cpp/build/bin/llama-server",
+        ENGINE_BIN,
         "-m", entry["path"],
         "--alias", entry["alias"],
         "--host", "0.0.0.0",
@@ -182,6 +187,16 @@ def serve_argv(entry: dict) -> list[str]:
     return argv
 
 
+def quant_label(entry: dict) -> str:
+    """Quant label for provenance, derived from the GGUF filename (the
+    repo-wide convention: the filename carries the quant, e.g. Q4_K_M,
+    UD-Q2_K_XL, IQ3_XXS). Falls back to the raw stem tail if no quant
+    pattern matches."""
+    name = Path(entry["path"]).name
+    m = re.search(r"(UD-)?(IQ|Q)\d[_A-Za-z0-9]*", name)
+    return (m.group(0) if m else name) + " (from gguf filename)"
+
+
 def dropin_text(entry: dict) -> str:
     """A drop-in that replaces ExecStart outright (empty value first, then the real one)."""
     wrapped = " \\\n  ".join(shlex.quote(a) for a in serve_argv(entry))
@@ -190,7 +205,7 @@ def dropin_text(entry: dict) -> str:
         "ExecStart=\n"
         f"ExecStart={wrapped}\n"
         # 4G is a performance trap, not a safety net: measured 2026-11-07 on
-        # provider <lane>, MemoryCurrent sat at 4.6G against a 4G cap with swap
+        # provider `<lane>`, MemoryCurrent sat at 4.6G against a 4G cap with swap
         # full, prompt eval collapsed to 1-5 tok/s and clients timed out with zero
         # tokens (24/102 attempts in one 94-task run). Same process, cap raised:
         # 1776-token prompt prefilled at 935.9 tok/s and decoded at 43.8 tok/s.
@@ -813,6 +828,11 @@ def main() -> int:
             str(ROOT / ".venv" / "bin" / "python"), "-m", "gauntlet.cli", "run",
             "--endpoint", f"http://{args.host}:{args.port}/v1",
             "--model", e["alias"], "--suite", args.suite,
+            "--gguf", e["path"],
+            "--quant", quant_label(e),
+            "--kv-type", e["ctk"] + "/" + e["ctv"],
+            "--ctx", str(e["ctx"]), "--slots", str(e.get("np", 1)),
+            "--serve-flags", " ".join(serve_argv(e)),
             "--concurrency", str(args.concurrency), "--timeout", str(args.timeout),
             "--seed", str(args.seed), "--thermal-limit", str(args.thermal_limit),
         ]

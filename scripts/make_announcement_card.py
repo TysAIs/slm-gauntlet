@@ -5,7 +5,14 @@ Same visual language as the model cards: same palette, fonts, rainbow
 gradient strip, tile grid, progress bars. Explains what the gauntlet is,
 how it was run, and shows the top finishers.
 
-Usage: python scripts/make_announcement_card.py results/cards/manifest.json
+Every number on the card is READ FROM THE CORPUS at render time — suite task
+counts from tasks/*.yaml (plus the generated retrieval tasks), the model count
+and the podium from results/cards/*.json, the epoch from
+gauntlet.methodology. The card used to hardcode "71 tasks · 7 suites · v0.3.1",
+so it kept advertising an epoch the repo had left behind.
+
+Usage: python scripts/make_announcement_card.py [results/cards/manifest.json]
+       (no argument: read every results/cards/card_*.json)
 """
 from __future__ import annotations
 
@@ -15,8 +22,84 @@ import sys
 import sys as _sys
 from pathlib import Path
 
+import yaml  # noqa: E402
+
 _sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from gauntlet.device import detect_device
+from gauntlet.device import detect_device  # noqa: E402
+from gauntlet.methodology import (  # noqa: E402
+    CURRENT_TASK_COUNT,
+    METHODOLOGY_VERSION,
+    NOLIMA_LADDER,
+    RETRIEVAL_LADDER,
+)
+
+ROOT = Path(__file__).resolve().parent.parent
+TASKS = ROOT / "tasks"
+
+
+def suite_counts() -> list[tuple[str, int]]:
+    """Task count per scored suite, derived from the task files, never typed in."""
+    counts: dict[str, int] = {}
+    for path in sorted(TASKS.glob("*.yaml")):
+        suite = path.stem.removesuffix("_hard").removesuffix("_easy")
+        n = len(yaml.safe_load(path.read_text()) or [])
+        counts[suite] = counts.get(suite, 0) + n
+    counts["retrieval"] = len(RETRIEVAL_LADDER) + len(NOLIMA_LADDER) + 2
+    return sorted(counts.items(), key=lambda kv: -kv[1])
+
+
+def manifest_from_cards() -> list[dict]:
+    """Ranked podium rows from the shipped cards, one per model family.
+
+    Fallback for a tree that has no published leaderboard yet (a stranger's own
+    first run). Only cards that covered the full current battery are eligible, so
+    a legacy or partial card can never take a medal.
+    """
+    best: dict[str, dict] = {}
+    for f in sorted((ROOT / "results" / "cards").glob("card_*.json")):
+        try:
+            data = json.loads(f.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        for m in data if isinstance(data, list) else [data]:
+            if m.get("model") == "announcement" or m.get("overall_pct") is None:
+                continue
+            if m.get("n") != CURRENT_TASK_COUNT:
+                continue
+            if (m.get("details") or {}).get("methodology") not in (None, METHODOLOGY_VERSION):
+                continue
+            name = m.get("display_name") or m["model"]
+            if name not in best or m["overall_pct"] > best[name]["overall_pct"]:
+                best[name] = {"display_name": name, "sub": m.get("sub") or "",
+                              "overall_pct": m["overall_pct"]}
+    rows = sorted(best.values(), key=lambda e: -e["overall_pct"])
+    for i, m in enumerate(rows, 1):
+        m["rank"] = i
+    return rows
+
+
+def podium_entries() -> list[dict]:
+    """The published ranking, straight from results/_published/leaderboard.json.
+
+    One definition of "best": the same file the README table and the scoreboard
+    are generated from, so the announcement cannot promote a configuration the
+    leaderboard does not rank first.
+    """
+    lb = ROOT / "results" / "_published" / "leaderboard.json"
+    if lb.exists():
+        try:
+            models = json.loads(lb.read_text()).get("models") or []
+        except (OSError, json.JSONDecodeError):
+            models = []
+        if models:
+            return [
+                {"rank": m.get("rank") or i,
+                 "display_name": m.get("display_name") or m["model"],
+                 "sub": m.get("configuration") or "",
+                 "overall_pct": m["overall_pct"]}
+                for i, m in enumerate(sorted(models, key=lambda x: -x["overall_pct"]), 1)
+            ]
+    return manifest_from_cards()
 
 
 def suite_color(pct: float) -> str:
@@ -95,32 +178,26 @@ def render(manifest: list[dict], dev: tuple[str, int, str]) -> str:
             f'<div class=p-pct style="color:{color}">{pct:.1f}%</div></div>'
         )
 
-    suites = [
-        ("Tool use", "19", "real tools, real state"),
-        ("Adversarial", "8", "injection resistance"),
-        ("Agent chains", "6", "multi-turn pipelines"),
-        ("Structured", "10", "strict JSON schemas"),
-        ("Retrieval", "8", "long-context needles"),
-        ("Coding", "6", "real bug fixes"),
-        ("Instruction", "14", "stacked constraints"),
-    ]
+    suites = suite_counts()
     suite_html = "".join(
-        f'<div class=suite><div class=suite-name>{name}</div>'
+        f'<div class=suite><div class=suite-name>{html.escape(name)}</div>'
         f'<div class=suite-n>{n}<small> tasks</small></div></div>'
-        for name, n, _ in suites
+        for name, n in suites
     )
-    total_tasks = sum(int(n) for _, n, _ in suites)
+    total_tasks = sum(n for _, n in suites)
+    models = len({e["display_name"] for e in manifest})
+    stamp = newest_card_ts()
 
     return (
         f'<!DOCTYPE html><html><head><meta charset=utf-8><style>{CSS}</style></head>'
         f'<body><div class=card>'
-        f'<div class=kicker>Open-source benchmark · MIT · 13 models tested</div>'
+        f'<div class=kicker>Open-source benchmark · MIT · {models} models tested</div>'
         f'<div class=title>SLM <span class=accent>Gauntlet</span></div>'
         f'<div class=tagline>Can small models actually <b>do work as subagents</b> — call tools, '
         f'recover from errors, follow instructions, retrieve from long context — '
-        f'not just answer trivia? <b>{total_tasks} tasks · 7 suites · zero LLM judging.</b></div>'
+        f'not just answer trivia? <b>{total_tasks} tasks · {len(suites)} suites · zero LLM judging.</b></div>'
         f'<div class=suites>{suite_html}</div>'
-        f'<div class=section>Top finishers of 13 · pass@1 · seed 1 · temp 0 · sep 2026</div>'
+        f'<div class=section>Top finishers of {models} · pass@1 · seed 1 · temp 0 · {html.escape(stamp)}</div>'
         f'<div class=podium>{podium}</div>'
         f'<div class=section>How it ran</div>'
         f'<div class=how>'
@@ -134,21 +211,58 @@ def render(manifest: list[dict], dev: tuple[str, int, str]) -> str:
         f'<div class=cell-v>One command<small>same seed → identical results · cards generated from your run</small></div></div>'  # noqa: E501
         f'</div>'
         f'<div class=foot><span>Run it yourself → github.com/TysAIs/slm-gauntlet</span>'
-        f'<span>results on {html.escape(dev_name)}{(" " + dev_mem) if dev_mem else ""} · v0.3.1</span></div>'
+        f'<span>results on {html.escape(dev_name)}{(" " + dev_mem) if dev_mem else ""} · v{METHODOLOGY_VERSION}</span></div>'  # noqa: E501
         f'</div></body></html>'
     )
 
 
+def run_device_from_cards() -> tuple[str, int, str] | None:
+    """The device the CARDS were measured on — not the machine rendering the card."""
+    seen: dict[tuple[str, int, str], int] = {}
+    for f in sorted((ROOT / "results" / "cards").glob("card_*.json")):
+        try:
+            data = json.loads(f.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        for m in data if isinstance(data, list) else [data]:
+            name = m.get("device_name")
+            if name:
+                key = (str(name), int(m.get("device_vram_mb") or 0), str(m.get("device_kind") or ""))
+                seen[key] = seen.get(key, 0) + 1
+    if not seen:
+        return None
+    return max(seen.items(), key=lambda kv: kv[1])[0]
+
+
+def newest_card_ts() -> str:
+    """Newest measurement date in the corpus, as YYYY-MM-DD."""
+    newest = ""
+    for f in sorted((ROOT / "results" / "cards").glob("card_*.json")):
+        try:
+            data = json.loads(f.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        for m in data if isinstance(data, list) else [data]:
+            ts = str(m.get("ts") or "")
+            if len(ts) >= 8 and ts > newest:
+                newest = ts
+    return f"{newest[:4]}-{newest[4:6]}-{newest[6:8]}" if newest else ""
+
+
 def main() -> None:
-    manifest = json.load(open(sys.argv[1])) if len(sys.argv) > 1 else []
-    outdir = Path("results/cards")
+    manifest = json.load(open(sys.argv[1])) if len(sys.argv) > 1 else podium_entries()
+    if not manifest:
+        raise SystemExit("no cards found: run scripts/cards_from_runs.py first")
+    outdir = ROOT / "results" / "cards"
     outdir.mkdir(parents=True, exist_ok=True)
-    # RUN device: manifest pin wins (results were measured there); auto-detect only as fallback
+    # RUN device: what the cards say they were measured on wins; the renderer's
+    # own hardware is only a last resort (a card must never claim the GPU of the
+    # machine that drew it).
     if manifest and manifest[0].get("device_name"):
         e = manifest[0]
         dev = (e["device_name"], e.get("device_vram_mb"), e.get("device_kind", ""))
     else:
-        dev = detect_device()
+        dev = run_device_from_cards() or detect_device()
     p = outdir / "announcement.html"
     p.write_text(render(manifest, dev))
     print("wrote", p, "device:", dev[0])

@@ -148,6 +148,17 @@
     - type: regex
       pattern: "FL\\d{4}-\\d"
       weight: 1.0
+    # the reported flight must BE the cheapest the sandbox offered, and the
+    # reported total must equal that flight's price x 3 (both graded against
+    # sandbox truth; the total may be written 876.93 or $876.93)
+    - type: state_predicate
+      expr: "sb.cheapest_offered_flight_id() is not None and sb.cheapest_offered_flight_id() in out"
+      weight: 2.0
+      must_pass: true
+    - type: state_predicate
+      expr: "sb.cheapest_offered_price() is not None and any(abs(float(m.replace(',', '')) - round(sb.cheapest_offered_price() * 3, 2)) < 0.005 for m in re.findall(r'\\d[\\d,]*\\.\\d+', out))"
+      weight: 2.0
+      must_pass: true
   state_asserts:
     - type: tool_called
       tool: search_flights

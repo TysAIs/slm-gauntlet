@@ -1,0 +1,36 @@
+# L2 (T2 = 65536) manifest, epoch 0.6.0 (built by driver Nov 11)
+# Roster: 8 Phase M finalists + Stage-3 top tier (Gemma 4 E2B 83.5, Ministral 3 8B 79.5) + Gemma 4 12B IQ3_XXS (Stage-2 score-per-GB headline).
+# Canonical quant x KV {f16, q8_0, q4_0}, ctx 65536. Same construction as T1 manifests.
+gemma4-e4b-q4km-l2-kvf16	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+gemma4-e4b-q4km-l2-kvq8	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-e4b-q4km-l2-kvq4	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+bolt-e4b-udq8kxl-l2-kvf16	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+bolt-e4b-udq8kxl-l2-kvq8	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+bolt-e4b-udq8kxl-l2-kvq4	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-9b-q4km-l2-kvf16	/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-9b-q4km-l2-kvq8	/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-9b-q4km-l2-kvq4	/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-4b-q8-l2-kvf16	/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q8_0.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-4b-q8-l2-kvq8	/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q8_0.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-4b-q8-l2-kvq4	/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q8_0.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+mimo-v2.6-9b-q4km-l2-kvf16	/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+mimo-v2.6-9b-q4km-l2-kvq8	/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+mimo-v2.6-9b-q4km-l2-kvq4	/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-4b-q4km-l2-kvf16	/mnt/data/models/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-4b-q4km-l2-kvq8	/mnt/data/models/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-4b-q4km-l2-kvq4	/mnt/data/models/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+ornith-1.5-9b-q4km-l2-kvf16	/mnt/data/models/ornith-9b/Ornith-1.5-9B-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+ornith-1.5-9b-q4km-l2-kvq8	/mnt/data/models/ornith-9b/Ornith-1.5-9B-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+ornith-1.5-9b-q4km-l2-kvq4	/mnt/data/models/ornith-9b/Ornith-1.5-9B-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+minicpm5-2b-q4km-l2-kvf16	/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+minicpm5-2b-q4km-l2-kvq8	/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+minicpm5-2b-q4km-l2-kvq4	/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+ministral3-8b-q4km-l2-kvf16	/mnt/data/models/ministral3-8b/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+ministral3-8b-q4km-l2-kvq8	/mnt/data/models/ministral3-8b/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+ministral3-8b-q4km-l2-kvq4	/mnt/data/models/ministral3-8b/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-e2b-q4_0-l2-kvf16	/mnt/data/models/gemma4-e2b/gemma-4-E2B_q4_0-it.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+gemma4-e2b-q4_0-l2-kvq8	/mnt/data/models/gemma4-e2b/gemma-4-E2B_q4_0-it.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-e2b-q4_0-l2-kvq4	/mnt/data/models/gemma4-e2b/gemma-4-E2B_q4_0-it.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-12b-iq3xxs-l2-kvf16	/mnt/data/models/gemma4-12b/gemma-4-12B-it-IQ3_XXS.gguf	65536	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+gemma4-12b-iq3xxs-l2-kvq8	/mnt/data/models/gemma4-12b/gemma-4-12B-it-IQ3_XXS.gguf	65536	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+gemma4-12b-iq3xxs-l2-kvq4	/mnt/data/models/gemma4-12b/gemma-4-12B-it-IQ3_XXS.gguf	65536	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0

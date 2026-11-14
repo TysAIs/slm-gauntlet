@@ -11,13 +11,25 @@
   tools: [search_flights, reserve_flight, get_reservation, calculator]
   state_asserts:
     - type: state_path
-      path: reservations
-      weight: 3.0
+      path: reservations.0.name
+      equals: "Ada Lovelace"
+      weight: 1.0
+      must_pass: true
+    - type: state_path
+      path: reservations.0.passport
+      equals: "A8842109"
+      weight: 1.0
       must_pass: true
   asserts:
     - type: regex
       pattern: "CONF-\\d{6}"
       weight: 2.0
+      must_pass: true
+    # the reservation must be for the CHEAPEST flight the sandbox offered
+    # (prices are sandbox-generated, so this grades against sandbox truth)
+    - type: state_predicate
+      expr: "len(state.get('reservations', [])) == 1 and state['reservations'][0]['flight_id'] == sb.cheapest_offered_flight_id()"
+      weight: 3.0
       must_pass: true
 
 - id: chain_file_pipeline
@@ -96,13 +108,21 @@
   tools: [search_flights, reserve_flight, calculator]
   state_asserts:
     - type: state_path
-      path: reservations
-      weight: 2.0
+      path: reservations.0.passport
+      equals: "B1122334"
+      weight: 1.0
       must_pass: true
   asserts:
     - type: regex
       pattern: "CONF-\\d{6}"
       weight: 2.0
+      must_pass: true
+    # branch correctness, graded against sandbox truth: the reserved flight
+    # must be the cheapest offered, and the passenger name must carry the
+    # "-DISC" suffix iff that cheapest price was above 200.
+    - type: state_predicate
+      expr: "len(state.get('reservations', [])) == 1 and state['reservations'][0]['flight_id'] == sb.cheapest_offered_flight_id() and state['reservations'][0]['name'] == ('Kim Park-DISC' if (sb.cheapest_offered_price() or 0) > 200 else 'Kim Park')"
+      weight: 3.0
       must_pass: true
 
 - id: chain_parallel_merge

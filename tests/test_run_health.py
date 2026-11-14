@@ -82,8 +82,8 @@ def _load_leaderboard_check():
 def test_publisher_refuses_to_rank_a_card_sourced_from_a_dead_endpoint():
     lb = _load_leaderboard_check()
     # ts is a CURRENT-epoch timestamp: classify() rejects a card measured under an
-    # older epoch (a new epoch starts at 20261108 = 0.5.1).
-    card = {"model": "m", "ts": "20261108T040626Z", "n": lb.FULL_TASKS}
+    # older epoch (a new epoch starts at 20261109 = 0.6.0).
+    card = {"model": "m", "ts": "20261109T040626Z", "n": lb.FULL_TASKS}
     src = {"path": "x.json", "score": {"transport_failure": (True, "79 of 79 attempts returned no tokens at all")}}
     rankable, why = lb.classify(card, src)
     assert not rankable
@@ -93,8 +93,8 @@ def test_publisher_refuses_to_rank_a_card_sourced_from_a_dead_endpoint():
 def test_publisher_still_ranks_a_measured_card():
     lb = _load_leaderboard_check()
     # ts is a CURRENT-epoch timestamp: classify() rejects a card measured under an
-    # older epoch (a new epoch starts at 20261108 = 0.5.1).
-    card = {"model": "m", "ts": "20261108T040626Z", "n": lb.FULL_TASKS}
+    # older epoch (a new epoch starts at 20261109 = 0.6.0).
+    card = {"model": "m", "ts": "20261109T040626Z", "n": lb.FULL_TASKS}
     ok = (False, "")
     src = {"path": "x.json", "score": {"transport_failure": ok}}
     rankable, why = lb.classify(card, src)

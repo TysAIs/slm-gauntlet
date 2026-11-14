@@ -1,0 +1,4 @@
+# 0.5.0 anchor re-run manifest (P4 Part 1, 2026-11-08): exact 0.5.0 published configs
+# battery: core only, via pve_sweep --suite <core list>; published 0.5.0: spark IQ3_M FP16 = 81.0, gemma4-e4b Q4_K_M FP16 = 86.3
+spark-x2.6-4b-iq3m-bartowski	/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+gemma4-e4b-q4_K_M	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0

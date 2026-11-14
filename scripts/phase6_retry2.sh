@@ -5,7 +5,8 @@
 set -u
 cd "$(dirname "$0")/.." || exit 1
 ROOT=$(pwd)
-export GRUNT_HOST=${GRUNT_HOST:-<lane>}
+: "${GRUNT_HOST:?GRUNT_HOST must be set (the endpoint address belongs to the operator, not the repo)}"
+export GRUNT_HOST
 echo "=== [retry2] gemma4-12b  $(date -Is)"
 "$ROOT/.venv/bin/python" scripts/pve_sweep.py --restore-on-exit \
   --state "$ROOT/results/_sweep_state_retry.jsonl" --only "gemma4-12b-ud-q2_K_XL"

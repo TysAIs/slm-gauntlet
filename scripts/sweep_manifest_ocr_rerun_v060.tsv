@@ -1,0 +1,6 @@
+# Stage 6 OCR fixture re-run manifest, epoch 0.6.0 (2026-11-13)
+# All three OCR-board models re-served with mmproj after the ui.png fixture re-render
+# (neutral username); OCR bench runs against the live endpoint during each serve window.
+lfm3-vl-2b-q4km-mmproj	/mnt/data/models/lfm3-vl-2b/LFM3-VL-2B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0 --mmproj /mnt/data/models/lfm3-vl-2b/mmproj-LFM3-VL-2B-F16.gguf
+minicpmv47-1b-q4km-mmproj	/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0 --mmproj /mnt/data/models/minicpmv47-1b/mmproj-model-f16.gguf
+minicpm-ocr-1.0-q4km-mmproj	/mnt/data/models/minicpm-ocr-1.0/MiniCPM-OCR-1_0-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0 --mmproj /mnt/data/models/minicpm-ocr-1.0/mmproj-model-f16-4x.gguf

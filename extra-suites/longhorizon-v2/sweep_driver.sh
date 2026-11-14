@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # LH v2r sweep driver — serves each manifest variant on PVE (GTX 1070 Ti),
-# benches it from REPO-HOST via the tunnel, enforces runbook health rules.
-# Thermal rule (Operator, 2026-11-04): HARD abort at 89C (the 1070 Ti is rated to 94C);
+# benches it from the repo host via the tunnel, enforces runbook health rules.
+# Thermal rule (the operator, 2026-11-04): HARD abort at 89C (the 1070 Ti is rated to 94C);
 # peaks are logged every 5s to /tmp/lh2_therm.log. 84C was the pre-ruling value.
 set -u
 SUITE="${SUITE:-$HOME/TysAIs/slm-gauntlet/extra-suites/longhorizon-v2}"

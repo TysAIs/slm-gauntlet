@@ -1,6 +1,6 @@
 # Long-horizon v2 — 102400 FIT LIST (from run log, parsed mechanically)
 
-Source: ~/workspace/research/slm-gauntlet-pve-run-2026-10-27.md (REPO-HOST repo run log),
+Source: ~/workspace/research/slm-gauntlet-pve-run-2026-10-27.md (run log on the repo host),
 context-push + LH-serve records. Parsed by section header (family/quant/KV) + the
 `102400 serve ... VRAM x MiB, spare y MiB` line in that section. Summary lines with no
 VRAM were ignored. One misattribution was corrected by hand: Dory q8_0 at 102400 FAILED

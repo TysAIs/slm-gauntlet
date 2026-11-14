@@ -101,3 +101,23 @@ async def test_usage_extraction_missing_is_zero():
     out = await client.chat([{"role": "user", "content": "hi"}])
     assert out.usage.prompt_tokens == 0
     assert out.usage.completion_tokens == 0
+
+
+async def test_version_info_returns_fingerprint():
+    def handler(request):
+        if request.url.path.endswith("/version"):
+            return httpx.Response(200, json={"system_fingerprint": "fp-abc", "version": "1"},
+                                  request=request)
+        return _resp(COMPLETION)
+
+    client = GauntletClient("http://test/v1", "test-model", transport=_transport(handler))
+    info = await client.version_info()
+    assert info["system_fingerprint"] == "fp-abc"
+
+
+async def test_version_info_missing_endpoint_is_empty_not_error():
+    def handler(request):
+        return httpx.Response(404, request=request)
+
+    client = GauntletClient("http://test/v1", "test-model", transport=_transport(handler))
+    assert await client.version_info() == {}

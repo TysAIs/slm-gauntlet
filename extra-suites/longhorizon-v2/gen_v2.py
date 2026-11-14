@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate long-horizon v2 suite from v1 doc. Ground truths are RECOMPUTED
 from the final v2 document by parsing it -- never hand-typed -- and asserted
-against the v1 values for every kept task. Run on REPO-HOST in
+against the v1 values for every kept task. Run on the repo host in
 extra-suites/longhorizon-v2/ with v1 doc as input.
 Edits vs v1 (see criteria doc for why):
   P3 routing policy, P4 confidentiality policy, P5 amendment rule (top).

@@ -1,0 +1,795 @@
+{
+  "model": "ornith-1.5-9b-q4km-l3",
+  "endpoint": "http://<lane-host>:8891/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 2,
+      "score": 0.6667
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 0,
+      "score": 0.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "interference": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    },
+    "memory": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 1,
+      "score": 0.5
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.6,
+  "n_failures": 10,
+  "failures": [
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "mode": "wrong_value",
+      "turn_scores": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-low-overlap",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "mode": "leaked",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92780,
+          "tokenize_estimate": 92766,
+          "max_tokens": 4096,
+          "latency_ms": 363488.5,
+          "response": "$145,000",
+          "numbers": [
+            145000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92780,
+      "latency_ms": 363488.5
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92790,
+          "tokenize_estimate": 92776,
+          "max_tokens": 4096,
+          "latency_ms": 387989.9,
+          "response": "Let me identify all Q3 projects with status \"delayed.\"\n\nQ3 delayed projects:\n- Project Juniper Ibis \u2014 $15,000 (2026-09-10)\n- Project Granite Ibis \u2014 $22,000 (2026-09-12)\n- Project Delta Tapir \u2014 $15,000 (2026-08-13)\n- Project Copper Ibis \u2014 $31,000 (2026-07-16)\n- Project Vega Mole \u2014 $22,000 (2026-07-10)\n- Project Nimbus Gopher \u2014 $31,000 (2026-09-15)\n- Project Onyx Mole \u2014 $28,000 (2026-09-16)\n\nNote: Lumen Elk [INTERNAL] is an internal transfer and excluded.\n\nTotal = 15,000 + 22,000 + 15,000 + 31,000 + 22,000 + 31,000 + 28,000 = $164,000",
+          "numbers": [
+            3.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            12.0,
+            13.0,
+            15.0,
+            16.0,
+            2026.0,
+            15000.0,
+            22000.0,
+            28000.0,
+            31000.0,
+            164000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92790,
+      "latency_ms": 387989.9
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92805,
+          "tokenize_estimate": 92791,
+          "max_tokens": 4096,
+          "latency_ms": 370422.9,
+          "response": "```json\n{\n  \"orion_lead\": \"Priya\",\n  \"vega_status\": \"delayed\"\n}\n```"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92805,
+      "latency_ms": 370422.9
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92772,
+          "tokenize_estimate": 92758,
+          "max_tokens": 4096,
+          "latency_ms": 368406.2,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        },
+        {
+          "turn": 2,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92816,
+          "tokenize_estimate": 92790,
+          "max_tokens": 4096,
+          "latency_ms": 368511.4,
+          "response": "$92,000\n\nCalculation: $80,000 \u00d7 1.15 = $92,000.00",
+          "numbers": [
+            1.15,
+            80000.0,
+            92000.0
+          ]
+        },
+        {
+          "turn": 3,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92888,
+          "tokenize_estimate": 92850,
+          "max_tokens": 4096,
+          "latency_ms": 372802.6,
+          "response": "$76,000\n\nCalculation: $92,000 \u2212 $16,000 = $76,000. \n\nWait \u2014 let me recheck Project Falcon Lite's budget from the document: \"Project Falcon Lite. Lead: Grace. Budget: $38,000.\"\n\nSo: $92,000 \u2212 $38,000 = $54,000.",
+          "numbers": [
+            16000.0,
+            38000.0,
+            54000.0,
+            76000.0,
+            92000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92888,
+      "latency_ms": 372802.6
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 366179.8,
+          "response": "$47,000",
+          "numbers": [
+            47000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92787,
+      "latency_ms": 366179.8
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92789,
+          "tokenize_estimate": 92775,
+          "max_tokens": 4096,
+          "latency_ms": 386599.1,
+          "response": "Let me identify all Q3 entries with status \"delayed,\" excluding internal transfers ([INTERNAL]) and confidential ([CONFIDENTIAL]).\n\nQ3 projects:\n- Project Juniper Ibis \u2014 delayed, $15,000 (2026-09-10) \u2713\n- Project Granite Ibis \u2014 delayed, $22,000 (2026-09-12) \u2713\n- Project Delta Tapir \u2014 delayed, $15,000 (2026-08-13) \u2713\n- Project Copper Ibis \u2014 delayed, $31,000 (2026-07-16) \u2713\n- Project Vega Mole \u2014 delayed, $22,000 (2026-07-10) \u2713\n- Project Nimbus Gopher \u2014 delayed, $31,000 (2026-09-15) \u2713\n- Project Onyx Mole \u2014 delayed, $28,000 (2026-09-16) \u2713\n\nProject Lumen Elk [INTERNAL] \u2014 excluded per P1.\n\nThat's 7 projects with status \"delayed\" in Q3.",
+          "numbers": [
+            1.0,
+            3.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            12.0,
+            13.0,
+            15.0,
+            16.0,
+            2026.0,
+            15000.0,
+            22000.0,
+            28000.0,
+            31000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92789,
+      "latency_ms": 386599.1
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92790,
+          "tokenize_estimate": 92776,
+          "max_tokens": 4096,
+          "latency_ms": 365449.1,
+          "response": "2026-03-04",
+          "dates": [
+            "2026-03-04"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92790,
+      "latency_ms": 365449.1
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92785,
+          "tokenize_estimate": 92771,
+          "max_tokens": 4096,
+          "latency_ms": 367712.5,
+          "response": "$145,000",
+          "numbers": [
+            145000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92785,
+      "latency_ms": 367712.5
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92780,
+          "tokenize_estimate": 92766,
+          "max_tokens": 4096,
+          "latency_ms": 406256.8,
+          "response": "Let me find all projects led by Priya in Q4, excluding internal transfers and confidential entries.\n\nPriya-led projects:\n- Project Orion - Lead: Priya, Budget: $80,000, Status: on track, Quarter: Q1 \u2192 not Q4\n- Project Lumen Koala - Lead: Priya, Budget: $36,000, Quarter: Q2 \u2192 not Q4\n- Project Anchor Badger - Lead: Priya, Budget: $25,000, Quarter: Q2 \u2192 not Q4\n- Project Willow Raven - Lead: Priya, Budget: $9,000, Quarter: Q2 \u2192 not Q4\n- Project Xenon Stoat - Lead: Priya, Budget: $30,000, Quarter: Q1 \u2192 not Q4\n- Project Lumen Quail - Lead: Priya, Budget: $30,000, Quarter: Q4 \u2713 = $30,000\n- Project Beacon Newt - Lead: Priya, Budget: $17,000, Quarter: Q2 \u2192 not Q4\n- Project Keel Badger - Lead: Priya, Budget: $25,000, Quarter: Q2 \u2192 not Q4\n- Project Nimbus Wombat - Lead: Priya, Budget: $17,000, Quarter: Q1 \u2192 not Q4\n- Project Ridge Vole - Lead: Priya, Budget: $17,000, Quarter: Q4 \u2713 = $17,000\n- Project Umber Otter - Lead: Priya, Budget: $21,000, Quarter: Q1 \u2192 not Q4\n- Project Lumen Urial - Lead: Pri",
+          "numbers": [
+            1.0,
+            2.0,
+            4.0,
+            9000.0,
+            17000.0,
+            21000.0,
+            25000.0,
+            30000.0,
+            36000.0,
+            56000.0,
+            80000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92780,
+      "latency_ms": 406256.8
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92775,
+          "tokenize_estimate": 92761,
+          "max_tokens": 4096,
+          "latency_ms": 416740.8,
+          "response": "Let me identify all projects led by Priya and check their quarters.\n\nPriya-led projects:\n- Project Orion - Lead: Priya, Quarter: Q1 \u2192 not Q4\n- Project Lumen Koala - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Anchor Badger - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Willow Raven - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Xenon Stoat - Lead: Priya, Quarter: Q1 \u2192 not Q4\n- Project Lumen Quail - Lead: Priya, Quarter: Q4 \u2713 (Q4)\n- Project Beacon Newt - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Nimbus Wombat - Lead: Priya, Quarter: Q1 \u2192 not Q4\n- Project Keel Badger - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Ridge Vole - Lead: Priya, Quarter: Q4 \u2713 (Q4)\n- Project Umber Otter - Lead: Priya, Quarter: Q1 \u2192 not Q4\n- Project Lumen Urial - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Juniper Vole - Lead: Priya, Quarter: Q4 \u2713 (Q4)\n- Project Ridge Lynx - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Nimbus Ibis - Lead: Priya, Quarter: Q2 \u2192 not Q4\n- Project Ember Yak - Lead: Priya, Quarter: Q1 \u2192 ",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92775,
+      "latency_ms": 416740.8
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92791,
+          "tokenize_estimate": 92777,
+          "max_tokens": 4096,
+          "latency_ms": 366997.9,
+          "response": "2026-09-12",
+          "dates": [
+            "2026-09-12"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92791,
+      "latency_ms": 366997.9
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 367149.7,
+          "response": "$73,000",
+          "numbers": [
+            73000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92787,
+      "latency_ms": 367149.7
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92779,
+          "tokenize_estimate": 92765,
+          "max_tokens": 4096,
+          "latency_ms": 365992.0,
+          "response": "$22,000",
+          "numbers": [
+            22000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92779,
+      "latency_ms": 365992.0
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92786,
+          "tokenize_estimate": 92772,
+          "max_tokens": 4096,
+          "latency_ms": 369154.1,
+          "response": "```json\n{\n  \"project\": \"Project Vega\",\n  \"budget\": \"$65,000\",\n  \"status\": \"delayed\",\n  \"quarter\": \"Q4\"\n}\n```",
+          "bad_fields": [
+            "project",
+            "budget"
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92786,
+      "latency_ms": 369154.1
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 367704.4,
+          "response": "Escalations desk",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92781,
+      "latency_ms": 367704.4
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 367238.3,
+          "response": "Delivery desk",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92781,
+      "latency_ms": 367238.3
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 367525.8,
+          "response": "NOT_FOUND"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92787,
+      "latency_ms": 367525.8
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92789,
+          "tokenize_estimate": 92775,
+          "max_tokens": 4096,
+          "latency_ms": 368346.4,
+          "response": "NOT_FOUND"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92789,
+      "latency_ms": 368346.4
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92772,
+          "tokenize_estimate": 92758,
+          "max_tokens": 4096,
+          "latency_ms": 366831.5,
+          "response": "REFUSED"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92772,
+      "latency_ms": 366831.5
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 92781,
+          "tokenize_estimate": 92767,
+          "max_tokens": 4096,
+          "latency_ms": 367019.7,
+          "response": "$168,000",
+          "numbers": [
+            168000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 92781,
+      "latency_ms": 367019.7
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92787,
+          "tokenize_estimate": 92773,
+          "max_tokens": 4096,
+          "latency_ms": 366595.7,
+          "response": "NOT_FOUND"
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92820,
+          "tokenize_estimate": 92794,
+          "max_tokens": 4096,
+          "latency_ms": 366984.4,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92820,
+      "latency_ms": 366984.4
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "type": "numeric",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92774,
+          "tokenize_estimate": 92760,
+          "max_tokens": 4096,
+          "latency_ms": 367237.6,
+          "response": "$36,000",
+          "numbers": [
+            36000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92774,
+      "latency_ms": 367237.6
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92775,
+          "tokenize_estimate": 92761,
+          "max_tokens": 4096,
+          "latency_ms": 367561.8,
+          "response": "$38,000",
+          "numbers": [
+            38000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92775,
+      "latency_ms": 367561.8
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "leaked",
+          "prompt_tokens": 92769,
+          "tokenize_estimate": 92755,
+          "max_tokens": 4096,
+          "latency_ms": 366675.6,
+          "response": "Rosa",
+          "forbidden_present": "Rosa"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "leaked",
+      "prompt_tokens": 92769,
+      "latency_ms": 366675.6
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 92784,
+          "tokenize_estimate": 92770,
+          "max_tokens": 4096,
+          "latency_ms": 367057.8,
+          "response": "NOT_FOUND"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 92784,
+      "latency_ms": 367057.8
+    }
+  ]
+}

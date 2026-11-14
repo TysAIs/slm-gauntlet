@@ -19,9 +19,15 @@ def test_different_seeds_differ():
 
 def test_needle_present_and_scorable():
     task = make_needle_task("n1", 4000, seed=7)
-    code = task.asserts[0].values[0]
+    assert task.asserts[0].type == "needle_set"
+    code = task.asserts[0].value
     assert code in task.prompt  # needle planted
     assert code.startswith("ZEBRA-")
+
+
+def test_nolima_keeps_substring_scoring():
+    task = make_needle_task("n1", 4000, seed=7, nolima=True)
+    assert task.asserts[0].type == "contains_all"
 
 
 def test_context_scales_with_target():

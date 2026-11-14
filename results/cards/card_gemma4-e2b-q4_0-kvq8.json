@@ -1,0 +1,52 @@
+[
+ {
+  "model": "gemma4-e2b-q4_0-kvq8",
+  "display_name": "Gemma 4 E2B",
+  "sub": "Q4_0 \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 83.5,
+  "suites": {
+   "adversarial": 0.8,
+   "agent_chains": 0.833,
+   "calendar": 0.8,
+   "classify": 0.909,
+   "coding": 1.0,
+   "docintake": 0.931,
+   "email": 0.87,
+   "instruction": 0.778,
+   "realworld": 0.5,
+   "structured": 0.8,
+   "summarize": 0.8,
+   "support": 0.781,
+   "tooluse": 0.825,
+   "retrieval": 1.0
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261111",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "gemma-4-E2B_q4_0-it.gguf",
+   "gguf_size_bytes": 3349516256,
+   "quant": "Q4_0",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/gemma4-e2b-q4_0-kvq8_20261111T082621Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

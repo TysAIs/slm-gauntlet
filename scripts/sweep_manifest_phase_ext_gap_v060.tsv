@@ -1,0 +1,20 @@
+# Stage 2 gap manifest, epoch 0.6.0 (2026-11-09)
+# The kvf16/kvq4 cells of the canonical quant for the 7 multi-variant tested models whose
+# canonical quant was only ever run at kvq8 (screen). Phase M finalists got these rows in the
+# Phase M manifests; these models were not finalists. Completes the "every quant x every KV"
+# matrix together with the screen, Phase M, Phase M extension, and Stage 2 manifests.
+# Same construction: T1 ctx 32768, np 1, -fa on --reasoning-budget 0 -cram 0.
+gemma4-12b-udq2kxl-kvf16	/mnt/data/models/gemma4-12b/gemma-4-12b-it-UD-Q2_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+gemma4-12b-udq2kxl-kvq4	/mnt/data/models/gemma4-12b/gemma-4-12b-it-UD-Q2_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-1.7b-q4km-kvf16	/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-1.7b-q4km-kvq4	/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+lfm3-1.7b-q4km-kvf16	/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+lfm3-1.7b-q4km-kvq4	/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+lfm2.5-2.6b-q4km-kvf16	/mnt/data/models/lfm2.5-2.6b/LFM2.5-2.6B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+lfm2.5-2.6b-q4km-kvq4	/mnt/data/models/lfm2.5-2.6b/LFM2.5-2.6B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+minicpmv47-1b-q4km-kvf16	/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+minicpmv47-1b-q4km-kvq4	/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+lfm2.5-1.2b-q4km-kvf16	/mnt/data/models/lfm25-1.2b/LFM2.5-1.2B-Instruct-Q4_K_M.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+lfm2.5-1.2b-q4km-kvq4	/mnt/data/models/lfm25-1.2b/LFM2.5-1.2B-Instruct-Q4_K_M.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0
+sharp-spark-4b-q4kxl-kvf16	/mnt/data/models/sharp-spark-4b/Sharp-Spark-X2.5-4B-Q4_K_XL.gguf	32768	1	f16	f16	-fa on --reasoning-budget 0 -cram 0
+sharp-spark-4b-q4kxl-kvq4	/mnt/data/models/sharp-spark-4b/Sharp-Spark-X2.5-4B-Q4_K_XL.gguf	32768	1	q4_0	q4_0	-fa on --reasoning-budget 0 -cram 0

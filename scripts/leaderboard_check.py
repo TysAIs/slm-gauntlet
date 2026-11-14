@@ -85,6 +85,7 @@ SCORER_EPOCHS = [        # (epoch, first card timestamp it applies to, commit)
     ("0.4.0", "20261105", "v0.4-suite"),
     ("0.5.0", "20261107", "v0.5-realworld-expand"),
     ("0.5.1", "20261108", "v0.5.1-task-validity"),
+    ("0.6.0", "20261109", "v0.6.0-agent-suites"),
 ]
 TOL = 0.2                # published-vs-recomputed tolerance, percentage points
 BLOCK_BEGIN = "<!-- BEGIN GENERATED LEADERBOARD: scripts/leaderboard_check.py -->"
@@ -333,7 +334,14 @@ def best_config_label(card: dict) -> str:
 
 
 def build_rows(cards: list[dict], logs, verbose=False) -> dict:
-    """Rank the corpus: one row per model family, best scoring configuration."""
+    """Rank the corpus: one row per model family and serving kind, best configuration.
+
+    The kind is part of the key. A family can have on-GPU cells and cells that
+    need RAM offload (same weights, different quant); collapsing by family alone
+    handed the whole family to whichever table its single best cell belonged to,
+    so an on-GPU model with one offload variant disappeared from the on-GPU
+    ranking. Each table now holds that family's best cell of its own kind.
+    """
     rows, legacy, families = [], [], {}
     repaired, notes = [], []
     for c in cards:
@@ -369,7 +377,7 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
         if not rankable:
             legacy.append(entry)
             continue
-        families.setdefault(entry["family"], []).append(entry)
+        families.setdefault((entry["category"] == "offload", entry["family"]), []).append(entry)
         if not entry["card_suites_match_log"] or not entry["card_headline_matches_log"]:
             repaired.append(entry)
             notes.append({
@@ -398,12 +406,15 @@ def build_rows(cards: list[dict], logs, verbose=False) -> dict:
         for r in ongpu + offload:
             print("family=%-30s best=%-34s %5.1f%% of %d variant(s)" % (
                 r["family"], r["model"], r["recomputed"], r["variants"]), file=sys.stderr)
+    fam_map: dict[str, list[str]] = {}
+    for (_offload, fam), entries in families.items():
+        fam_map.setdefault(fam, []).extend(e["model"] for e in entries)
     return {
         "rows": ongpu,
         "offload": offload,
         "legacy": sorted(legacy, key=lambda r: (r["family"], -(r["published"] or 0))),
         "card_repairs": notes,
-        "families": {k: [e["model"] for e in v] for k, v in families.items()},
+        "families": fam_map,
     }
 
 
@@ -442,12 +453,16 @@ def legacy_groups(legacy: list[dict]) -> list[dict]:
 
 def render_block(data: dict) -> str:
     L = [BLOCK_BEGIN, ""]
-    L.append("**Current leaderboard — %d tasks, scorer %s, PVE GTX 1070 Ti 8 GB, all layers "
+    L.append("**Current leaderboard — %d tasks, scorer %s, NVIDIA GTX 1070 Ti 8 GB, all layers "
              "on-GPU, zero CPU offload, temp 0, seed 1.**" % (FULL_TASKS, CURRENT_EPOCH))
     L.append("")
     L.append("One row per model: the **best-scoring configuration** of that model in the corpus "
              "(%d scored configurations behind this table). Every score is the weighted aggregate "
-             "defined in `scripts/leaderboard_check.py` and is recomputed from that run's log; the "
+             "defined in `scripts/leaderboard_check.py`, recomputed from that run's log on the "
+             "authoring tree; the published instrument is the model's own card "
+             "(`results/cards/*.json`), which carries the per-suite result the score is computed "
+             "from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an "
+             "authoring-tree tool: in a public clone it reports every card as not reproducible. The "
              "`Method` column carries the task count and scorer version for the row, so no row is "
              "ever compared across methodologies. Full per-configuration data: "
              "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)." % (
@@ -792,7 +807,7 @@ def main(argv=None) -> int:
 
     def detail_problems() -> list[str]:
         """results/_published/LEADERBOARD.md is generated from the same cards; catch staleness too."""
-        gen = root / "gen-leaderboard.py"
+        gen = root / "scripts" / "gen_leaderboard.py"
         committed = root / "results" / "_published" / "LEADERBOARD.md"
         if not gen.exists():
             return []
@@ -801,9 +816,9 @@ def main(argv=None) -> int:
             r = subprocess.run([sys.executable, str(gen), "--out", str(tmp)],
                                cwd=str(root), capture_output=True, text=True)
             if r.returncode != 0:
-                return ["gen-leaderboard.py failed: " + (r.stderr or r.stdout)[-300:]]
+                return ["scripts/gen_leaderboard.py failed: " + (r.stderr or r.stdout)[-300:]]
             if not committed.exists() or committed.read_text() != tmp.read_text():
-                return ["results/_published/LEADERBOARD.md is stale — run python3 gen-leaderboard.py "
+                return ["results/_published/LEADERBOARD.md is stale — run python3 scripts/gen_leaderboard.py "
                         "(the detail table is generated from the same cards)"]
         return []
 
@@ -836,7 +851,7 @@ def main(argv=None) -> int:
             write_readme(readme, read_readme(readme), block)
             lj.parent.mkdir(parents=True, exist_ok=True)
             lj.write_text(lj_text)
-            gen = root / "gen-leaderboard.py"
+            gen = root / "scripts" / "gen_leaderboard.py"
             if gen.exists():  # detail table comes from the same corpus
                 subprocess.run([sys.executable, str(gen)], cwd=str(root), check=False)
         print("{} README block and {}".format("would write" if a.dry_run else "wrote",

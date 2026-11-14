@@ -1,41 +1,52 @@
 [
  {
   "model": "lfm3-1.7b-q4km-kvq8",
-  "display_name": "LFM3 1.7B",
-  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 Oct 2026 \u00b7 NEW BUILD 0.8.0-dev",
-  "overall_pct": 83.2,
+  "display_name": "LFM3-1.7B",
+  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 66.5,
   "suites": {
+   "adversarial": 0.5,
+   "agent_chains": 0.833,
+   "calendar": 0.65,
+   "classify": 0.606,
+   "coding": 0.8,
+   "docintake": 0.828,
+   "email": 0.674,
+   "instruction": 0.5,
+   "realworld": 0.4,
+   "structured": 0.4,
+   "summarize": 0.85,
+   "support": 0.688,
    "tooluse": 0.842,
-   "adversarial": 0.75,
-   "agent_chains": 1.0,
-   "structured": 0.9,
-   "retrieval": 0.75,
-   "coding": 1.0,
-   "instruction": 0.571
+   "retrieval": 0.571
   },
-  "n": 71,
+  "n": 320,
   "rank": "",
-  "ts": "20261028",
+  "ts": "20261109",
   "device_name": "GTX 1070 Ti",
   "device_vram_mb": 8192,
   "device_kind": "nvidia",
+  "failure_modes": {},
   "details": {
-   "release_date": "Oct 24 2026",
+   "release_date": "2026",
    "gguf_file": "LFM3-1.7B-Q4_K_M.gguf",
    "gguf_size_bytes": 1099627808,
    "quant": "Q4_K_M",
    "kv_type": "q8_0",
    "context_tokens": 32768,
-   "vram_used_mb": 1507,
    "vram_total_mb": 8192,
    "kv_pool_tokens": 32768,
    "max_subagents": 4,
-   "server_build": "0.8.0-dev (new primary)",
-   "category": "on-GPU \u226412B"
-  },
-  "failure_modes": {
-   "looped": 2,
-   "error": 1
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/lfm3-1.7b-q4km-kvq8_20261109T081806Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
   }
  }
 ]

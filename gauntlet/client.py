@@ -62,6 +62,20 @@ class GauntletClient:
     async def close(self):
         await self._http.aclose()
 
+    async def version_info(self) -> dict:
+        """GET /version on the engine — llama.cpp returns a JSON object whose
+        `system_fingerprint` identifies the exact server build. Returns {} when
+        the endpoint has no /version (non-llama.cpp engines, mock transports in
+        tests); provenance collection treats that as unknown, never an error."""
+        try:
+            resp = await self._http.get("/version")
+            if resp.status_code != 200:
+                return {}
+            data = resp.json()
+            return data if isinstance(data, dict) else {}
+        except Exception:  # noqa: BLE001 — provenance is best-effort
+            return {}
+
     async def chat(
         self,
         messages: list[dict],

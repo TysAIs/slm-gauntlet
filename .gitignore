@@ -35,3 +35,6 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Internal reassessment inventory — never published
+REASSESSMENT-P0-INVENTORY.md

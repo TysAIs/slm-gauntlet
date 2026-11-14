@@ -9,7 +9,7 @@ canvas-2D software renderer + playwright frame capture + ffmpeg mux.
 Determinism comes from window.__frame(t): every screenshot sets the animation
 clock explicitly, so the same input bytes always produce the same frames.
 
-Data comes from the card JSONs that make_cards.py/gen-leaderboard.py already
+Data comes from the card JSONs that scripts/make_cards.py and scripts/gen_leaderboard.py already
 produce (results/cards/*.json) *and* from results/cards/manifest.json, which is
 where the published headline cards for older models live. Both are
 scripts/leaderboard_check.py sources, so the animation cannot drift from the
@@ -341,18 +341,14 @@ draw(0);
 def card_entries() -> dict[str, dict]:
     """model id -> card entry, from the repo's own card corpus.
 
-    Two card sources live in results/cards and BOTH are published leaderboard
-    sources, so both count:
+    Source: card_<config>.json — per-configuration cards (make_cards.py output;
+    they carry details.quant and source_log provenance).
 
-      * card_<config>.json  per-configuration cards (make_cards.py output; they
-        carry details.quant and source_log provenance);
-      * manifest.json       the 14 headline cards published for models that were
-        carded before per-configuration JSONs were kept -- Gemma 4 E4B,
-        MiniCPM-V 5 2B and 12 more, including the leaderboard's #2 and #3.
-
-    scripts/leaderboard_check.py reads every *.json in that directory (see its
-    card_files()), so skipping manifest.json here made the animation's "top N"
-    disagree with the published table: the 2026-11-03 cut dropped #2 and #3.
+    A `manifest.json` headline set is also read when present, because it used to
+    be the only record for 10 models carded before per-configuration JSONs were
+    kept. It is NOT in the current corpus (it duplicated cards that now exist
+    properly and inflated the published configuration count), so the fallback is
+    normally inert; every model it named is a per-config card now.
 
     A per-configuration card always wins over a manifest row for the same model
     id, so a model present in both can never be counted twice or shadowed by a

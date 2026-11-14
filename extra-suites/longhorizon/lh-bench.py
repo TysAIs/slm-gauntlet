@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# LEGACY (retired): v1 long-horizon scoring is gameable (substring / numeric-set
+# checks can be satisfied by echoing the ledger). Superseded by v2r —
+# see extra-suites/longhorizon-v2/lh-bench-v2r.py and this directory's README.md.
 """Long-horizon 100K+ bench: shared long document + 8 tasks, temp 0.
 One POST per task (doc + question); multi-turn task does 2 sequential calls
 with history. Scoring is deterministic: numeric normalization ($ and commas

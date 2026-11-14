@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "slm-gauntlet"
-version = "0.1.0"
+version = "0.6.0"
 description = "Gauntlet benchmark for small (sub-12B) language models: agent tool-use, structured output, retrieval, coding, instruction-following, and throughput."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -42,6 +42,12 @@ ignore = ["UP031"]
 # Verbatim engine-log excerpts: each journal line has to stay one physical line, so a
 # long `cudaMalloc failed` line cannot be wrapped without editing the evidence.
 "tests/test_sweep_serve_diagnostics.py" = ["E501"]
+# Verbatim task fixtures: prompts, gold answers and receipts are data, not code — a
+# wrapped line would change the string the task grades against.
+"tests/validity_data_*.py" = ["E501"]
+"tests/test_validity_*.py" = ["E501"]
+"tests/test_core_validity.py" = ["E501"]
+"tests/test_scorer_fixes.py" = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

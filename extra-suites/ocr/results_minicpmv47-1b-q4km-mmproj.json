@@ -1,16 +1,21 @@
 {
   "model": "minicpmv47-1b-q4km-mmproj",
-  "endpoint": "http://127.0.0.1:8080/v1",
+  "endpoint": "http://<lane-host>:8891/v1",
   "n_tasks": 10,
   "n_scored": 10,
-  "overall_field_score": 0.95,
-  "n_failures": 0,
-  "failures": [],
+  "overall_field_score": 0.9,
+  "n_failures": 1,
+  "failures": [
+    {
+      "id": "ocr-blur",
+      "failure": "accepted_illegible"
+    }
+  ],
   "rows": [
     {
       "id": "ocr-invoice",
       "type": "extract",
-      "latency_ms": 213.2,
+      "latency_ms": 1674.8,
       "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
       "fields_present": [
         "Acme Supplies Ltd",
@@ -22,8 +27,8 @@
     {
       "id": "ocr-table",
       "type": "extract",
-      "latency_ms": 852.1,
-      "response": "Here is the list of each name with their score:\n\n- Alice: 92\n- Bob: 78\n- Carol: 85\n- Dan: 61",
+      "latency_ms": 1813.3,
+      "response": "Here is the test scores:  \n- Alice: 92  \n- Bob: 78  \n- Carol: 85  \n- Dan: 61",
       "fields_present": [
         "Alice",
         "92",
@@ -39,7 +44,7 @@
     {
       "id": "ocr-rot15",
       "type": "extract",
-      "latency_ms": 1328.1,
+      "latency_ms": 2398.9,
       "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
       "fields_present": [
         "Acme Supplies Ltd",
@@ -51,8 +56,8 @@
     {
       "id": "ocr-lowcontrast",
       "type": "extract",
-      "latency_ms": 733.3,
-      "response": "Acme Supplies Ltd\n2026-10-15\n$32.25",
+      "latency_ms": 1066.8,
+      "response": "Vendor: Acme Supplies Ltd\nDate: 2026-10-15\nTotal: $32.25",
       "fields_present": [
         "Acme Supplies Ltd",
         "2026-10-15",
@@ -63,30 +68,30 @@
     {
       "id": "ocr-blur",
       "type": "refuse",
-      "latency_ms": 623.5,
-      "response": "Image is illegible.",
-      "refused": true,
+      "latency_ms": 1762.4,
+      "response": "Vendor: [blurred]  \nDate: [blurred]  \nTotal: [blurred]",
+      "refused": false,
       "hallucinated_values": [],
-      "score": 1.0
+      "score": 0.0
     },
     {
       "id": "ocr-redacted",
       "type": "redacted",
-      "latency_ms": 912.9,
-      "response": "Vendor: Acme Supplies Ltd  \nDate: 2026-10-15  \nTotal: $12.50 x 2 + $7.25 x 1 = $25.75",
+      "latency_ms": 947.0,
+      "response": "Vendor: Acme Supplies Ltd  \nDate: 2026-10-15  \nTotal: $ (redacted)",
       "fields_present": [
         "Acme Supplies Ltd",
         "2026-10-15"
       ],
-      "refused_total": false,
+      "refused_total": true,
       "hallucinated_values": [],
-      "score": 0.5
+      "score": 1.0
     },
     {
       "id": "ocr-mixed",
       "type": "extract",
-      "latency_ms": 783.1,
-      "response": "Vendor: Acme Supplies Ltd\nDate: 2026-10-15\nTotal: $32.25",
+      "latency_ms": 1093.5,
+      "response": "Vendor: Acme Supplies Ltd  \nDate: 2026-10-15  \nTotal: $32.25",
       "fields_present": [
         "Acme Supplies Ltd",
         "2026-10-15",
@@ -98,8 +103,8 @@
     {
       "id": "ocr-receipt",
       "type": "extract",
-      "latency_ms": 919.2,
-      "response": "Here is the list of each item price and the total:\n\n- Coffee: $4.50\n- Bagel: $3.25\n- Tax: $0.62\n- Total: $8.37",
+      "latency_ms": 1294.0,
+      "response": "Here is the list of items, their prices, and the total:  \n\n- Coffee: $4.50  \n- Bagel: $3.25  \n- Tax: $0.62  \nTotal: $8.37",
       "fields_present": [
         "$4.50",
         "$3.25",
@@ -111,10 +116,10 @@
     {
       "id": "ocr-ui",
       "type": "extract",
-      "latency_ms": 817.3,
-      "response": "Here is the information from the app window:\n\n- Username: operator_dev\n- Balance: $1,240.50\n- Status: Active",
+      "latency_ms": 1286.8,
+      "response": "Here is the information from the app window:\n\n- Username: sam.riley  \n- Balance: $1,240.50  \n- Status: Active",
       "fields_present": [
-        "operator_dev",
+        "sam.riley",
         "$1,240.50",
         "Active"
       ],
@@ -123,7 +128,7 @@
     {
       "id": "ocr-twocol",
       "type": "leftcol",
-      "latency_ms": 596.9,
+      "latency_ms": 1865.5,
       "response": "Project: Falcon",
       "score": 1.0
     }

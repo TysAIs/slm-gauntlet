@@ -1,0 +1,54 @@
+[
+ {
+  "model": "qwen3.5-4b-q4km-kvf16",
+  "display_name": "Qwen3.5-4B",
+  "sub": "Q4_K_M \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 83.3,
+  "suites": {
+   "adversarial": 0.7,
+   "agent_chains": 1.0,
+   "calendar": 0.8,
+   "classify": 0.97,
+   "coding": 0.8,
+   "docintake": 0.966,
+   "email": 0.848,
+   "instruction": 0.5,
+   "realworld": 0.583,
+   "structured": 0.7,
+   "summarize": 0.85,
+   "support": 0.844,
+   "tooluse": 0.895,
+   "retrieval": 1.0
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261109",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {
+   "looped": 1
+  },
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "Qwen3.5-4B-Q4_K_M.gguf",
+   "gguf_size_bytes": 2740937888,
+   "quant": "Q4_K_M",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/qwen3.5-4b-q4km-kvf16_20261109T164131Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

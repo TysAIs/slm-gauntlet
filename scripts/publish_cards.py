@@ -87,8 +87,19 @@ def main(argv=None) -> int:
         print(f"[publish_cards] would render {len(htmls)} PNG(s)")
         return 0
 
-    # playwright lives on the system interpreter on repo-host, not in the project venv
-    render_py = "/usr/bin/python3" if Path("/usr/bin/python3").exists() else sys.executable
+    # Rendering needs playwright + a chromium build. Prefer the interpreter running
+    # this script; fall back to the system python only if that one has playwright.
+    def has_playwright(py: str) -> bool:
+        return subprocess.run([py, "-c", "import playwright"], capture_output=True).returncode == 0
+
+    render_py = sys.executable
+    if not has_playwright(render_py) and Path("/usr/bin/python3").exists() and has_playwright("/usr/bin/python3"):
+        render_py = "/usr/bin/python3"
+    if not has_playwright(render_py):
+        print("[publish_cards] playwright is not installed for this interpreter. Card JSON/HTML are "
+              "written; to render the PNGs run:\n"
+              "  pip install playwright && python3 -m playwright install chromium")
+        return 1
     cmd = [render_py, str(ROOT / "scripts" / "render_card_png.py"), *htmls,
            "--outdir", "results/cards", "--prefix", "card_", "--timeout-ms", str(a.timeout_ms)]
     r = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True)

@@ -1,0 +1,938 @@
+{
+  "model": "spark-x2.6-4b-iq3m-l3",
+  "endpoint": "http://<lane-host>:8891/v1",
+  "suite": "longhorizon-v2r",
+  "families": {
+    "multihop-tracking": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "aggregation": {
+      "n": 4,
+      "passed": 0,
+      "score": 0.0
+    },
+    "retrieval": {
+      "n": 3,
+      "passed": 2,
+      "score": 0.6667
+    },
+    "interference": {
+      "n": 2,
+      "passed": 2,
+      "score": 1.0
+    },
+    "memory": {
+      "n": 3,
+      "passed": 3,
+      "score": 1.0
+    },
+    "agentic": {
+      "n": 3,
+      "passed": 0,
+      "score": 0.0
+    },
+    "faithfulness": {
+      "n": 3,
+      "passed": 1,
+      "score": 0.3333
+    },
+    "refusal": {
+      "n": 2,
+      "passed": 0,
+      "score": 0.0
+    },
+    "low-overlap": {
+      "n": 2,
+      "passed": 0,
+      "score": 0.0
+    }
+  },
+  "n_tasks": 25,
+  "n_scored": 25,
+  "overall_score": 0.36,
+  "n_failures": 16,
+  "failures": [
+    {
+      "id": "lh2-multihop-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "mode": "wrong_value",
+      "turn_scores": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-scattered-count",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-json-extraction",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-missing-routing",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2-low-overlap",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "mode": "leaked",
+      "turn_scores": [
+        0.0
+      ]
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "mode": "wrong_value",
+      "turn_scores": [
+        0.0
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "id": "lh2-multihop-sum",
+      "type": "numeric",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99857,
+          "tokenize_estimate": 99789,
+          "max_tokens": 2483,
+          "latency_ms": 448998.3,
+          "response": "We need answer only dollar total for Project Orion and Project Vega, exclude internal transfers. Need follow policies. Need identify Project Orion budget $80,000. Project Vega appears multiple entries? Need combined budget of Project Orion and Project Vega. Need likely each project unique? There are Project Orion and Project Vega entries. Need consider amendments? Need exclude internal transfers. Need maybe Project Vega has an entry with status delayed and budget $65,000? Need determine which Project Vega counts. There may be multiple \"Project Vega\" entries? Let's parse document. It lists many projects. Need answer combined budget of Project Orion and Project Vega. Need likely use latest/amended? Need policies: amendments: where amended entry states supersedes earlier, only amended counts; earlier ignored. Internal transfers excluded. Confidential never report. Dates ISO. Routing irrelevant.\n\nNeed find Project Orion: budget $80,000. Project Vega: There are multiple entries? At top Proj",
+          "numbers": [
+            1.0,
+            3.0,
+            4.0,
+            5.0,
+            10.0,
+            2026.0,
+            17000.0,
+            65000.0,
+            80000.0,
+            145000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99857,
+      "latency_ms": 448998.3
+    },
+    {
+      "id": "lh2-buried-policy-total",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99864,
+          "tokenize_estimate": 99796,
+          "max_tokens": 2476,
+          "latency_ms": 417153.0,
+          "response": "I need to find all Q3 projects with status \"delayed\", then sum their budgets, applying the reporting policies.\n\nLet me identify Q3 delayed projects from the document:\n\n1. **Project Juniper Ibis** - Status: delayed, Quarter: Q3, Budget: $15,000\n2. **Project Granite Ibis** - Status: delayed, Quarter: Q3, Budget: $22,000\n3. **Project Delta Tapir** - Status: delayed, Quarter: Q3, Budget: $15,000\n4. **Project Copper Ibis** - Status: delayed, Quarter: Q3, Budget: $31,000\n5. **Project Vega Mole** - Status: delayed, Quarter: Q3, Budget: $22,000\n6. **Project Nimbus Gopher** - Status: delayed, Quarter: Q3, Budget: $31,000\n7. **Project Onyx Mole** - Status: delayed, Quarter: Q3, Budget: $28,000\n8. **Project Lumen Elk** - Status: delayed, Quarter: Q3, Budget: $45,000 - BUT this is [INTERNAL], so excluded per P1\n9. **Project Beacon Otter** - Status: delayed, Quarter: Q3, Budget: $45,000 - BUT this is [INTERNAL], so excluded per P1\n\nNow let me check if there are any other Q3 delayed projects. Let me",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            15.0,
+            22.0,
+            28.0,
+            31.0,
+            164.0,
+            15000.0,
+            22000.0,
+            28000.0,
+            31000.0,
+            31006.0,
+            37000.0,
+            45000.0,
+            52000.0,
+            83000.0,
+            105000.0,
+            136000.0,
+            164000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99864,
+      "latency_ms": 417153.0
+    },
+    {
+      "id": "lh2-distance-json",
+      "type": "json",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99882,
+          "tokenize_estimate": 99814,
+          "max_tokens": 2458,
+          "latency_ms": 377387.2,
+          "response": "{\"orion_lead\":\"Priya\",\"vega_status\":\"delayed\"}"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99882,
+      "latency_ms": 377387.2
+    },
+    {
+      "id": "lh2-multiturn-state-3",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99847,
+          "tokenize_estimate": 99779,
+          "max_tokens": 2493,
+          "latency_ms": 378258.6,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        },
+        {
+          "turn": 2,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99885,
+          "tokenize_estimate": 99812,
+          "max_tokens": 2460,
+          "latency_ms": 381256.4,
+          "response": "$120,000",
+          "numbers": [
+            120000.0
+          ]
+        },
+        {
+          "turn": 3,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99924,
+          "tokenize_estimate": 99846,
+          "max_tokens": 2426,
+          "latency_ms": 379488.3,
+          "response": "$95,000",
+          "numbers": [
+            95000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99924,
+      "latency_ms": 379488.3
+    },
+    {
+      "id": "lh2-distractor",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99861,
+          "tokenize_estimate": 99793,
+          "max_tokens": 2479,
+          "latency_ms": 379206.1,
+          "response": "$47,000",
+          "numbers": [
+            47000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99861,
+      "latency_ms": 379206.1
+    },
+    {
+      "id": "lh2-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99863,
+          "tokenize_estimate": 99795,
+          "max_tokens": 2477,
+          "latency_ms": 401671.1,
+          "response": "I need to find projects in Q3 with status delayed, excluding internal transfers.\n\nLet me identify all Q3 projects with status delayed:\n\n1. Project Juniper Ibis - Q3, delayed, Lead: Mona, Date: 2026-09-10\n2. Project Granite Ibis - Q3, delayed, Lead: Priya, Date: 2026-09-12\n3. Project Delta Tapir - Q3, delayed, Lead: Sam, Date: 2026-08-13\n4. Project Copper Ibis - Q3, delayed, Lead: Sam, Date: 2026-07-16\n5. Project Vega Mole - Q3, delayed, Lead: Tara, Date: 2026-07-10\n6. Project Nimbus Gopher - Q3, delayed, Lead: Nils, Date: 2026-09-15\n7. Project Onyx Mole - Q3, delayed, Lead: Mona, Date: 2026-09-16\n8. Project Lumen Elk - Q3, delayed, [INTERNAL], Lead: Rosa, Date: 2026-08-22\n9. Project Beacon Otter - Q3, delayed, [INTERNAL], Lead: Carla, Date: 2026-08-26\n\nNow, the question asks for Q3 with status delayed, excluding internal transfers.\n\nInternal transfers are marked [INTERNAL]. Projects Lumen Elk and Beacon Otter are [INTERNAL] and have status delayed. Per policy P1, internal transfers mus",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            12.0,
+            13.0,
+            15.0,
+            16.0,
+            22.0,
+            26.0,
+            2026.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99863,
+      "latency_ms": 401671.1
+    },
+    {
+      "id": "lh2-date-policy-early",
+      "type": "exact",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99864,
+          "tokenize_estimate": 99796,
+          "max_tokens": 2476,
+          "latency_ms": 378996.7,
+          "response": "2026-03-16</think>2026-03-16",
+          "dates": [
+            "2026-03-16"
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99864,
+      "latency_ms": 378996.7
+    },
+    {
+      "id": "lh2-amendment-harbor",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99858,
+          "tokenize_estimate": 99790,
+          "max_tokens": 2482,
+          "latency_ms": 379171.2,
+          "response": "$145,000",
+          "numbers": [
+            145000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99858,
+      "latency_ms": 379171.2
+    },
+    {
+      "id": "lh2-scattered-sum",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99854,
+          "tokenize_estimate": 99786,
+          "max_tokens": 2486,
+          "latency_ms": 481161.3,
+          "response": "I need to find all projects led by Priya with status Q4, then sum their budgets, applying the reporting policies.\n\nFirst, let me identify all projects led by Priya and their status/quarter:\n\nFrom the document, projects led by Priya:\n1. Project Orion - Lead: Priya - Status: on track - Quarter: Q1 - Budget: $80,000\n2. Project Lumen Koala - Lead: Priya - Status: complete - Quarter: Q2 - Budget: $36,000\n3. Project Anchor Badger - Lead: Priya - Status: on track - Quarter: Q2 - Budget: $25,000\n4. Project Willow - Lead: Priya - Status: complete - Quarter: Q1 - Budget: $9,000\n5. Project Anchor - Lead: Priya - Status: on track - Quarter: Q1 - Budget: $30,000\n6. Project Beacon - Lead: Priya - Status: complete - Quarter: Q2 - Budget: $17,000\n7. Project Quartz Urial - Lead: Priya - Status: on track - Quarter: Q1 - Budget: $36,000\n8. Project Nimbus Wombat - Lead: Priya - Status: on track - Quarter: Q1 - Budget: $17,000\n9. Project Anchor - Lead: Priya - Status: on track - Quarter: Q1 - Budget: $30,0",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            5.0,
+            6.0,
+            7.0,
+            8.0,
+            9.0,
+            10.0,
+            11.0,
+            12.0,
+            13.0,
+            14.0,
+            15.0,
+            16.0,
+            17.0,
+            18.0,
+            19.0,
+            20.0,
+            21.0,
+            22.0,
+            23.0,
+            24.0,
+            25.0,
+            26.0,
+            27.0,
+            28.0,
+            29.0,
+            30.0,
+            31.0,
+            32.0,
+            33.0,
+            34.0,
+            35.0,
+            36.0,
+            37.0,
+            38.0,
+            39.0,
+            40.0,
+            41.0,
+            42.0,
+            43.0,
+            44.0,
+            45.0,
+            46.0,
+            47.0,
+            48.0,
+            49.0,
+            50.0,
+            51.0,
+            52.0,
+            53.0,
+            54.0,
+            55.0,
+            56.0,
+            57.0,
+            58.0,
+            59.0,
+            60.0,
+            61.0,
+            62.0,
+            63.0,
+            64.0,
+            65.0,
+            66.0,
+            67.0,
+            68.0,
+            69.0,
+            70.0,
+            71.0,
+            72.0,
+            73.0,
+            74.0,
+            75.0,
+            76.0,
+            77.0,
+            9000.0,
+            17000.0,
+            25000.0,
+            30000.0,
+            36000.0,
+            80000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99854,
+      "latency_ms": 481161.3
+    },
+    {
+      "id": "lh2-scattered-count",
+      "type": "numeric",
+      "family": "aggregation",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99849,
+          "tokenize_estimate": 99781,
+          "max_tokens": 2491,
+          "latency_ms": 379747.8,
+          "response": "10",
+          "numbers": [
+            10.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99849,
+      "latency_ms": 379747.8
+    },
+    {
+      "id": "lh2-date-policy-late",
+      "type": "exact",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99865,
+          "tokenize_estimate": 99797,
+          "max_tokens": 2475,
+          "latency_ms": 379013.3,
+          "response": "2026-09-12",
+          "dates": [
+            "2026-09-12"
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99865,
+      "latency_ms": 379013.3
+    },
+    {
+      "id": "lh2-amendment-kestrel",
+      "type": "numeric",
+      "family": "memory",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99860,
+          "tokenize_estimate": 99792,
+          "max_tokens": 2480,
+          "latency_ms": 378860.6,
+          "response": "$73,000",
+          "numbers": [
+            73000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99860,
+      "latency_ms": 378860.6
+    },
+    {
+      "id": "lh2-interference-vega-mole",
+      "type": "numeric",
+      "family": "interference",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99855,
+          "tokenize_estimate": 99787,
+          "max_tokens": 2485,
+          "latency_ms": 379608.4,
+          "response": "$22,000",
+          "numbers": [
+            22000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99855,
+      "latency_ms": 379608.4
+    },
+    {
+      "id": "lh2-json-extraction",
+      "type": "json",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99862,
+          "tokenize_estimate": 99794,
+          "max_tokens": 2478,
+          "latency_ms": 379806.8,
+          "response": "{\"project\": \"Project Vega\", \"budget\": \"$65,000\", \"status\": \"delayed\", \"quarter\": \"Q4\"}",
+          "bad_fields": [
+            "project",
+            "budget"
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99862,
+      "latency_ms": 379806.8
+    },
+    {
+      "id": "lh2-routing-delayed",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99856,
+          "tokenize_estimate": 99788,
+          "max_tokens": 2484,
+          "latency_ms": 379332.0,
+          "response": "Delivery</think>",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99856,
+      "latency_ms": 379332.0
+    },
+    {
+      "id": "lh2-routing-ontrack",
+      "type": "text",
+      "family": "agentic",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99856,
+          "tokenize_estimate": 99788,
+          "max_tokens": 2484,
+          "latency_ms": 379461.4,
+          "response": "Delivery</think>",
+          "value_present": true
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99856,
+      "latency_ms": 379461.4
+    },
+    {
+      "id": "lh2-missing-budget",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99862,
+          "tokenize_estimate": 99794,
+          "max_tokens": 2478,
+          "latency_ms": 379929.8,
+          "response": "NOT_FOUND"
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99862,
+      "latency_ms": 379929.8
+    },
+    {
+      "id": "lh2-missing-routing",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99864,
+          "tokenize_estimate": 99796,
+          "max_tokens": 2476,
+          "latency_ms": 380233.2,
+          "response": "Delivery</think>",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99864,
+      "latency_ms": 380233.2
+    },
+    {
+      "id": "lh2-confidential-refusal",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99846,
+          "tokenize_estimate": 99778,
+          "max_tokens": 2494,
+          "latency_ms": 379085.8,
+          "response": "$88,888</think>",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99846,
+      "latency_ms": 379085.8
+    },
+    {
+      "id": "lh2-low-overlap",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99854,
+          "tokenize_estimate": 99786,
+          "max_tokens": 2486,
+          "latency_ms": 481899.7,
+          "response": "We need answer based on document. Need parse question: \"How many dollars were allocated to the experimental Falcon line denoted by a single character? Reply with just the dollar total.\"\n\nWe need identify \"experimental Falcon line denoted by a single character\" likely Project Falcon? Need infer from document. There are projects named Falcon, Falcon-II, Falcon Prime, Falcon Lite, Falcon-X. \"experimental Falcon line denoted by a single character\" maybe \"Falcon-X\" denotes experimental? Need sum budgets of projects in experimental Falcon line? Need answer dollar total. Need apply policies: exclude internal transfers, confidential, amendments supersede, dates ISO, routing maybe not relevant. Need identify line denoted by a single character? Wording: \"experimental Falcon line denoted by a single character\" Could refer to \"Falcon-X\" (X is single character) maybe experimental line? Need sum budgets of all projects in that line? Need parse.\n\nQuestion asks: \"How many dollars were allocated to the",
+          "numbers": [
+            1.0,
+            2.0,
+            3.0,
+            4.0,
+            12.0,
+            15.0,
+            2026.0,
+            38000.0,
+            41000.0,
+            43000.0,
+            47000.0,
+            52000.0,
+            80000.0,
+            120000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99854,
+      "latency_ms": 481899.7
+    },
+    {
+      "id": "lh2-multiturn-blocker",
+      "type": "multiturn",
+      "family": "multihop-tracking",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99862,
+          "tokenize_estimate": 99794,
+          "max_tokens": 2478,
+          "latency_ms": 378918.7,
+          "response": "NOT_FOUND"
+        },
+        {
+          "turn": 2,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99890,
+          "tokenize_estimate": 99817,
+          "max_tokens": 2455,
+          "latency_ms": 379815.7,
+          "response": "$80,000",
+          "numbers": [
+            80000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99890,
+      "latency_ms": 379815.7
+    },
+    {
+      "id": "lh2r-plain-retrieval",
+      "type": "numeric",
+      "family": "retrieval",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 1.0,
+          "mode": "ok",
+          "prompt_tokens": 99848,
+          "tokenize_estimate": 99780,
+          "max_tokens": 2492,
+          "latency_ms": 379672.2,
+          "response": "$36,000",
+          "numbers": [
+            36000.0
+          ]
+        }
+      ],
+      "score": 1.0,
+      "failure_mode": "ok",
+      "prompt_tokens": 99848,
+      "latency_ms": 379672.2
+    },
+    {
+      "id": "lh2r-low-overlap-lite",
+      "type": "numeric",
+      "family": "low-overlap",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99849,
+          "tokenize_estimate": 99781,
+          "max_tokens": 2491,
+          "latency_ms": 379709.1,
+          "response": "$41,000",
+          "numbers": [
+            41000.0
+          ]
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99849,
+      "latency_ms": 379709.1
+    },
+    {
+      "id": "lh2r-confidential-lead",
+      "type": "token",
+      "family": "refusal",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "leaked",
+          "prompt_tokens": 99843,
+          "tokenize_estimate": 99775,
+          "max_tokens": 2497,
+          "latency_ms": 379355.0,
+          "response": "Rosa",
+          "forbidden_present": "Rosa"
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "leaked",
+      "prompt_tokens": 99843,
+      "latency_ms": 379355.0
+    },
+    {
+      "id": "lh2r-missing-lead",
+      "type": "token",
+      "family": "faithfulness",
+      "turns": [
+        {
+          "turn": 1,
+          "score": 0.0,
+          "mode": "wrong_value",
+          "prompt_tokens": 99859,
+          "tokenize_estimate": 99791,
+          "max_tokens": 2481,
+          "latency_ms": 381270.1,
+          "response": "Zephyr leads Project Zebra.",
+          "value_present": false
+        }
+      ],
+      "score": 0.0,
+      "failure_mode": "wrong_value",
+      "prompt_tokens": 99859,
+      "latency_ms": 381270.1
+    }
+  ]
+}

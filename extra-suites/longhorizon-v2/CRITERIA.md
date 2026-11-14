@@ -1,6 +1,6 @@
 # Long-horizon suite — reformatted criteria (v2r, Oct 2026)
 
-**Suite:** `~/TysAIs/slm-gauntlet/extra-suites/longhorizon-v2/` (REPO-HOST repo)
+**Suite:** `~/TysAIs/slm-gauntlet/extra-suites/longhorizon-v2/` (the repo host)
 **Document:** `longhorizon_doc_v2.txt` — 519-entry synthetic ledger, 70,748 words
 **Tasks:** `longhorizon_tasks_v2r.json` — 25 tasks in 9 families (v2r format)
 **Bench:** `lh-bench-v2r.py` — strict deterministic scoring, per-family subscores
@@ -310,7 +310,7 @@ this sweep and must not be smuggled in.
   Thermal: see open question 1 below.
 - No wipe, no deletions, no Sparks work, no push.
 
-## Open questions for Operator (nothing silently decided)
+## Open questions for the operator (nothing silently decided)
 
 1. **Thermal threshold — blocks the sweep as literally written.** Criterion
    says abort at GPU > 80C (hard abort 84C). Measured: sustained 100K
@@ -318,7 +318,7 @@ this sweep and must not be smuggled in.
    validation re-observed 79-82C at 96-97% util). Throttle ~83-84C, max
    94C. A literal > 80C abort kills essentially every 100K run at cold
    prefill. Proposed: hard abort at 84C; > 80C watch-and-record with peak
-   temp logged per run. Needs Operator's explicit decision before the sweep.
+   temp logged per run. Needs the operator's explicit decision before the sweep.
 2. **Dory v2 fit — gate, not a blocker.** v1 prompt overflowed the cap by
    ~930 tokens on Dory tokenization; the v2 doc is ~690 words shorter, so
    the v2 prompt may land just under 102400 with ~0 generation headroom.
@@ -328,6 +328,6 @@ this sweep and must not be smuggled in.
    LFM2.5-8B KV variants, Bolt UD-Q8, Qwen q8_0 KV, and all v0.3.1-era
    variants have no 102400 record; they need a fit-test before sweep
    scoring (FIT_LIST.md). Including them is a separate fit-test step.
-4. **Cut-off sentence ambiguity — RESOLVED by Operator Oct 30 ~22:08** (build
+4. **Cut-off sentence ambiguity — RESOLVED by the operator Oct 30 ~22:08** (build
    off v1, modern Oct 2026 criteria, full reformat). No other ambiguity
    remains in the brief: full-sweep scope unchanged (184 eligible).

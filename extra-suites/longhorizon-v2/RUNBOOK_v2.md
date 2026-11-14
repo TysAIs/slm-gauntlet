@@ -1,14 +1,14 @@
 # Long-horizon v2 — sweep runbook (for the sweep executor)
 
-Suite dir (REPO-HOST): `slm-gauntlet/extra-suites/longhorizon-v2/`
+Suite dir (the repo host): `slm-gauntlet/extra-suites/longhorizon-v2/`
 Bench: `python3 lh-bench-v2r.py --endpoint http://127.0.0.1:8080/v1 --model <id>
   --doc longhorizon_doc_v2.txt --tasks longhorizon_tasks_v2r.json
   --out results_<id>-v2r.json`  (25 tasks, 9 families; per-family subscores in JSON)
-Tunnel: REPO-HOST systemd user service `gauntlet-tunnel.service` (already active;
-endpoint is http://127.0.0.1:8080/v1 from REPO-HOST, NEVER the PVE host's own :8080 —
+Tunnel: a systemd user service on the repo host `gauntlet-tunnel.service` (already active;
+endpoint is http://127.0.0.1:8080/v1 from the repo host, NEVER the PVE host's own :8080 —
 PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
 
-## Serve (PVE, via REPO-HOST ssh with staging key ~/migration-backup/dotfiles/.ssh/id_ed25519)
+## Serve (PVE, via ssh from the repo host with staging key ~/migration-backup/dotfiles/.ssh/id_ed25519)
 
 ```
 /opt/llama-new/llama-dory-merge/build/bin/llama-server -m <gguf> \
@@ -43,7 +43,7 @@ PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
 
 ## Health aborts (stop the run, record, do not retry blindly)
 
-- GPU temp: HARD abort at 84C. > 80C is watch-and-record pending Operator's
+- GPU temp: HARD abort at 84C. > 80C is watch-and-record pending the operator's
   decision (see criteria doc §8.1): sustained 100K prefills plateau at
   81-82C on this card, so a literal > 80C abort would kill every run.
   Record peak temp per run regardless.

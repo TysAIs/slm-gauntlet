@@ -1,0 +1,52 @@
+[
+ {
+  "model": "granite4.2-3b-q4km-kvq8",
+  "display_name": "Granite 4.2 3B",
+  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 65.7,
+  "suites": {
+   "adversarial": 0.8,
+   "agent_chains": 0.667,
+   "calendar": 0.5,
+   "classify": 0.606,
+   "coding": 0.2,
+   "docintake": 0.793,
+   "email": 0.761,
+   "instruction": 0.333,
+   "realworld": 0.383,
+   "structured": 0.5,
+   "summarize": 0.75,
+   "support": 0.688,
+   "tooluse": 0.895,
+   "retrieval": 0.857
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261111",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "2026",
+   "gguf_file": "granite-4.2-3b-Q4_K_M.gguf",
+   "gguf_size_bytes": 2244011552,
+   "quant": "Q4_K_M",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/granite4.2-3b-q4km-kvq8_20261111T074311Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

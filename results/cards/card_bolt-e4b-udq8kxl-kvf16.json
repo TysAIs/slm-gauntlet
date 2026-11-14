@@ -1,0 +1,52 @@
+[
+ {
+  "model": "bolt-e4b-udq8kxl-kvf16",
+  "display_name": "Bolt E4B",
+  "sub": "UD-Q8_K_XL \u00b7 KV FP16 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 90.5,
+  "suites": {
+   "adversarial": 0.8,
+   "agent_chains": 1.0,
+   "calendar": 0.9,
+   "classify": 1.0,
+   "coding": 1.0,
+   "docintake": 0.931,
+   "email": 0.957,
+   "instruction": 0.833,
+   "realworld": 0.717,
+   "structured": 1.0,
+   "summarize": 0.75,
+   "support": 0.938,
+   "tooluse": 0.947,
+   "retrieval": 0.714
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261109",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "Nov 2026",
+   "gguf_file": "NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf",
+   "gguf_size_bytes": 8192955584,
+   "quant": "UD-Q8_K_XL",
+   "kv_type": "FP16",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "offload",
+   "methodology": "0.6.0",
+   "run_log": "results/bolt-e4b-udq8kxl-kvf16_20261109T200817Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

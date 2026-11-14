@@ -36,7 +36,7 @@ GRUNT_HOST=<test-box> python3 scripts/preflight_lane.py --json     # machine-rea
 GRUNT_HOST=<test-box> python3 scripts/preflight_seeded_faults.py
 
 # 1. inventory of what is actually on the box (no invented quants)
-ssh pve 'pct exec 100 -- find /mnt/data/models -name "*.gguf" -printf "%s\t%p\n"' > /tmp/inv.tsv
+ssh <test-box> 'pct exec <ctid> -- find <model-root> -name "*.gguf" -printf "%s\t%p\n"' > /tmp/inv.tsv
 
 # 2. manifest: 18 re-runnable ranked rows + 30 Nemotron quant x KV configs
 .venv/bin/python scripts/build_sweep_manifest.py --inventory /tmp/inv.tsv
@@ -50,7 +50,7 @@ GRUNT_HOST=<test-box> setsid .venv/bin/python scripts/pve_sweep.py \
     > results/_sweep_logs/sweep.out 2>&1 < /dev/null &
 
 # 5. after the sweep: cards + published table
-.venv/bin/python gen-leaderboard.py
+.venv/bin/python scripts/gen_leaderboard.py
 .venv/bin/python scripts/make_cards.py results/cards/manifest.json
 .venv/bin/python scripts/leaderboard_check.py --write
 .venv/bin/python scripts/leaderboard_check.py     # must exit 0
@@ -149,11 +149,11 @@ Measured causes on this lane (llama.cpp `a2878d3`, 2026-09-11 build):
 emits them from `EXCLUDE_GGUF`, keyed by GGUF basename so every KV row of that file is covered,
 and they are re-enablement-gated on an engine upgrade — not on a retry.
 
-**The engine upgrade they were gated on now exists** (2026-11-07): `/opt/llama.cpp-dory`
+**The engine upgrade they were gated on now exists** (2026-11-07): `<engine-build-dir>`
 (pinned PR ggml-org/llama.cpp#30306, commit `1c3cdd2`, CUDA sm_61) loads **both** `dory` and
 `lfm3`. Verified as serving, not just as source support: Dory Q5_K_M answered a chat completion
 on 127.0.0.1:8892 (alias `dory-1.0-4b-q5km`, `system_fingerprint b1-1c3cdd2`) and
-LFM3-1.7B-IQ2_M answered too. Build/serve/VRAM notes: `/opt/llama.cpp-dory/README.fleet.md` on
+LFM3-1.7B-IQ2_M answered too. Build/serve/VRAM notes: the engine fork README on
 the 1070 Ti container. This does **not** retro-change the running campaign: its engine stays
 `a2878d3` so all 48 configs stay comparable. On the next sweep, point the worker at the dory
 build and drop the `dory`/`lfm3` rows from `EXCLUDE_GGUF` — that is a configuration change
@@ -203,7 +203,7 @@ candidate, gated on a per-class context ceiling measured the same way for each s
   serve are recorded as `serve_failed` **with a named cause and the engine's own log**
   (`results/_sweep_logs/<alias>-kv<ctk>.serve.log`) — a missing row is data, but only if it
   says why.
-* The sweep takes the test lane for hours. Nothing else may use `<lane>` meanwhile; the
+* The sweep takes the test lane for hours. Nothing else may use the test box meanwhile; the
   shipped unit is restored (and proven with a real completion) at the end.
 
 ## The lane itself can be the failure: ufw (measured 2026-11-07 22:04 MST)
@@ -220,7 +220,7 @@ working — which is why the sweep looked alive while every new config died.
 Fix (persistent, applied on the container):
 
 ```
-ufw allow in on tailscale0 comment 'tailnet test lane (grunt)'
+ufw allow in on tailscale0 comment 'tailnet test lane'
 ```
 
 After that, 3/3 `curl` attempts from the sweep host returned 200 and the sweep resumed.

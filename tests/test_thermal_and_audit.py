@@ -15,7 +15,7 @@ from gauntlet.task import StateAssert, Task
 
 # --- F2: the 89C rule is a checked threshold -------------------------------
 
-def test_thermal_limit_is_operators_89c():
+def test_thermal_limit_is_89c():
     assert thermal.THERMAL_LIMIT_C == 89.0
 
 

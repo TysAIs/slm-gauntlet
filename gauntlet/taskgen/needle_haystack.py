@@ -140,7 +140,13 @@ def make_needle_task(
     context = "\n\n".join(paragraphs)
     prompt = f"{context}\n\nQuestion: {question}\nAnswer with only the answer itself."
 
-    asserts = [Assert(type="contains_all", values=[expected])]
+    if nolima:
+        asserts = [Assert(type="contains_all", values=[expected])]
+    else:
+        # Set equality, not substring: the answer passes iff the set of ZEBRA
+        # codes in it is exactly {secret}. Naming a decoy code (or several)
+        # fails the task; only the secret alone passes.
+        asserts = [Assert(type="needle_set", value=expected)]
 
     return Task(
         id=task_id,

@@ -1,0 +1,52 @@
+[
+ {
+  "model": "ministral3-3b-q4km-kvq8",
+  "display_name": "Ministral 3 3B",
+  "sub": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K \u00b7 GTX 1070 Ti \u00b7 120 W pin",
+  "overall_pct": 68.9,
+  "suites": {
+   "adversarial": 0.7,
+   "agent_chains": 0.833,
+   "calendar": 0.5,
+   "classify": 0.515,
+   "coding": 0.6,
+   "docintake": 0.862,
+   "email": 0.674,
+   "instruction": 0.722,
+   "realworld": 0.383,
+   "structured": 0.5,
+   "summarize": 0.75,
+   "support": 0.781,
+   "tooluse": 0.895,
+   "retrieval": 0.714
+  },
+  "n": 320,
+  "rank": "",
+  "ts": "20261111",
+  "device_name": "GTX 1070 Ti",
+  "device_vram_mb": 8192,
+  "device_kind": "nvidia",
+  "failure_modes": {},
+  "details": {
+   "release_date": "Dec 2025",
+   "gguf_file": "Ministral-3-3B-Instruct-2512-Q4_K_M.gguf",
+   "gguf_size_bytes": 2147023008,
+   "quant": "Q4_K_M",
+   "kv_type": "q8_0",
+   "context_tokens": 32768,
+   "vram_total_mb": 8192,
+   "kv_pool_tokens": 32768,
+   "max_subagents": 4,
+   "server_build": "llama.cpp b1-1c3cdd2 (recorded by the run log)",
+   "category": "on-GPU \u226412B",
+   "methodology": "0.6.0",
+   "run_log": "results/ministral3-3b-q4km-kvq8_20261111T071308Z.json",
+   "gpu_power_limit_w": 120.0,
+   "gpu_persistence": "Enabled",
+   "gpu_pins_ok": true,
+   "transport_failure": false,
+   "zero_token_errors": 0,
+   "attempts": 328
+  }
+ }
+]

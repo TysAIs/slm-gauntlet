@@ -1,0 +1,8 @@
+# Stage 5 variance manifest, epoch 0.6.0 (built by driver Nov 11)
+# Top-5 canonical cells (Q4_K_M-class x KV q8_0, ctx 32768), seeds 2+3 via per-seed state files and -s2/-s3 aliases.
+# Seed 1 = canonical runs on disk. Top5 by canonical score: Gemma E4B 90.2, Bolt UD-Q8 90.1, Qwen3.5-9B 84.5, Spark Q8_0 85.5, MiMo 83.6.
+gemma4-e4b-q4km-s23	/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+bolt-e4b-udq8kxl-s23	/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+qwen3.5-9b-q4km-s23	/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+spark-x2.6-4b-q8-s23	/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q8_0.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0
+mimo-v2.6-9b-q4km-s23	/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf	32768	1	q8_0	q8_0	-fa on --reasoning-budget 0 -cram 0

@@ -1,0 +1,501 @@
+{
+ "about": "sha256 of every GGUF on the test-lane host, generated worker-side (sha256sum over the model tree, 2026-11-13) because the files do not live on the machine that runs the gauntlet CLI. Consulted by gauntlet/provenance.py when a local read is impossible. Regenerate after the model tree changes.",
+ "entries": {
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ2_M.gguf": {
+   "sha256": "070456a111a8431a32ba72a506f76e71f5ada7c684371fd63cf9083b24551795",
+   "size": 3531578560
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-IQ3_XXS.gguf": {
+   "sha256": "e678b2bdc79a31a6f954062fedeb43b41e5bab105c3743a4d1a1926f2a9be173",
+   "size": 3703968960
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q2_K_XL.gguf": {
+   "sha256": "b70fcf46323970cd40b393b99a56087cee645014afa34081925305c9405a9187",
+   "size": 3742102720
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q3_K_XL.gguf": {
+   "sha256": "3f8032b9d2c18536c4ac51b97959a563cc27434de99823640c98147edc62ce9b",
+   "size": 4219133120
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q4_K_XL.gguf": {
+   "sha256": "84ff34f5834b929043f5ae74799e8d562d4056998f6a5923ceb44831e8ad84d6",
+   "size": 5060482240
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q5_K_XL.gguf": {
+   "sha256": "e79fc43c104cd127626b5ed6b4a6d9a3ac108518bb3842c580d399a849cd0cb6",
+   "size": 5832930496
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q6_K_XL.gguf": {
+   "sha256": "dfb738c25ba41219bd51ae4aa07c3f86f8e6e76d7acd918d0502113cb206d548",
+   "size": 7258879168
+  },
+  "/mnt/data/models/bolt-e4b-ud/NVIDIA-Nemotron-3.5-Bolt-E4B-UD-Q8_K_XL.gguf": {
+   "sha256": "6176bd788769bd58042c165d3dc8e8c86a8ca5c90d5de188a364b31dc9560810",
+   "size": 8192955584
+  },
+  "/mnt/data/models/bolt-e4b/Nemotron-3.5-Bolt-E4B-Q4_K_M.gguf": {
+   "sha256": "c8af2b8aea10a690a1d9491db744a9446660173cb38fc489612b556615a69612",
+   "size": 6180446208
+  },
+  "/mnt/data/models/bonsai-2/Ternary-Bonsai-2-27B-PTQ1_0.gguf": {
+   "sha256": "53107f530aa52eb00912263ab1ee29bd199261c87cd7b4ad4ca1318c1fe33ee3",
+   "size": 5946648928
+  },
+  "/mnt/data/models/clef-27b/Cloudflare_clef-Q4_K_M.gguf": {
+   "sha256": "f1e2cc7f36893b52f773cc01f0ed351abab17c510502423bc4d2f5782a93cebb",
+   "size": 17652432960
+  },
+  "/mnt/data/models/clef-flash/Clef-Flash-Q4_K_M.gguf": {
+   "sha256": "eef2968c238a80d49d340430f22410ea3db9934ad1c6fdb233a503cbf9a9b54e",
+   "size": 6732781824
+  },
+  "/mnt/data/models/d1-2b/d1-2B-Q4_K_M.gguf": {
+   "sha256": "adca5789ad30ae6027e8e936749bb9f19673097492ab26fa1c5b69643ca50b4b",
+   "size": 1099629888
+  },
+  "/mnt/data/models/d1-2b/d1-2B-Q8_0.gguf": {
+   "sha256": "073313d92b53b0ac8193db6e906cb3c78a98183d244b15b7b8f5426115c6738c",
+   "size": 1846240576
+  },
+  "/mnt/data/models/d1-3b/d1-3B-Q4_K_M.gguf": {
+   "sha256": "16aff27ea2eefdc32b9897f43854a5d3170c1dc8dccb9c756905af30a4e22402",
+   "size": 1674456672
+  },
+  "/mnt/data/models/d1-omni-2b/d1-Omni-2B-Q8_0.gguf": {
+   "sha256": "aedf1a7c341b4281979423dbc39e9c3d3ad1da8834156c8e75af5399ca3b0861",
+   "size": 1846241184
+  },
+  "/mnt/data/models/d1-omni-600m/d1-omni-600M-Q8_0.gguf": {
+   "sha256": "cd94463f4cac9c700ec6750df8df005bb6846de410e159d1f5e985e1171693d3",
+   "size": 407207584
+  },
+  "/mnt/data/models/dory-4b/NVIDIA-Nemotron-Labs-Dory1.0-4B-Q5_K_M.gguf": {
+   "sha256": "96080be49ffd67b916018b7bdef8c484762576fb52780e10ab98ac4978a660e0",
+   "size": 3673288864
+  },
+  "/mnt/data/models/flint/RecursiveSI_flint-IQ2_XXS.gguf": {
+   "sha256": "a013a40f43b462554c31b113aef9d8f6cf768639fd164492c55c5a651783ad47",
+   "size": 12029007072
+  },
+  "/mnt/data/models/flint/flint-UD-Q4_K_XL.gguf": {
+   "sha256": "63c2ecc461ca545134b670c660e76fa20f47240f8d39b6510bfd21c4dd6e072f",
+   "size": 25054688704
+  },
+  "/mnt/data/models/gemma-e4b/gemma-3n-E4B-it-Q4_K_M.gguf": {
+   "sha256": "43b489bb77a81bda85180e7c490d40ad7f1d5c2ce654c9b05e15e104bd3c777e",
+   "size": 4539054208
+  },
+  "/mnt/data/models/gemma4-12b/gemma-4-12B-it-IQ3_XXS.gguf": {
+   "sha256": "3a85fa01d72d3f5c30c4ae723f6a42e8ad0f6d4df366776b9628e1135e06f4c3",
+   "size": 5145090528
+  },
+  "/mnt/data/models/gemma4-12b/gemma-4-12b-it-UD-Q2_K_XL.gguf": {
+   "sha256": "aa6e1ccf5cd1c5340c4786f0bda2478181327f14aba2359e51e455d02c90bff3",
+   "size": 4661419840
+  },
+  "/mnt/data/models/gemma4-e2b/gemma-4-E2B_q4_0-it.gguf": {
+   "sha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634",
+   "size": 3349516256
+  },
+  "/mnt/data/models/gemma4-e4b/google_gemma-4-E4B-it-Q4_K_M.gguf": {
+   "sha256": "d35a3aa7a6d47de237fd488bb6f7f3efd62908d828f85a63da0ee93acdbefe9f",
+   "size": 5405170144
+  },
+  "/mnt/data/models/granite-switch-41/granite-switch-4.1-8b-Q4_K_M.gguf": {
+   "sha256": "cebe8dab60e60e1ec09c2607451f6eb6b08f945da422391ff99e1404fa737dfa",
+   "size": 6412400416
+  },
+  "/mnt/data/models/granite-switch-41/granite-switch-4.1-8b-Q5_K_M.gguf": {
+   "sha256": "2dbaa1ff0c9fda9b2efc6078e7fba0b62bc538ef33c69b0e036c33301b74460c",
+   "size": 7214561056
+  },
+  "/mnt/data/models/granite-switch-41/granite-switch-4.1-8b-Q6_K.gguf": {
+   "sha256": "84572900ab7a73b7acdab97be977235efdd016aa80d1a31b9a938847be177f51",
+   "size": 8066856736
+  },
+  "/mnt/data/models/granite42-3b/granite-4.2-3b-Q4_K_M.gguf": {
+   "sha256": "e0406663965846ae22a403456eb826ccce5f450840491f71952f18a7cb78e7d5",
+   "size": 2244011552
+  },
+  "/mnt/data/models/granite42-8b/granite-4.2-8b-Q4_K_M.gguf": {
+   "sha256": "16a9369d0805f80b7377d25d87f937a90c05dc04ad79173a52001e42c9aab311",
+   "size": 5347917952
+  },
+  "/mnt/data/models/laya/Laya-Q8_0.gguf": {
+   "sha256": "c06528c5746d3bb8baa72a27938be95abbfd0b226f8471e8a9e365ed0bb066d2",
+   "size": 449397600
+  },
+  "/mnt/data/models/lfm2.5-2.6b/LFM2.5-2.6B-Q4_K_M.gguf": {
+   "sha256": "02a8b7e17487d326e46d68ce0ba24211e1b80a14c4cd0597fa73c1cd697f52ed",
+   "size": 1674455040
+  },
+  "/mnt/data/models/lfm2.5-2.6b/LFM2.5-2.6B-Q8_0.gguf": {
+   "sha256": "1e22128dfa128bdfb684da167e74e072d0a056baa7d06d9f280291e2839b0fc9",
+   "size": 2874779648
+  },
+  "/mnt/data/models/lfm25-1.2b/LFM2.5-1.2B-Instruct-Q4_K_M.gguf": {
+   "sha256": "856aeee6d85ac684b1db8dee48795b44fc06731ecda03aee36ece682413a9b9a",
+   "size": 730895584
+  },
+  "/mnt/data/models/lfm25-1.2b/LFM2.5-1.2B-Instruct-Q8_0.gguf": {
+   "sha256": "b808eead8d6061f71990ab7b144c5ca6650fad219aa7acc407fe5fb26abf3dc2",
+   "size": 1246254304
+  },
+  "/mnt/data/models/lfm25-24b-a2b/LFM2.5-24B-A2B-UD-Q4_K_XL.gguf": {
+   "sha256": "a235d23638cc5549cb1ff61da7522c8a7e97f056f27093462a1e56f35aba91d8",
+   "size": 14876901632
+  },
+  "/mnt/data/models/lfm25-8b-a1b/LFM2.5-8B-A1B-UD-Q4_K_M.gguf": {
+   "sha256": "e2c8350d5e6e7c633b2ba4e20805a2c86bc46884cd285e8f3fe36ad917b772c7",
+   "size": 5322223200
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ2_M.gguf": {
+   "sha256": "fa50d66d301d8933b65f1f72ccccc4c3ff7ccbfdfb2538ffa28f84303a3c9ac0",
+   "size": 651650624
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ3_M.gguf": {
+   "sha256": "c7e43a40e424e95b920136912aea8203e1ac2d1f860cd5297f633fc67c1eb1f0",
+   "size": 925533760
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ3_XS.gguf": {
+   "sha256": "fbb780bd43e515b7ea997fb88e1aaa4ba7dba358b8f62f423d58a1a65237873c",
+   "size": 812467776
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ3_XXS.gguf": {
+   "sha256": "f7c78246eac98f06aa460e4dd3afd3bfb324126ea8a4c2a2c6ddb52536462618",
+   "size": 780871232
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ4_NL.gguf": {
+   "sha256": "abc725bbb8c18638f712fd9c410b1dfff41377722dc7eb88277730c6b3c7d444",
+   "size": 1115637312
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-IQ4_XS.gguf": {
+   "sha256": "5a3463dcabfe214e4861c920a558ab908840e4c564ab51d3d50c086d467520c5",
+   "size": 997303872
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q2_K.gguf": {
+   "sha256": "27e54b86e2692313961362e378b50a9060797beb12608adc23ffd48060bdd7b8",
+   "size": 701310528
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q3_K_S.gguf": {
+   "sha256": "156cbacf85d842be678a50041de93738e06a16c4611a874de5a4415ea8868693",
+   "size": 811501120
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q4_0.gguf": {
+   "sha256": "403eece15abd461b20d4b6a951a4bad2c00f90d625481df19c6af4b22161c765",
+   "size": 1057971776
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q4_1.gguf": {
+   "sha256": "17c54a087eef97c77d217d4b474e27855df23f833dd0499009d15aa5fb6bb794",
+   "size": 1145353792
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q4_K_M.gguf": {
+   "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+   "size": 1099627808
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q5_K_M.gguf": {
+   "sha256": "41e51fb0be5f472d323055f2734d986d5a2429570973508fa6322f3f07f6d7f3",
+   "size": 1258663200
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q6_K.gguf": {
+   "sha256": "54e1bd947c77167823d45bf495f1c3e2d226ca7fb242f83cfa141ee3a6ab55c6",
+   "size": 1427638304
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q6_K_L.gguf": {
+   "sha256": "767235d8410725ba79e94dfc10728934c9bd04fed6a86e7801e2fe5d51506318",
+   "size": 1582933568
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q6_K_S.gguf": {
+   "sha256": "b97d8d751f8fda6164096eab34db1945659154ccaacd1a9609b52447d9c48fdc",
+   "size": 1456719424
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B-Q8_0.gguf": {
+   "sha256": "8f6b24182258205e9e01e21f1f24a1f208c1e8115578825d202ce39976af20b6",
+   "size": 1846238496
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B.Q3_K_L.gguf": {
+   "sha256": "d523dc133646269d6d4eb4b68f4c430e85efe6181a50acd51eb83e55087fc8b5",
+   "size": 967066144
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B.Q3_K_M.gguf": {
+   "sha256": "8f3b3a9c16a9d09483070d5895c162b400ba16200872185e43f97ea9edaa88f8",
+   "size": 914899488
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B.Q4_K_S.gguf": {
+   "sha256": "c4b3eed043328927da21c35209bacdcd7cc83fa804a758992ddd9dd7fc9817ff",
+   "size": 1056038176
+  },
+  "/mnt/data/models/lfm3-1.7b/LFM3-1.7B.Q5_K_S.gguf": {
+   "sha256": "d51c8f5a75ff638de4743923f9819bacef5b44a97bb4e1ee5d0d0054ac82c3c6",
+   "size": 1232899360
+  },
+  "/mnt/data/models/lfm3-vl-2b/LFM3-VL-2B-Q4_K_M.gguf": {
+   "sha256": "56dac2e192ff0d9ab8507f4f1aeb4aed0463449bbbefaac79497f041c95f21eb",
+   "size": 1099627808
+  },
+  "/mnt/data/models/lfm3-vl-2b/mmproj-LFM3-VL-2B-F16.gguf": {
+   "sha256": "1d8e6e58eefc093e09d6332f081516e1ddbd5b35cfca7f35463fb270db230b1e",
+   "size": 378996032
+  },
+  "/mnt/data/models/llama31-8b/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf": {
+   "sha256": "7b064f5842bf9532c91456deda288a1b672397a54fa729aa665952863033557c",
+   "size": 4920739232
+  },
+  "/mnt/data/models/mimo-9b/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf": {
+   "sha256": "4bca6f18c73f72270c7a20c2ea2bea581de8246e318714277120369d34048c81",
+   "size": 5841049120
+  },
+  "/mnt/data/models/minicpm-ocr-1.0/MiniCPM-OCR-1_0-Q4_K_M.gguf": {
+   "sha256": "c80a703400633f298cc2fddf6d493a541be36918c0801c0b1bf3f14c5703ce49",
+   "size": 529106816
+  },
+  "/mnt/data/models/minicpm-ocr-1.0/mmproj-model-f16-4x.gguf": {
+   "sha256": "ceed82261b3b1380c3165f8b37c10117a50093be1362cbfeeb692fa036444682",
+   "size": 901017536
+  },
+  "/mnt/data/models/minicpm5-1b/MiniCPM5-1B-Q4_K_M.gguf": {
+   "sha256": "81b64d05a23b17b34c475f42b3e72fbde62d4b92cc34541f7a8031d0752deafa",
+   "size": 688065920
+  },
+  "/mnt/data/models/minicpm5-2b/MiniCPM5-2.6B-DSpark.gguf": {
+   "sha256": "57df08640f0534a1aac075d1c8bdacdb2b7e5815da6f4e5cfd39ecac3a3f0c26",
+   "size": 652730240
+  },
+  "/mnt/data/models/minicpm5-2b/MiniCPM5-2B-F16.gguf": {
+   "sha256": "0ffba3682a853295566b98bc38c0ab755d6b2d91b994bc031ed727a08cfcdf25",
+   "size": 5039006688
+  },
+  "/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q4_K_M.gguf": {
+   "sha256": "967d467b5a73f2def7f339f8ad724a984fe1caa323006577cd9c26adb755f0de",
+   "size": 1615826144
+  },
+  "/mnt/data/models/minicpm5-2b/MiniCPM5-2B-Q8_0.gguf": {
+   "sha256": "c5415f8989bf88a8288f1b55a3cc371af53c07b0faa220a63bd7a990cfaba078",
+   "size": 2679710688
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-IQ3_M.gguf": {
+   "sha256": "6275435d0432c27837dc97b0ff80088cca1cabea0ce8bf120aad3878d702be63",
+   "size": 562920864
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-IQ3_XS.gguf": {
+   "sha256": "4759f0e26e7ed2f1abeed89bc59af5d7deecffaba57e8d44fc55454c8e3e7cc0",
+   "size": 552267168
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-IQ4_NL.gguf": {
+   "sha256": "5b7aef6d7b0939e0df51e1b35e1e8a2ddf7d2e986a504bea30047bfaf436f1d0",
+   "size": 658708352
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-IQ4_XS.gguf": {
+   "sha256": "a89bca9db759bdb4566ad2bc1e106caf2f47f219d1768728bddb292bf3172c17",
+   "size": 638856128
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_0.gguf": {
+   "sha256": "755d33456c739f84443dcf629a908c99dbf3747170db12ce1453f9b32bad4351",
+   "size": 644159072
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_1.gguf": {
+   "sha256": "dbdac15d4d79e37bf1b56470fc6ad45c58c9eab0175039bc6f73bad8d7989224",
+   "size": 691138016
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_K_M.gguf": {
+   "sha256": "f18f594747e5317ab490cff9c06339c9cfb89acbe2f02ebc48a4e167bc23576d",
+   "size": 672003680
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q4_K_S.gguf": {
+   "sha256": "989e4bf043033e22958bd8dfe50d488158abc0e6053173e833a6e666617edac6",
+   "size": 647960160
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q5_0.gguf": {
+   "sha256": "a6a6a43991bfc88ab3112dce6c481c2ca864091d0670e11de7c3ac71413ddee7",
+   "size": 738116960
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q5_1.gguf": {
+   "sha256": "3cff024eabe70fe2efaf19c399ddfaa8e0ecef3c9856075d8ae490edc8be9326",
+   "size": 785095904
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q5_K_M.gguf": {
+   "sha256": "9e513c61e42e83a1aa271957eab2b06b15335f6f12756465c739da1ea3192bc5",
+   "size": 752461152
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q5_K_S.gguf": {
+   "sha256": "a4406569f7b504ec7cc7ef90e54c033102d437b6fa804fe7bfb2affd458f03d2",
+   "size": 738116960
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q6_K.gguf": {
+   "sha256": "495b1e7567d976e178f076cea3f774f9a6d6c60d606cedfbdc73cb392b4f08ce",
+   "size": 837947232
+  },
+  "/mnt/data/models/minicpmv47-1b/MiniCPM-V-4_7-1B-Q8_0.gguf": {
+   "sha256": "32322779352e9c6e7b9748ecbf62c9b8a6570bb8630fa4dddb9d0394528ea7fa",
+   "size": 1081517920
+  },
+  "/mnt/data/models/minicpmv47-1b/mmproj-model-f16.gguf": {
+   "sha256": "fb9cc047a3cdad5317fd8433a4aeda2d22f00f02ca4bd93b34ad84165b25a900",
+   "size": 1110117984
+  },
+  "/mnt/data/models/ministral3-3b/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf": {
+   "sha256": "9ed150d4367e68df0ac8e1540f6ddc65b42d0ee26378329d1ecbca60f93fc5f8",
+   "size": 2147023008
+  },
+  "/mnt/data/models/ministral3-8b/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf": {
+   "sha256": "33e7a72cf5e6e2cfc2f2847075acc013d68bba023e35310cef86b5cf8fdca761",
+   "size": 5198911904
+  },
+  "/mnt/data/models/nemotron3-nano-4b/NVIDIA-Nemotron3-Nano-4B-Q4_K_M.gguf": {
+   "sha256": "be5d9a656a51922f24f1f09a759cebb694e1f5d9728bf0ef9f8c972c5a0b5ef2",
+   "size": 2837072864
+  },
+  "/mnt/data/models/ornith-9b/Ornith-1.5-9B-Q4_K_M.gguf": {
+   "sha256": "70c112196e0b7023803c9762752e46d29e612a92c83f995bc3ba1ceb07e8fab6",
+   "size": 5780090816
+  },
+  "/mnt/data/models/qwen3.5-0.8b/Qwen3.5-0.8B-Q4_K_M.gguf": {
+   "sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+   "size": 532517120
+  },
+  "/mnt/data/models/qwen3.5-2b/Qwen3.5-2B-Q4_K_M.gguf": {
+   "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+   "size": 1280835840
+  },
+  "/mnt/data/models/qwen3.5-4b/Qwen3.5-4B-Q4_K_M.gguf": {
+   "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+   "size": 2740937888
+  },
+  "/mnt/data/models/qwen35-9b/Qwen3.5-9B-Q4_K_M.gguf": {
+   "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+   "size": 5680522464
+  },
+  "/mnt/data/models/sharp-spark-4b/Sharp-Spark-X2.5-4B-Q4_K_XL.gguf": {
+   "sha256": "8e5601dbd18fbc2b731cf674a040dd32f3ec2d09a312f4e0f3c4d7bc92998837",
+   "size": 2677961984
+  },
+  "/mnt/data/models/spark-x2.5/Spark-X2.5-1.7B-Q4_K_M.gguf": {
+   "sha256": "902bde2522394954ac17821b3e5fd0df02defbc6944f122253f2580acf0503f4",
+   "size": 1107457856
+  },
+  "/mnt/data/models/spark-x2.5/Spark-X2.5-1.7B-Q8_0.gguf": {
+   "sha256": "cd77c03185a834bb1162a4b7713520be5838058bfc54873645beff470bb24442",
+   "size": 1820112704
+  },
+  "/mnt/data/models/spark-x2.5/Spark-X2.5-4B-Q4_K_M.gguf": {
+   "sha256": "adfcfa19a4ed6a5985da8bf565fe15f8e1a7e131d79bae2d19d48d1c40109428",
+   "size": 2600224352
+  },
+  "/mnt/data/models/spark-x2.5/Spark-X2.5-4B-Q8_0.gguf": {
+   "sha256": "5c2c3c190e4337e1016b8593ca8e26e8b18c972200b107385d4ec61a25d9dea2",
+   "size": 4375021152
+  },
+  "/mnt/data/models/spark-x2.6-1.7b-xhtoken/Spark-X2.6-1.7B.Q3_K_L.gguf": {
+   "sha256": "510026a93f1bf11dde293151f113c1667ca9023cf0030cbc574a54d6e5e21845",
+   "size": 1018514528
+  },
+  "/mnt/data/models/spark-x2.6-1.7b-xhtoken/Spark-X2.6-1.7B.Q3_K_M.gguf": {
+   "sha256": "21d0a1ef0c0b4643c52e742b6bdc472b463a5f740bcded7e505722af0c03545b",
+   "size": 937380960
+  },
+  "/mnt/data/models/spark-x2.6-1.7b-xhtoken/Spark-X2.6-1.7B.Q4_K_S.gguf": {
+   "sha256": "70dccc9a0730fc5d0eaf77e046c6a6a6a7a0dc47293515add41973a7ae3c52a4",
+   "size": 1043806816
+  },
+  "/mnt/data/models/spark-x2.6-1.7b-xhtoken/Spark-X2.6-1.7B.Q5_K_S.gguf": {
+   "sha256": "f98012266da954e8ef7edc672b8743498fb61bce8cd224b57e01e1d319f5a566",
+   "size": 1215437408
+  },
+  "/mnt/data/models/spark-x2.6-1.7b-xhtoken/Spark-X2.6-1.7B.Q6_K.gguf": {
+   "sha256": "3236e0f811d61e2a2c7ff030d78831b3fe1f79902ce4240a3737738ed4ca8258",
+   "size": 1406568544
+  },
+  "/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q4_K_M.gguf": {
+   "sha256": "7abd9859c10924be3c583945456fa9b25d0569484876105a7b7376f7938fffb7",
+   "size": 1768720512
+  },
+  "/mnt/data/models/spark-x2.6-1.7b/Spark-X2.6-1.7B-Q8_0.gguf": {
+   "sha256": "8d96279c95ae2be111576f3f599880598be0922efee15069b4d7e4dd96ef6ed4",
+   "size": 1820113440
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ2_M.gguf": {
+   "sha256": "ddff7a7313225abd6b139309599f70c8fb705550360681167967ecee63bac80c",
+   "size": 1565852288
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_M.gguf": {
+   "sha256": "2799d4390a37291e337557149f80a7bc13ee8dbfb4924aed67dee788dc1578e7",
+   "size": 2233950848
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_XS.gguf": {
+   "sha256": "28074059732872711064bd197a45fb25a3978091ffbeb2b9d9b0c8aabfe42862",
+   "size": 1912128128
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ3_XXS.gguf": {
+   "sha256": "cc1b0bde185f0705f91845872bf6a250653f9f694a69d96413031eac871cc604",
+   "size": 1802396288
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ4_NL.gguf": {
+   "sha256": "d5cbdd1998cc551bce0f6bc411a0229985b3dd4f89222df64e8249cd9c33efb3",
+   "size": 2621104768
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-IQ4_XS.gguf": {
+   "sha256": "83a6ede7deb5a25617648cd289959c67ff8870bfc972274439f519c75bae1276",
+   "size": 2338275968
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q2_K.gguf": {
+   "sha256": "cf1682cf43e6e4e368e177bdf6ec68e40785652d6f485362055cff2301c936d9",
+   "size": 1610457728
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q3_K_S.gguf": {
+   "sha256": "6b66788a6ce826f1558b58d6ac61b205fbba6270f717ce9780a124e5e41a7a2c",
+   "size": 1903731328
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q4_0.gguf": {
+   "sha256": "11cb688da063865c23bf8e0a40e2ad1e30af26ba5545e8e3c4d48367a76edc26",
+   "size": 2412137088
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q4_1.gguf": {
+   "sha256": "f56d3b7df075862f2b4b632c700f2c999a385ae60a512f1372e105ba7b443015",
+   "size": 2641605248
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q4_K_L.gguf": {
+   "sha256": "a77088810c2e346ea3f8df8cada26402e5b2a7b2c0861b4be45e204f52dc0c93",
+   "size": 2811732608
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q6_K_L.gguf": {
+   "sha256": "fef06a2ed67c97c373a3c2f5b3bc7fea49f6b7c8f08db4489fb65f11c4b6cc70",
+   "size": 3780027008
+  },
+  "/mnt/data/models/spark-x2.6-4b-bartowski/Spark-X2.6-4B-Q6_K_S.gguf": {
+   "sha256": "c3042954a6c5395090435875cd6c5b5c6ccf349a6a9bb4a10e6c2886cdfd266f",
+   "size": 3454968448
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q3_K_L.gguf": {
+   "sha256": "1e182dab954b30efcc29febcf6de2fcb3892e8ba09a347872ca817cb7d0cafb0",
+   "size": 2390641760
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q3_K_M.gguf": {
+   "sha256": "a58c55d6ba9ffeccd2878a195428d4f42286d8c049c2c1031407b1fd28734bca",
+   "size": 2165197920
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q4_K_S.gguf": {
+   "sha256": "84a68c747ce432aaab0747fc870869e5d2e82df1055c4a8510c2eaa64edce58e",
+   "size": 2426554720
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q5_K_M.gguf": {
+   "sha256": "8907bb53fe156f51a9c2eb10a724388eaa55aac0a1b9e4738c1a0de03ad407cd",
+   "size": 2977896800
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q5_K_S.gguf": {
+   "sha256": "12e9a966c514c0a9d6794eda9aa91cc0454b80e6f2e389b43891fccbaa7089e0",
+   "size": 2877626720
+  },
+  "/mnt/data/models/spark-x2.6-4b-xhtoken/Spark-X2.6-4B.Q6_K.gguf": {
+   "sha256": "147623442b41fdd68dc3f9ea843ca6dcc325c14f29c263ecdfc9c92048297547",
+   "size": 3379172960
+  },
+  "/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q4_K_M.gguf": {
+   "sha256": "91cb2811aebb47ac916aa619d27d4cdd7f4143106b7917accb8ead4cd7f5cbd9",
+   "size": 3543441312
+  },
+  "/mnt/data/models/spark-x2.6-4b/Spark-X2.6-4B-Q8_0.gguf": {
+   "sha256": "145c2aa606820663f26ad530b8fc141ed885e2e9ca29f9be7c3bfe8931d58b81",
+   "size": 4375021824
+  }
+ }
+}
