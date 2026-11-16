@@ -622,6 +622,41 @@ Each family lists its **current-epoch** rows first, then its **pre-0.6.0** rows 
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Sharp-Spark-4B | 94 t · 0.5.0 (pre-0.6.0) | — | Sharp-Spark-X2.5-4B-Q4_K_XL.gguf (2.68 GB) | Q4_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **68.4%** | 63.2 | 100.0 | 71.4 | 90.0 | 64.3 | 87.5 | 66.7 | 4.04s | 17/17/17 | none | `../cards/card_sharp-spark-4b-q4_K_XL.png` | on-GPU ≤12B |
 
+<!-- 2026-11-16 currency pass: these four family sections were appended by the lane's currency pass and are rendered from the same cards the generator reads. TTFT and tok-per-s read '—' because no perf run was made for these models; every other column is the card's.
+If you regenerate this file with scripts/gen_leaderboard.py, note that the shipped generator has no perf_*.json to read on this machine and will blank TTFT/tok-per-s for EVERY row, not just these four — see PACKET.md §7.6 (N8). -->
+
+### ZoomGain-4B
+
+**Current epoch — 320 tasks, scorer 0.6.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ZoomGain-4B | 320 t · 0.6.0 (current) | Nov 10 2026 | ZoomGain-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **82.9%** | 89.5 | 60.0 | 85.7 | 90.0 | 77.8 | 70.0 | 100.0 | — | — | looped 1 | `../cards/card_zoomgain-4b-q4km-kvq8.png` | on-GPU ≤12B |
+
+### ZwZ2-4B
+
+**Current epoch — 320 tasks, scorer 0.6.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ZwZ2-4B | 320 t · 0.6.0 (current) | Oct 15 2026 | ZwZ2-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.3%** | 89.5 | 60.0 | 100.0 | 80.0 | 61.1 | 70.0 | 100.0 | — | — | none | `../cards/card_zwz2-4b-q4km-kvq8.png` | on-GPU ≤12B |
+
+### Ternary-Bonsai-2 9B
+
+**Current epoch — 320 tasks, scorer 0.6.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ternary-Bonsai-2 9B | 320 t · 0.6.0 (current) | Nov 2026 | Ternary-Bonsai-2-9B-Q2_0.gguf (2.56 GB) | Q2_0 | q8_0 | 32,768 | not recorded | 32,768 | 4 | **79.2%** | 89.5 | 90.0 | 14.3 | 90.0 | 61.1 | 80.0 | 100.0 | — | — | none | `../cards/card_ternary-bonsai-2-9b-q2-kvq8.png` | on-GPU ≤12B |
+
+### Ternary-Bonsai-2 2B
+
+**Current epoch — 320 tasks, scorer 0.6.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ternary-Bonsai-2 2B | 320 t · 0.6.0 (current) | Nov 2026 | Ternary-Bonsai-2-2B-Q2_0.gguf (0.55 GB) | Q2_0 | q8_0 | 32,768 | not recorded | 32,768 | 4 | **60.9%** | 71.9 | 40.0 | 57.1 | 40.0 | 55.6 | 80.0 | 83.3 | — | — | none | `../cards/card_ternary-bonsai-2-2b-q2-kvq8.png` | on-GPU ≤12B |
+
 ## Classifier leaderboard (SEPARATE — never merged into generative %)
 
 48-task v1.0 benchmark (`classifier-bench/`): routing/topic choice, urgency score (4-level), noul @0.5. Metrics: choice accuracy, noul accuracy, score exact-level accuracy + MAE, ECE (10 bins), multiclass Brier, mean/p95 latency, abstention (confidence < 0.6), option-order flip rate (0–26). No composite % is invented.

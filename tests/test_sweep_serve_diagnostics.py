@@ -175,6 +175,37 @@ def test_probe_rejects_a_response_with_no_content_and_no_reasoning(monkeypatch):
     assert ok is False and meta == {}
 
 
+# Verbatim from results/_sweep_logs/d1-3b-q4km-kvq8-kvq8_0.serve.log (2026-11-16): the engine
+# loaded, listened and published its alias, then refused every chat request. The probe used to
+# treat that as silence and the sweep spent the full 600 s before blaming "transport".
+DECISION_REFUSAL = (
+    '{"error":{"code":501,"message":"This model is a decision model without text generation, '
+    'use /v1/systemone","type":"not_supported_error"}}'
+)
+
+
+def test_refusal_from_body_names_the_engine_message():
+    said = pve.refusal_from_body(501, DECISION_REFUSAL)
+    assert "501" in said and "decision model without text generation" in said
+
+
+def test_refusal_from_body_ignores_an_empty_or_junk_body():
+    assert pve.refusal_from_body(500, "") == ""
+    assert pve.refusal_from_body(500, "<html>" + "x" * 500) == ""
+
+
+def test_probe_reports_an_engine_refusal_instead_of_silence(monkeypatch):
+    def fake_urlopen(req, timeout=None):
+        raise pve.urllib.error.HTTPError(req.full_url, 501, "Not Implemented", {},
+                                         __import__("io").BytesIO(DECISION_REFUSAL.encode()))
+
+    monkeypatch.setattr(pve.urllib.request, "urlopen", fake_urlopen)
+    ok, meta = pve.probe_completion("127.0.0.1", 1, "d1-3b-q4km-kvq8")
+    assert ok is False
+    # No second payload is tried: a role refusal is not a failed probe, it is the answer.
+    assert "decision model without text generation" in meta["refusal"]
+
+
 def test_vram_gate_waits_until_the_card_is_free(monkeypatch):
     reads: list[int] = []
 

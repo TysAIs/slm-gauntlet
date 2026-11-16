@@ -4,18 +4,20 @@
 
 - best overall: **Gemma 4 E4B** Q4_K_M / KV q8_0, **90.2** (single run, seed 1);
 - next three: Bolt E4B 89.3, Qwen3.5-9B 84.5, Spark-X2.6-4B 84.4 — Bolt is inside one task's weight of the lead, so it is a tie, not a win;
+- newest entrant (measured 2026-11-16): **ZoomGain-4B** Q4_K_M, **82.9** seed-1 / **83.4** 3-run mean — a tie with Qwen3.5-4B (83.0) and Ornith-1.5-9B (83.1), 7.3 behind the lead;
 - at 102K context the hierarchy inverts: **MiniCPM5-2B** leads with 0.76, the 8 GB champion finishes last with 0.12;
-- 28 models ranked, 302 scored configurations, 209 extended-matrix cells; epoch 0.6.0 is not comparable with 0.5.0 or earlier.
+- 32 models ranked, 306 scored configurations, 209 extended-matrix cells; epoch 0.6.0 is not comparable with 0.5.0 or earlier.
+- **2026-11-16 currency pass:** four entrants released in the previous two months were measured on this board (3 runs each, variance board below). Three more staged candidates could not be scored and are named with the reason in *Notes and exclusions* — none of them is silently missing.
 
 All results measured on one reference board: **NVIDIA GTX 1070 Ti 8GB**, llama.cpp serving, temperature-0 requests (the harness sets it per request), scores are the gauntlet weighted aggregate over the 320-task battery unless a board says otherwise. A cell that cannot be served in 8 GB is recorded as **does-not-fit** (serve_failed), never as zero.
 
-Unless a row carries a 3-seed mean, scores are **single-run**. The five headline models with 3-seed variance data are marked † and listed in the Variance section; the table cell is that model's canonical seed-1 run — the same run its card names — not the 3-seed mean. Every cell is recomputable from the model's card (`results/cards/`); `scripts/scoreboard_check.py` re-derives every board whose instrument ships here and names the boards whose raw run logs stay off the publish surface.
+Unless a row carries a 3-seed mean, scores are **single-run**. The nine models with 3-run variance data are marked † and listed in the Variance boards; the table cell is that model's canonical seed-1 run — the same run its card names — not the 3-run mean. Every cell is recomputable from the model's card (`results/cards/`); `scripts/scoreboard_check.py` re-derives every board whose instrument ships here and names the boards whose raw run logs stay off the publish surface.
 
 Every board below repeats its hardware line: **NVIDIA GTX 1070 Ti 8GB**.
 
 ## T1 screen — 32,768 ctx, KV q8_0
 
-*NVIDIA GTX 1070 Ti 8GB · single run per cell (each model's canonical seed-1 run); the five † models' 3-seed spread is in the Variance board.*
+*NVIDIA GTX 1070 Ti 8GB · single run per cell (each model's canonical seed-1 run); the nine † models' 3-run spread is in the Variance boards.*
 
 | # | Model | Quant | Score | License |
 |---|---|---|---|---|
@@ -27,26 +29,32 @@ Every board below repeats its hardware line: **NVIDIA GTX 1070 Ti 8GB**.
 | 6 | Gemma 4 E2B | Q4_0 | **83.5** | Apache 2.0 |
 | 7 | Ornith-1.5-9B | Q4_K_M | **83.1** | MIT |
 | 8 | Qwen3.5-4B | Q4_K_M | **83.0** | Apache 2.0 |
-| 9 | MiniCPM5-2B | Q4_K_M | **79.6** | Apache 2.0 |
-| 10 | Gemma 4 12B | UD-Q2_K_XL | **79.5** | Apache 2.0 |
-| 11 | Ministral 3 8B | Q4_K_M | **79.5** | Apache 2.0 |
-| 12 | Sharp-Spark-X2.6-4B | Q4_K_XL | **76.9** | Apache 2.0 |
-| 13 | Dory 1.0 4B | Q5_K_M | **76.5** | OpenMDW-1.1 |
-| 14 | Granite 4.2 8B | Q4_K_M | **74.2** | Apache 2.0 |
-| 15 | Spark-X2.6-1.7B | Q4_K_M | **68.9** | Apache 2.0 |
-| 16 | Ministral 3 3B | Q4_K_M | **68.9** | Apache 2.0 |
-| 17 | Qwen3.5-2B | Q4_K_M | **67.3** | Apache 2.0 |
-| 18 | LFM3-1.7B | Q4_K_M | **66.5** | LFM Open License v1.0 |
-| 19 | Granite 4.2 3B | Q4_K_M | **65.7** | Apache 2.0 |
-| 20 | Gemma 3n E4B | Q4_K_M | **64.7** | Gemma Terms |
-| 21 | Nemotron 3 Nano 4B | Q4_K_M | **64.1** | NVIDIA Nemotron Open Model License |
-| 22 | LFM2.5-2.6B | Q4_K_M | **62.3** | LFM Open License v1.0 |
-| 23 | Llama 3.1 8B | Q4_K_M | **61.8** | Llama Community License |
-| 24 | LFM2.5-8B-A1B | UD-Q4_K_M | **54.7** | LFM Open License v1.0 |
-| 25 | Qwen3.5-0.8B | Q4_K_M | **54.6** | Apache 2.0 |
-| 26 | MiniCPM-V 4.7 1B | Q4_K_M | **53.5** | Apache 2.0 |
-| 27 | LFM2.5-1.2B | Q4_K_M | **53.1** | LFM Open License v1.0 |
-| 28 | MiniCPM5-1B | Q4_K_M | **45.9** | Apache 2.0 |
+| 9 | ZoomGain-4B † | Q4_K_M | **82.9** | see model repo |
+| 10 | ZwZ2-4B † | Q4_K_M | **81.3** | see model repo |
+| 11 | MiniCPM5-2B | Q4_K_M | **79.6** | Apache 2.0 |
+| 12 | Gemma 4 12B | UD-Q2_K_XL | **79.5** | Apache 2.0 |
+| 13 | Ministral 3 8B | Q4_K_M | **79.5** | Apache 2.0 |
+| 14 | Ternary-Bonsai-2 9B † | Q2_0 | **79.2** | Apache 2.0 (family card) |
+| 15 | Sharp-Spark-X2.6-4B | Q4_K_XL | **76.9** | Apache 2.0 |
+| 16 | Dory 1.0 4B | Q5_K_M | **76.5** | OpenMDW-1.1 |
+| 17 | Granite 4.2 8B | Q4_K_M | **74.2** | Apache 2.0 |
+| 18 | Spark-X2.6-1.7B | Q4_K_M | **68.9** | Apache 2.0 |
+| 19 | Ministral 3 3B | Q4_K_M | **68.9** | Apache 2.0 |
+| 20 | Qwen3.5-2B | Q4_K_M | **67.3** | Apache 2.0 |
+| 21 | LFM3-1.7B | Q4_K_M | **66.5** | LFM Open License v1.0 |
+| 22 | Granite 4.2 3B | Q4_K_M | **65.7** | Apache 2.0 |
+| 23 | Gemma 3n E4B | Q4_K_M | **64.7** | Gemma Terms |
+| 24 | Nemotron 3 Nano 4B | Q4_K_M | **64.1** | NVIDIA Nemotron Open Model License |
+| 25 | LFM2.5-2.6B | Q4_K_M | **62.3** | LFM Open License v1.0 |
+| 26 | Llama 3.1 8B | Q4_K_M | **61.8** | Llama Community License |
+| 27 | Ternary-Bonsai-2 2B † | Q2_0 | **60.9** | Apache 2.0 (family card) |
+| 28 | LFM2.5-8B-A1B | UD-Q4_K_M | **54.7** | LFM Open License v1.0 |
+| 29 | Qwen3.5-0.8B | Q4_K_M | **54.6** | Apache 2.0 |
+| 30 | MiniCPM-V 4.7 1B | Q4_K_M | **53.5** | Apache 2.0 |
+| 31 | LFM2.5-1.2B | Q4_K_M | **53.1** | LFM Open License v1.0 |
+| 32 | MiniCPM5-1B | Q4_K_M | **45.9** | Apache 2.0 |
+
+Rank is a reading order, not a claim of separation: rows 7-9 (83.1, 83.0, 82.9) are inside one task's weight of each other and are a three-way tie, exactly as rows 11-14 (79.6, 79.5, 79.5, 79.2) are a four-way tie. Ternary-Bonsai-2's licence was read from the family's public GGUF card (`prism-ml/Ternary-Bonsai-2-27B-gguf`, `license: apache-2.0`); the 9B/2B repos themselves are gated, so their own cards could not be read. ZoomGain-4B and ZwZ2-4B publish no licence field on their model cards at all, so their cell reads 'see model repo' rather than guessing one.
 
 ## Phase M matrix — finalists × KV cache type (32,768 ctx)
 
@@ -148,6 +156,19 @@ Ministral 3 8B: does-not-fit at 102,400 ctx (serve_failed, VRAM) even at q4_0 KV
 
 Seeds 2 and 3 reproduced identical aggregate scores on all five models (row-level diff on one pair: 305/320 rows byte-identical, differing rows unchanged in pass outcome). The observed spread is cross-session, not seed-driven. On 3-seed means, Bolt E4B passes Gemma 4 E4B — the canonical single-run order inverted, which is what this stage existed to catch.
 
+## Variance — 2026-11-16 new entrants × 3 runs (canonical cells, KV q8_0)
+
+*NVIDIA GTX 1070 Ti 8GB · 3 runs per model on separate sessions; the mean and spread columns are the only aggregate on this board.*
+
+| Model | Run 1 | Run 2 | Run 3 | Mean | Spread |
+|---|---|---|---|---|---|
+| ZoomGain-4B Q4_K_M | 82.9 | 83.6 | 83.6 | **83.4** | 0.7 |
+| ZwZ2-4B Q4_K_M | 81.3 | 81.3 | 81.3 | **81.3** | 0.0 |
+| Ternary-Bonsai-2 9B Q2_0 | 79.2 | 80.2 | 81.2 | **80.2** | 2.0 |
+| Ternary-Bonsai-2 2B Q2_0 | 60.9 | 62.1 | 62.1 | **61.7** | 1.2 |
+
+Each column is a separate full 320-task run on a freshly served config (`--seed 1|2|3`); the seed changes only generated-task sampling, so the spread is cross-session variance, the same reading the board above gives its five headline models. ZwZ2-4B returned the identical aggregate 81.3 three times; that is a stability observation, not three independent samples of a distribution. On 3-run means ZoomGain-4B (83.4) moves above Qwen3.5-4B (83.0) and Ornith-1.5-9B (83.1), and Ternary-Bonsai-2 9B (80.2) moves above MiniCPM5-2B (79.6) — both reversals are inside the variance, so neither is claimed as a win.
+
 ## OCR board — document extraction (10 tasks, field score)
 
 *NVIDIA GTX 1070 Ti 8GB · single run per model on the 2026-11-13 fixture.*
@@ -164,6 +185,11 @@ MiniCPM-V 4.7 1B's text-battery rows elsewhere on this board are text-only serve
 
 ## Notes and exclusions
 
+- **2026-11-16 pass — what was and was not measured for the four new entrants.** Each has its canonical T1 cell and three full runs (variance board above). None was re-run through the Phase M KV matrix, the extended quant matrix, L2 (65K), L3 (102K long-horizon) or the OCR board, so those boards still carry their 2026-11-13 roster and say nothing about these models. Their cards record engine build `b1-1c3cdd2`, ctx 32,768, slots 1, KV q8_0/q8_0 and the 120 W pin — the same serve recipe as every other cell on this board.
+- **ZoomGain-4B and ZwZ2-4B are vision-language models served text-only.** Both are Qwen3.5-4B-based VLMs from inclusionAI (`ZwZ2-4B`'s card names `base_model: Qwen/Qwen3.5-4B`, `pipeline_tag: image-text-to-text`). They were served without a projector, exactly as MiniCPM-V 4.7 1B is on the text battery, so these rows measure their text behaviour only. Their vision capability is **not** measured here — the OCR board has no row for either, and none is implied.
+- **Three staged candidates were refused by the engine and are excluded by role, not by score.** Clef-Flash (released 2026-11-11), d1-3B and d1-2B load, listen and publish an alias, then answer every chat completion with `HTTP 501: This model is a decision model without text generation, use /v1/systemone` (engine log lines in `results/_sweep_logs/`). They are classifier/decision models, so their instrument is the classifier lane — where Clef-flash Q4 and d1-2B Q4 already have rows in the leaderboard's classifier section — and that lane's expansion still waits on the proprietary `/v1/systemone` scoring endpoint named below. d1-Omni-2B is the same family and was not attempted. Recorded as `excluded_role` in the sweep state, never as zero and never as does-not-fit.
+- **Staged but not run this pass**, with the reason each was left out: **ZoomGain-9B** (9.4B params, released 2026-11-10, would fit — no GGUF staged on the lane); **Laya** (449 MB Q8_0 GGUF staged, but its Hugging Face card is gated so neither release date nor role could be verified); **Flint** (IQ2_XXS is 12 GB, above this board's 8 GB class — its existing leaderboard entry is a swap-aborted run, not a score); **Clef-27B** (17.6 GB, does not fit, and a decision model); **LFM2.5-24B-A2B** (14.9 GB, already carried as an offload row, not an 8 GB cell); **Spark-X2.5** (predecessor of the X2.6 family already on the board — established, not new); **Granite Switch 4.1** (decision model, already excluded by role).
+- **Provenance for the new rows.** Nine full runs (4 models x 3, minus one aborted and re-run) on the PVE GTX 1070 Ti lane, each from a cold serve of the named GGUF, `llama-server` restart between configs, a real completion required before the run, 320 tasks, 328 attempts, `zero_token_errors: 0`, `transport_failure: false`. Run logs stay off the publish surface, as they do for every other card (see the leaderboard's verifiability note).
 - **Granite Switch** (IBM's classifier-story model) is excluded from the generative roster by role: it is a classification model, not a generative SLM, and its board is the classifier lane, not this one. Its weights were not run through the generative battery.
 - The classifier board's expansion is blocked on a proprietary scoring endpoint the local harness cannot substitute; recorded as a known blocker, not a result.
 - Licenses were re-checked against the publishers' Hugging Face model-card metadata on 2026-11-13 (family by family, from the card's license field, not from a summary). Corrections made in that pass: **Gemma 4** (E4B / E2B / 12B) is **Apache 2.0**, not the Gemma Terms that Gemma 3n still uses; **MiniCPM-V 4.7 1B** is **Apache 2.0**, so the board no longer says "see model repo". Families whose card could not be resolved keep an explicit "see model repo" — consult the repository before reuse. LFM Open License v1.0 permits commercial use below $10M annual revenue; it is not Apache 2.0. OpenMDW-1.1 is the Linux Foundation license carried by NVIDIA's current Nemotron releases.

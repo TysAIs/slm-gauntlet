@@ -64,6 +64,14 @@ SIZES = ROOT / "gguf-sizes.csv"
 # families by normalized display name, so all Bolt E4B quants (including the
 # vendor-prefixed Nemotron ids) stay one family and are never split by spelling.
 DISPLAY = [
+    ("zoomgain-4b", "ZoomGain-4B"),
+    ("zwz2-4b", "ZwZ2-4B"),
+    ("ternary-bonsai-2-9b", "Ternary-Bonsai-2 9B"),
+    ("ternary-bonsai-2-2b", "Ternary-Bonsai-2 2B"),
+    ("clef-flash", "Clef-Flash"),
+    ("d1-omni-2b", "d1-Omni-2B"),
+    ("d1-3b", "d1-3B"),
+    ("d1-2b", "d1-2B"),
     ("nvidia-nemotron-3.5-bolt-e4b", "Bolt E4B"),
     ("nemotron-3.5-bolt-e4b", "Bolt E4B"),
     ("nvidia-nemotron-labs-dory1.0-4b", "Dory 1.0 4B"),
@@ -103,6 +111,14 @@ DISPLAY = [
     ("lfm2.5-8b-a1b", "LFM2.5-8B-A1B"),
 ]
 RELEASE = {
+    "ZoomGain-4B": "Nov 10 2026",
+    "ZwZ2-4B": "Oct 15 2026",
+    "Ternary-Bonsai-2 9B": "Nov 2026",
+    "Ternary-Bonsai-2 2B": "Nov 2026",
+    "Clef-Flash": "Nov 11 2026",
+    "d1-Omni-2B": "Oct 24 2026",
+    "d1-3B": "Oct 5 2026",
+    "d1-2B": "Oct 24 2026",
     "Bolt E4B": "Nov 2026",
     "Dory 1.0 4B": "Nov 2026",
     "Gemma 4 E4B": "2026",

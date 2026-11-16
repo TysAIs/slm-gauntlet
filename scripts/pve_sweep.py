@@ -69,6 +69,7 @@ import shlex
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -291,6 +292,30 @@ def classify_serve_failure(text: str, unit_state: dict | None = None,
     )
 
 
+def refusal_from_body(status: int | None, body: str) -> str:
+    """The engine's own refusal message, when it answered with an error instead of text.
+
+    Measured 2026-11-16: a decision model (LFI/family "lfm2-d1", also Clef-Flash) starts,
+    listens, publishes its alias and answers every chat request with HTTP 501
+    `This model is a decision model without text generation, use /v1/systemone`. The probe
+    treated that as silence and the sweep waited the full 600 s before calling it
+    `transport_blocked` — a wrong cause that blames the network for a role mismatch.
+    """
+    text = (body or "").strip()
+    if not text:
+        return ""
+    try:
+        obj = json.loads(text)
+    except Exception:  # noqa: BLE001 - a non-JSON body is still evidence if it is short
+        return text[:200] if len(text) <= 200 else ""
+    err = obj.get("error")
+    msg = err.get("message") if isinstance(err, dict) else err
+    msg = str(msg or "").strip()
+    if not msg:
+        return ""
+    return f"HTTP {status}: {msg}" if status else msg
+
+
 def probe_completion(host: str, port: int, alias: str, timeout: int = 120) -> tuple[bool, dict]:
     """One real completion as proof the engine answers.
 
@@ -299,6 +324,9 @@ def probe_completion(host: str, port: int, alias: str, timeout: int = 120) -> tu
     reasoning channel, returns `content: ''` with finish_reason 'length', and *is* a live
     engine. Rejecting exactly that is what made ornith-9b and qwen35-9b look dead on
     2026-11-07 while their servers were healthy and named correctly.
+
+    A body carrying an engine error is returned as `refusal` rather than swallowed: that answer
+    is the engine talking, and waiting 600 s more cannot change it.
     """
     msg = [{"role": "user", "content": "Reply with the single word: READY"}]
     payloads = [
@@ -306,6 +334,7 @@ def probe_completion(host: str, port: int, alias: str, timeout: int = 120) -> tu
          "chat_template_kwargs": {"enable_thinking": False}},
         {"model": alias, "messages": msg, "max_tokens": 8, "temperature": 0},
     ]
+    refusal = ""
     for i, payload in enumerate(payloads):
         try:
             req = urllib.request.Request(
@@ -326,9 +355,18 @@ def probe_completion(host: str, port: int, alias: str, timeout: int = 120) -> tu
                     "content": content[:40], "reasoning": reasoning[:40],
                     "finish_reason": choice.get("finish_reason"),
                 }
+        except urllib.error.HTTPError as exc:
+            body = ""
+            try:
+                body = exc.read().decode(errors="replace")
+            except Exception:  # noqa: BLE001 - no body is still an HTTP answer
+                body = ""
+            refusal = refusal_from_body(exc.code, body) or refusal
+            if refusal:
+                break
         except Exception:
             continue
-    return False, {}
+    return False, ({"refusal": refusal} if refusal else {})
 
 
 def journal_scrape(lane: Lane, unit: str, since: int, limit: int | None = None) -> str:
@@ -437,6 +475,7 @@ def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
             base_restarts = 0
         state: dict = base
         answered: dict = {}
+        refusal: dict = {}
         fastfail = ""
         deadline = started + HEALTH_TIMEOUT_S
         last_state_check = 0.0
@@ -458,6 +497,12 @@ def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
                 ok, meta = probe_completion(host, port, entry["alias"])
                 if ok:
                     answered = meta
+                    break
+                if meta.get("refusal"):
+                    # The engine is up and speaking: it refused this endpoint's role. Waiting
+                    # the full HEALTH_TIMEOUT_S cannot change a role mismatch, and calling it
+                    # a transport fault would blame the network.
+                    refusal = meta
                     break
             if time.time() - last_state_check >= UNIT_PROBE_INTERVAL_S:
                 last_state_check = time.time()
@@ -502,6 +547,15 @@ def serve(entry: dict, lane: Lane, log=print, logs_dir: Path | None = None,
         diag.update(ok=True, probe=answered)
         log(f"    served {entry['alias']}: probe answered via {answered.get('answered_in')} "
             f"({answered.get('payload')}), {diag['seconds']}s")
+        return diag
+    if refusal:
+        # Named, terminal, and fast: the engine loaded and answered, it just does not serve
+        # text generation on this endpoint. Stop it so VRAM is free for the next config.
+        lane.run(["systemctl", "stop", unit], timeout=60)
+        diag.update(ok=False, cause="engine_refused", detail=refusal["refusal"],
+                    refused=True, attempt_seconds=diag["seconds"])
+        log(f"    {entry['alias']} refused text generation after {diag['seconds']}s: "
+            f"{refusal['refusal']}")
         return diag
     # A crash-looping config retries every 5 s for up to 60 attempts, and each attempt re-runs
     # the loader (a VRAM-OOM config grabs and drops a CUDA context every time). Stop it: the
