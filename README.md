@@ -115,8 +115,8 @@ Every score above is the weighted aggregate defined in `scripts/leaderboard_chec
 same figures `gauntlet run` prints. The **card** (`results/cards/*.json`) carries the
 per-suite results the score is computed from, and [`SCOREBOARD.md`](SCOREBOARD.md) is
 re-derived from those cards by `scripts/scoreboard_check.py`, which exits non-zero on any
-disagreement — 92 cells verified in a clone, 144 on the authoring tree, with the boards whose
-raw logs stay private named rather than skipped silently.
+disagreement — 92 cells verified in a clone, and the boards whose raw logs stay private are
+named rather than skipped silently.
 
 The run log of every ranked configuration ships with the corpus: 63 files under `results/`,
 one per scored configuration in epoch 0.6.0, each with its `endpoint` address replaced by
