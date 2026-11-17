@@ -33,7 +33,7 @@
    "vram_total_mb": 8192,
    "kv_pool_tokens": 32768,
    "max_subagents": 4,
-   "server_build": "llama.cpp a2878d3 (CT100, 2026-09-11)",
+   "server_build": "llama.cpp a2878d3 (<test-box>, 2026-09-11)",
    "category": "on-GPU \u226412B",
    "methodology": "0.5.0",
    "run_log": "results/spark-x2.6-1.7b-q8_0_20261108T080140Z.json",

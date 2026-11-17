@@ -17,7 +17,7 @@ then it moves wholesale.
 
 | fact | value | how it was measured |
 |---|---|---|
-| test box | PVE CT100, `llama-worker@8891.service`, GTX 1070 Ti 8 GB | `systemctl list-units` in the CT |
+| test box | `<test-box>`, `llama-worker@8891.service`, GTX 1070 Ti 8 GB | `systemctl list-units` in the CT |
 | single-stream decode | **38.7 tok/s** (prefill 471 tok/s) | one `/v1/chat/completions` with `timings` |
 | VRAM at 32K ctx, f16 KV, 4B IQ3_M | 3.7 GiB, GPU 78 % | `nvidia-smi` during the run |
 | thermal start | 28 C | `gauntlet run` preflight line |

@@ -3,7 +3,7 @@
 
 WHY THIS EXISTS
 The gauntlet corpus was produced by per-model hand runs and a Mac-era night queue that
-spoke `ssh pve-lab` + port 18081. Neither matches the current test lane (CT100,
+spoke `ssh pve-lab` + port 18081. Neither matches the current test lane (`<test-box>`,
 `llama-worker@8891.service`, the box's tailnet address on port 8891), so a whole-suite
 re-run had no driver. This is that driver, and it is resume-safe because a full re-run
 spans hours.
@@ -641,7 +641,8 @@ def gpu_pins(lane: Lane, log=print) -> dict:
 def gpu_memory(lane: Lane) -> dict:
     """Host-side GPU memory right before an attempt.
 
-    Inside CT100 `nvidia-smi --query-compute-apps` only sees that container's processes, which
+    Inside the test lane's container, `nvidia-smi --query-compute-apps` only sees that container's
+    processes, which
     is how a config was once declared a VRAM wall while another server held 6 GiB of the card.
     The PVE host is the only authority on this number, and it is what makes an OOM verdict
     attributable to the config instead of to whatever else was resident.
