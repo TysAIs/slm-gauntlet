@@ -14,7 +14,7 @@ A benchmark for **small language models** (sub-12B class) that runs on whatever 
 
 **Current leaderboard — 320 tasks, scorer 0.6.0, NVIDIA GTX 1070 Ti 8 GB, all layers on-GPU, zero CPU offload, temp 0, seed 1.**
 
-One row per model: the **best-scoring configuration** of that model in the corpus (59 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py`, recomputed from that run's log on the authoring tree; the published instrument is the model's own card (`results/cards/*.json`), which carries the per-suite result the score is computed from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an authoring-tree tool: in a public clone it reports every card as not reproducible. The `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
+One row per model: the **best-scoring configuration** of that model in the corpus (63 scored configurations behind this table). Every score is the weighted aggregate defined in `scripts/leaderboard_check.py`, recomputed from that run's own log, which ships with the corpus (`results/<model>_<timestamp>.json`): `python3 scripts/leaderboard_check.py` re-derives this table from a clone and exits non-zero on any disagreement. The model's card (`results/cards/*.json`) carries the per-suite result the score is computed from. The `Method` column carries the task count and scorer version for the row, so no row is ever compared across methodologies. Full per-configuration data: [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 
 | Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | Retr | Code | Instr | Method | Card |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -26,26 +26,30 @@ One row per model: the **best-scoring configuration** of that model in the corpu
 | 6 | Ornith-1.5-9B | Q4_K_M · KV FP16 · 32K ctx | **84.2%** | 84% | 60% | 100% | 90% | 100% | 80% | 67% | 320 t · 0.6.0 | [png](results/cards/card_ornith-1.5-9b-q4km-kvf16.png) |
 | 7 | Gemma 4 E2B | Q4_0 · KV q8_0 · 32K ctx | **83.5%** | 82% | 80% | 83% | 80% | 100% | 100% | 78% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-e2b-q4_0-kvq8.png) |
 | 8 | Qwen3.5-4B | Q4_K_M · KV FP16 · 32K ctx | **83.3%** | 89% | 70% | 100% | 70% | 100% | 80% | 50% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-4b-q4km-kvf16.png) |
-| 9 | MiniCPM5-2B | Q4_K_M · KV FP16 · 32K ctx | **80.3%** | 95% | 90% | 83% | 80% | 100% | 90% | 83% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-2b-q4km-kvf16.png) |
-| 10 | Gemma 4 12B | UD-Q2_K_XL · KV q8_0 · 32K ctx | **79.5%** | 79% | 90% | 83% | 80% | 71% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-12b-udq2kxl-kvq8.png) |
-| 11 | Ministral 3 8B | Q4_K_M · KV q8_0 · 32K ctx | **79.5%** | 89% | 60% | 100% | 40% | 86% | 90% | 78% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-8b-q4km-kvq8.png) |
-| 12 | Sharp-Spark-4B | Q4_K_XL · KV q8_0 · 32K ctx | **76.9%** | 63% | 90% | 50% | 100% | 71% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_sharp-spark-4b-q4kxl-kvq8.png) |
-| 13 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **76.5%** | 74% | 80% | 100% | 50% | 100% | 80% | 44% | 320 t · 0.6.0 | [png](results/cards/card_dory-1.0-4b-q5km-kvq8.png) |
-| 14 | Granite 4.2 8B | Q4_K_M · KV q8_0 · 32K ctx | **74.2%** | 95% | 80% | 100% | 60% | 100% | 40% | 50% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-8b-q4km-kvq8.png) |
-| 15 | Spark-X2.6-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 77% | 90% | 100% | 50% | 57% | 20% | 56% | 320 t · 0.6.0 | [png](results/cards/card_spark-x2.6-1.7b-q4km-kvq8.png) |
-| 16 | Ministral 3 3B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 89% | 70% | 83% | 50% | 71% | 60% | 72% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-3b-q4km-kvq8.png) |
-| 17 | Qwen3.5-2B | Q4_K_M · KV q8_0 · 32K ctx | **67.3%** | 79% | 80% | 100% | 30% | 57% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-2b-q4km-kvq8.png) |
-| 18 | LFM3-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **66.5%** | 84% | 50% | 83% | 40% | 57% | 80% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm3-1.7b-q4km-kvq8.png) |
-| 19 | Granite 4.2 3B | Q4_K_M · KV q8_0 · 32K ctx | **65.7%** | 89% | 80% | 67% | 50% | 86% | 20% | 33% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-3b-q4km-kvq8.png) |
-| 20 | Gemma 3n E4B | Q4_K_M · KV q8_0 · 32K ctx | **64.7%** | 26% | 50% | 17% | 70% | 43% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_gemma3n-e4b-q4km-kvq8.png) |
-| 21 | Nemotron 3 Nano 4B | Q4_K_M · KV q8_0 · 32K ctx | **64.0%** | 74% | 60% | 67% | 50% | 29% | 70% | 39% | 320 t · 0.6.0 | [png](results/cards/card_nemotron3-nano-4b-q4km-kvq8.png) |
-| 22 | LFM2.5-2.6B | Q4_K_M · KV q8_0 · 32K ctx | **62.3%** | 79% | 50% | 83% | 60% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-2.6b-q4km-kvq8.png) |
-| 23 | Llama 3.1 8B | Q4_K_M · KV q8_0 · 32K ctx | **61.8%** | 16% | 40% | 17% | 60% | 100% | 90% | 56% | 320 t · 0.6.0 | [png](results/cards/card_llama-3.1-8b-q4km-kvq8.png) |
-| 24 | LFM2.5-8B-A1B | UD-Q4_K_M · KV q8_0 · 32K ctx | **54.7%** | 84% | 60% | 67% | 20% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-8b-a1b-udq4km-kvq8.png) |
-| 25 | Qwen3.5-0.8B | Q4_K_M · KV q8_0 · 32K ctx | **54.6%** | 63% | 60% | 100% | 40% | 57% | 10% | 39% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-0.8b-q4km-kvq8.png) |
-| 26 | MiniCPM-V 4.7 1B | Q4_K_M · KV q8_0 · 32K ctx | **53.5%** | 60% | 60% | 83% | 50% | 29% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_minicpmv47-1b-q4km-kvq8.png) |
-| 27 | LFM2.5-1.2B | Q4_K_M · KV q8_0 · 32K ctx | **53.1%** | 58% | 70% | 100% | 40% | 71% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-1.2b-q4km-kvq8.png) |
-| 28 | MiniCPM5-1B | Q4_K_M · KV q8_0 · 32K ctx | **45.9%** | 47% | 60% | 50% | 30% | 71% | 30% | 56% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-1b-q4km-kvq8.png) |
+| 9 | ZoomGain-4B | Q4_K_M · KV q8_0 · 32K ctx | **82.8%** | 89% | 70% | 100% | 60% | 86% | 90% | 78% | 320 t · 0.6.0 | [png](results/cards/card_zoomgain-4b-q4km-kvq8.png) |
+| 10 | ZwZ2-4B | Q4_K_M · KV q8_0 · 32K ctx | **81.3%** | 89% | 70% | 100% | 60% | 100% | 80% | 61% | 320 t · 0.6.0 | [png](results/cards/card_zwz2-4b-q4km-kvq8.png) |
+| 11 | MiniCPM5-2B | Q4_K_M · KV FP16 · 32K ctx | **80.3%** | 95% | 90% | 83% | 80% | 100% | 90% | 83% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-2b-q4km-kvf16.png) |
+| 12 | Gemma 4 12B | UD-Q2_K_XL · KV q8_0 · 32K ctx | **79.5%** | 79% | 90% | 83% | 80% | 71% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_gemma4-12b-udq2kxl-kvq8.png) |
+| 13 | Ministral 3 8B | Q4_K_M · KV q8_0 · 32K ctx | **79.5%** | 89% | 60% | 100% | 40% | 86% | 90% | 78% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-8b-q4km-kvq8.png) |
+| 14 | Ternary-Bonsai-2 9B | Q2_0 · KV q8_0 · 32K ctx | **79.2%** | 89% | 80% | 100% | 90% | 14% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_ternary-bonsai-2-9b-q2-kvq8.png) |
+| 15 | Sharp-Spark-4B | Q4_K_XL · KV q8_0 · 32K ctx | **76.9%** | 63% | 90% | 50% | 100% | 71% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_sharp-spark-4b-q4kxl-kvq8.png) |
+| 16 | Dory 1.0 4B | Q5_K_M · KV q8_0 · 32K ctx | **76.5%** | 74% | 80% | 100% | 50% | 100% | 80% | 44% | 320 t · 0.6.0 | [png](results/cards/card_dory-1.0-4b-q5km-kvq8.png) |
+| 17 | Granite 4.2 8B | Q4_K_M · KV q8_0 · 32K ctx | **74.2%** | 95% | 80% | 100% | 60% | 100% | 40% | 50% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-8b-q4km-kvq8.png) |
+| 18 | Spark-X2.6-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 77% | 90% | 100% | 50% | 57% | 20% | 56% | 320 t · 0.6.0 | [png](results/cards/card_spark-x2.6-1.7b-q4km-kvq8.png) |
+| 19 | Ministral 3 3B | Q4_K_M · KV q8_0 · 32K ctx | **68.9%** | 89% | 70% | 83% | 50% | 71% | 60% | 72% | 320 t · 0.6.0 | [png](results/cards/card_ministral3-3b-q4km-kvq8.png) |
+| 20 | Qwen3.5-2B | Q4_K_M · KV q8_0 · 32K ctx | **67.3%** | 79% | 80% | 100% | 30% | 57% | 60% | 67% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-2b-q4km-kvq8.png) |
+| 21 | LFM3-1.7B | Q4_K_M · KV q8_0 · 32K ctx | **66.5%** | 84% | 50% | 83% | 40% | 57% | 80% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm3-1.7b-q4km-kvq8.png) |
+| 22 | Granite 4.2 3B | Q4_K_M · KV q8_0 · 32K ctx | **65.7%** | 89% | 80% | 67% | 50% | 86% | 20% | 33% | 320 t · 0.6.0 | [png](results/cards/card_granite4.2-3b-q4km-kvq8.png) |
+| 23 | Gemma 3n E4B | Q4_K_M · KV q8_0 · 32K ctx | **64.7%** | 26% | 50% | 17% | 70% | 43% | 90% | 61% | 320 t · 0.6.0 | [png](results/cards/card_gemma3n-e4b-q4km-kvq8.png) |
+| 24 | Nemotron 3 Nano 4B | Q4_K_M · KV q8_0 · 32K ctx | **64.0%** | 74% | 60% | 67% | 50% | 29% | 70% | 39% | 320 t · 0.6.0 | [png](results/cards/card_nemotron3-nano-4b-q4km-kvq8.png) |
+| 25 | LFM2.5-2.6B | Q4_K_M · KV q8_0 · 32K ctx | **62.3%** | 79% | 50% | 83% | 60% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-2.6b-q4km-kvq8.png) |
+| 26 | Llama 3.1 8B | Q4_K_M · KV q8_0 · 32K ctx | **61.8%** | 16% | 40% | 17% | 60% | 100% | 90% | 56% | 320 t · 0.6.0 | [png](results/cards/card_llama-3.1-8b-q4km-kvq8.png) |
+| 27 | Ternary-Bonsai-2 2B | Q2_0 · KV q8_0 · 32K ctx | **60.9%** | 72% | 80% | 83% | 40% | 57% | 40% | 56% | 320 t · 0.6.0 | [png](results/cards/card_ternary-bonsai-2-2b-q2-kvq8.png) |
+| 28 | LFM2.5-8B-A1B | UD-Q4_K_M · KV q8_0 · 32K ctx | **54.7%** | 84% | 60% | 67% | 20% | 14% | 30% | 50% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-8b-a1b-udq4km-kvq8.png) |
+| 29 | Qwen3.5-0.8B | Q4_K_M · KV q8_0 · 32K ctx | **54.6%** | 63% | 60% | 100% | 40% | 57% | 10% | 39% | 320 t · 0.6.0 | [png](results/cards/card_qwen3.5-0.8b-q4km-kvq8.png) |
+| 30 | MiniCPM-V 4.7 1B | Q4_K_M · KV q8_0 · 32K ctx | **53.5%** | 60% | 60% | 83% | 50% | 29% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_minicpmv47-1b-q4km-kvq8.png) |
+| 31 | LFM2.5-1.2B | Q4_K_M · KV q8_0 · 32K ctx | **53.1%** | 58% | 70% | 100% | 40% | 71% | 40% | 44% | 320 t · 0.6.0 | [png](results/cards/card_lfm2.5-1.2b-q4km-kvq8.png) |
+| 32 | MiniCPM5-1B | Q4_K_M · KV q8_0 · 32K ctx | **45.9%** | 47% | 60% | 50% | 30% | 71% | 30% | 56% | 320 t · 0.6.0 | [png](results/cards/card_minicpm5-1b-q4km-kvq8.png) |
 
 **Legacy rows — NOT comparable, kept for provenance:** one row per model, its best-scoring pre-0.5.0 configuration; the 243 configurations behind them are listed in [`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md).
 

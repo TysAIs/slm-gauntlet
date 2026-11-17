@@ -232,6 +232,62 @@
   },
   {
    "rank": 9,
+   "model": "zoomgain-4b-q4km-kvq8",
+   "display_name": "ZoomGain-4B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 82.84,
+   "suites": {
+    "adversarial": 0.7,
+    "agent_chains": 1.0,
+    "calendar": 0.8,
+    "classify": 0.9697,
+    "coding": 0.9,
+    "docintake": 0.931,
+    "email": 0.7826,
+    "instruction": 0.7778,
+    "realworld": 0.5833,
+    "retrieval": 0.8571,
+    "structured": 0.6,
+    "summarize": 0.9,
+    "support": 0.8438,
+    "tooluse": 0.8947
+   },
+   "tasks": 320,
+   "scorer": "0.6.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_zoomgain-4b-q4km-kvq8.png",
+   "source_log": "results/zoomgain-4b-q4km-kvq8_20261116T081339Z.json"
+  },
+  {
+   "rank": 10,
+   "model": "zwz2-4b-q4km-kvq8",
+   "display_name": "ZwZ2-4B",
+   "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 81.28,
+   "suites": {
+    "adversarial": 0.7,
+    "agent_chains": 1.0,
+    "calendar": 0.7,
+    "classify": 0.9697,
+    "coding": 0.8,
+    "docintake": 0.931,
+    "email": 0.7826,
+    "instruction": 0.6111,
+    "realworld": 0.5667,
+    "retrieval": 1.0,
+    "structured": 0.6,
+    "summarize": 0.85,
+    "support": 0.8125,
+    "tooluse": 0.8947
+   },
+   "tasks": 320,
+   "scorer": "0.6.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_zwz2-4b-q4km-kvq8.png",
+   "source_log": "results/zwz2-4b-q4km-kvq8_20261116T082905Z.json"
+  },
+  {
+   "rank": 11,
    "model": "minicpm5-2b-q4km-kvf16",
    "display_name": "MiniCPM5-2B",
    "configuration": "Q4_K_M \u00b7 KV FP16 \u00b7 32K ctx",
@@ -259,7 +315,7 @@
    "source_log": "results/minicpm5-2b-q4km-kvf16_20261109T220336Z.json"
   },
   {
-   "rank": 10,
+   "rank": 12,
    "model": "gemma4-12b-udq2kxl-kvq8",
    "display_name": "Gemma 4 12B",
    "configuration": "UD-Q2_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -287,7 +343,7 @@
    "source_log": "results/gemma4-12b-udq2kxl-kvq8_20261109T054139Z.json"
   },
   {
-   "rank": 11,
+   "rank": 13,
    "model": "ministral3-8b-q4km-kvq8",
    "display_name": "Ministral 3 8B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -315,7 +371,35 @@
    "source_log": "results/ministral3-8b-q4km-kvq8_20261111T073149Z.json"
   },
   {
-   "rank": 12,
+   "rank": 14,
+   "model": "ternary-bonsai-2-9b-q2-kvq8",
+   "display_name": "Ternary-Bonsai-2 9B",
+   "configuration": "Q2_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 79.22,
+   "suites": {
+    "adversarial": 0.8,
+    "agent_chains": 1.0,
+    "calendar": 0.55,
+    "classify": 0.7879,
+    "coding": 0.9,
+    "docintake": 0.9655,
+    "email": 0.9348,
+    "instruction": 0.6111,
+    "realworld": 0.5833,
+    "retrieval": 0.1429,
+    "structured": 0.9,
+    "summarize": 0.9,
+    "support": 0.875,
+    "tooluse": 0.8947
+   },
+   "tasks": 320,
+   "scorer": "0.6.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_ternary-bonsai-2-9b-q2-kvq8.png",
+   "source_log": "results/ternary-bonsai-2-9b-q2-kvq8_20261116T090540Z.json"
+  },
+  {
+   "rank": 15,
    "model": "sharp-spark-4b-q4kxl-kvq8",
    "display_name": "Sharp-Spark-4B",
    "configuration": "Q4_K_XL \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -343,7 +427,7 @@
    "source_log": "results/sharp-spark-4b-q4kxl-kvq8_20261109T070636Z.json"
   },
   {
-   "rank": 13,
+   "rank": 16,
    "model": "dory-1.0-4b-q5km-kvq8",
    "display_name": "Dory 1.0 4B",
    "configuration": "Q5_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -371,7 +455,7 @@
    "source_log": "results/dory-1.0-4b-q5km-kvq8_20261109T085020Z.json"
   },
   {
-   "rank": 14,
+   "rank": 17,
    "model": "granite4.2-8b-q4km-kvq8",
    "display_name": "Granite 4.2 8B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -399,7 +483,7 @@
    "source_log": "results/granite4.2-8b-q4km-kvq8_20261111T081341Z.json"
   },
   {
-   "rank": 15,
+   "rank": 18,
    "model": "spark-x2.6-1.7b-q4km-kvq8",
    "display_name": "Spark-X2.6-1.7B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -427,7 +511,7 @@
    "source_log": "results/spark-x2.6-1.7b-q4km-kvq8_20261109T065657Z.json"
   },
   {
-   "rank": 16,
+   "rank": 19,
    "model": "ministral3-3b-q4km-kvq8",
    "display_name": "Ministral 3 3B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -455,7 +539,7 @@
    "source_log": "results/ministral3-3b-q4km-kvq8_20261111T071308Z.json"
   },
   {
-   "rank": 17,
+   "rank": 20,
    "model": "qwen3.5-2b-q4km-kvq8",
    "display_name": "Qwen3.5-2B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -483,7 +567,7 @@
    "source_log": "results/qwen3.5-2b-q4km-kvq8_20261111T065405Z.json"
   },
   {
-   "rank": 18,
+   "rank": 21,
    "model": "lfm3-1.7b-q4km-kvq8",
    "display_name": "LFM3-1.7B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -511,7 +595,7 @@
    "source_log": "results/lfm3-1.7b-q4km-kvq8_20261109T081806Z.json"
   },
   {
-   "rank": 19,
+   "rank": 22,
    "model": "granite4.2-3b-q4km-kvq8",
    "display_name": "Granite 4.2 3B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -539,7 +623,7 @@
    "source_log": "results/granite4.2-3b-q4km-kvq8_20261111T074311Z.json"
   },
   {
-   "rank": 20,
+   "rank": 23,
    "model": "gemma3n-e4b-q4km-kvq8",
    "display_name": "Gemma 3n E4B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -567,7 +651,7 @@
    "source_log": "results/gemma3n-e4b-q4km-kvq8_20261109T055755Z.json"
   },
   {
-   "rank": 21,
+   "rank": 24,
    "model": "nemotron3-nano-4b-q4km-kvq8",
    "display_name": "Nemotron 3 Nano 4B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -595,7 +679,7 @@
    "source_log": "results/nemotron3-nano-4b-q4km-kvq8_20261111T070317Z.json"
   },
   {
-   "rank": 22,
+   "rank": 25,
    "model": "lfm2.5-2.6b-q4km-kvq8",
    "display_name": "LFM2.5-2.6B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -623,7 +707,7 @@
    "source_log": "results/lfm2.5-2.6b-q4km-kvq8_20261109T080310Z.json"
   },
   {
-   "rank": 23,
+   "rank": 26,
    "model": "llama-3.1-8b-q4km-kvq8",
    "display_name": "Llama 3.1 8B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -651,7 +735,35 @@
    "source_log": "results/llama-3.1-8b-q4km-kvq8_20261109T094613Z.json"
   },
   {
-   "rank": 24,
+   "rank": 27,
+   "model": "ternary-bonsai-2-2b-q2-kvq8",
+   "display_name": "Ternary-Bonsai-2 2B",
+   "configuration": "Q2_0 \u00b7 KV q8_0 \u00b7 32K ctx",
+   "overall_pct": 60.9,
+   "suites": {
+    "adversarial": 0.8,
+    "agent_chains": 0.8333,
+    "calendar": 0.45,
+    "classify": 0.6667,
+    "coding": 0.4,
+    "docintake": 0.7586,
+    "email": 0.587,
+    "instruction": 0.5556,
+    "realworld": 0.35,
+    "retrieval": 0.5714,
+    "structured": 0.4,
+    "summarize": 0.7,
+    "support": 0.6562,
+    "tooluse": 0.7193
+   },
+   "tasks": 320,
+   "scorer": "0.6.0",
+   "variants_scored": 1,
+   "card_png": "results/cards/card_ternary-bonsai-2-2b-q2-kvq8.png",
+   "source_log": "results/ternary-bonsai-2-2b-q2-kvq8_20261116T091211Z.json"
+  },
+  {
+   "rank": 28,
    "model": "lfm2.5-8b-a1b-udq4km-kvq8",
    "display_name": "LFM2.5-8B-A1B",
    "configuration": "UD-Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -679,7 +791,7 @@
    "source_log": "results/lfm2.5-8b-a1b-udq4km-kvq8_20261109T081236Z.json"
   },
   {
-   "rank": 25,
+   "rank": 29,
    "model": "qwen3.5-0.8b-q4km-kvq8",
    "display_name": "Qwen3.5-0.8B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -707,7 +819,7 @@
    "source_log": "results/qwen3.5-0.8b-q4km-kvq8_20261111T064823Z.json"
   },
   {
-   "rank": 26,
+   "rank": 30,
    "model": "minicpmv47-1b-q4km-kvq8",
    "display_name": "MiniCPM-V 4.7 1B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -735,7 +847,7 @@
    "source_log": "results/minicpmv47-1b-q4km-kvq8_20261109T063945Z.json"
   },
   {
-   "rank": 27,
+   "rank": 31,
    "model": "lfm2.5-1.2b-q4km-kvq8",
    "display_name": "LFM2.5-1.2B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",
@@ -763,7 +875,7 @@
    "source_log": "results/lfm2.5-1.2b-q4km-kvq8_20261109T075026Z.json"
   },
   {
-   "rank": 28,
+   "rank": 32,
    "model": "minicpm5-1b-q4km-kvq8",
    "display_name": "MiniCPM5-1B",
    "configuration": "Q4_K_M \u00b7 KV q8_0 \u00b7 32K ctx",

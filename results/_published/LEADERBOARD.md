@@ -1,6 +1,6 @@
-# SLM Gauntlet — Leaderboard (generated 2026-11-11 from the card corpus)
+# SLM Gauntlet — Leaderboard (generated 2026-11-16 from the card corpus)
 
-All runs on a single NVIDIA GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temperature 0 requests, 32K primary unless noted. Every row carries its own **Method** column and is scored with its own epoch's weight table (42 cards at 94 tasks / scorer 0.5.0; 59 cards at 320 tasks / scorer 0.6.0; 201 cards at 71 tasks / scorer v0.3.1). Rows from different epochs are printed as separate tables and are never ranked against each other. KV labels are exact: q8_0 is NOT FP8, q4_0 is NOT FP4. FP8/FP4 KV cache is NOT supported by the llama.cpp builds used (blocked, recorded).
+All runs on a single NVIDIA GTX 1070 Ti (8 GB), `-ngl 99`, seed 1, temperature 0 requests, 32K primary unless noted. Every row carries its own **Method** column and is scored with its own epoch's weight table (42 cards at 94 tasks / scorer 0.5.0; 63 cards at 320 tasks / scorer 0.6.0; 201 cards at 71 tasks / scorer v0.3.1). Rows from different epochs are printed as separate tables and are never ranked against each other. KV labels are exact: q8_0 is NOT FP8, q4_0 is NOT FP4. FP8/FP4 KV cache is NOT supported by the llama.cpp builds used (blocked, recorded).
 
 ## Method notes (read before ranking)
 
@@ -622,26 +622,15 @@ Each family lists its **current-epoch** rows first, then its **pre-0.6.0** rows 
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Sharp-Spark-4B | 94 t · 0.5.0 (pre-0.6.0) | — | Sharp-Spark-X2.5-4B-Q4_K_XL.gguf (2.68 GB) | Q4_K_XL | FP16 | 32,768 | not recorded | 32,768 | 4 | **68.4%** | 63.2 | 100.0 | 71.4 | 90.0 | 64.3 | 87.5 | 66.7 | 4.04s | 17/17/17 | none | `../cards/card_sharp-spark-4b-q4_K_XL.png` | on-GPU ≤12B |
 
-<!-- 2026-11-16 currency pass: these four family sections were appended by the lane's currency pass and are rendered from the same cards the generator reads. TTFT and tok-per-s read '—' because no perf run was made for these models; every other column is the card's.
-If you regenerate this file with scripts/gen_leaderboard.py, note that the shipped generator has no perf_*.json to read on this machine and will blank TTFT/tok-per-s for EVERY row, not just these four — see PACKET.md §7.6 (N8). -->
-
-### ZoomGain-4B
+### ternary-bonsai-2-2b
 
 **Current epoch — 320 tasks, scorer 0.6.0**
 
 | Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| ZoomGain-4B | 320 t · 0.6.0 (current) | Nov 10 2026 | ZoomGain-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **82.9%** | 89.5 | 60.0 | 85.7 | 90.0 | 77.8 | 70.0 | 100.0 | — | — | looped 1 | `../cards/card_zoomgain-4b-q4km-kvq8.png` | on-GPU ≤12B |
+| Ternary-Bonsai-2 2B | 320 t · 0.6.0 (current) | Nov 2026 | Ternary-Bonsai-2-2B-Q2_0.gguf (0.55 GB) | Q2_0 | q8_0 | 32,768 | not recorded | 32,768 | 4 | **60.9%** | 71.9 | 40.0 | 57.1 | 40.0 | 55.6 | 80.0 | 83.3 | — | — | none | `../cards/card_ternary-bonsai-2-2b-q2-kvq8.png` | on-GPU ≤12B |
 
-### ZwZ2-4B
-
-**Current epoch — 320 tasks, scorer 0.6.0**
-
-| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| ZwZ2-4B | 320 t · 0.6.0 (current) | Oct 15 2026 | ZwZ2-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.3%** | 89.5 | 60.0 | 100.0 | 80.0 | 61.1 | 70.0 | 100.0 | — | — | none | `../cards/card_zwz2-4b-q4km-kvq8.png` | on-GPU ≤12B |
-
-### Ternary-Bonsai-2 9B
+### ternary-bonsai-2-9b
 
 **Current epoch — 320 tasks, scorer 0.6.0**
 
@@ -649,13 +638,21 @@ If you regenerate this file with scripts/gen_leaderboard.py, note that the shipp
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Ternary-Bonsai-2 9B | 320 t · 0.6.0 (current) | Nov 2026 | Ternary-Bonsai-2-9B-Q2_0.gguf (2.56 GB) | Q2_0 | q8_0 | 32,768 | not recorded | 32,768 | 4 | **79.2%** | 89.5 | 90.0 | 14.3 | 90.0 | 61.1 | 80.0 | 100.0 | — | — | none | `../cards/card_ternary-bonsai-2-9b-q2-kvq8.png` | on-GPU ≤12B |
 
-### Ternary-Bonsai-2 2B
+### zoomgain-4b
 
 **Current epoch — 320 tasks, scorer 0.6.0**
 
 | Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Ternary-Bonsai-2 2B | 320 t · 0.6.0 (current) | Nov 2026 | Ternary-Bonsai-2-2B-Q2_0.gguf (0.55 GB) | Q2_0 | q8_0 | 32,768 | not recorded | 32,768 | 4 | **60.9%** | 71.9 | 40.0 | 57.1 | 40.0 | 55.6 | 80.0 | 83.3 | — | — | none | `../cards/card_ternary-bonsai-2-2b-q2-kvq8.png` | on-GPU ≤12B |
+| ZoomGain-4B | 320 t · 0.6.0 (current) | Nov 10 2026 | ZoomGain-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **82.9%** | 89.5 | 60.0 | 85.7 | 90.0 | 77.8 | 70.0 | 100.0 | — | — | looped 1 | `../cards/card_zoomgain-4b-q4km-kvq8.png` | on-GPU ≤12B |
+
+### zwz2-4b
+
+**Current epoch — 320 tasks, scorer 0.6.0**
+
+| Model | Method | Release | GGUF file (size) | Quant | KV | Ctx | VRAM used / total | KV pool | Max subagents | Full % | Tool | Struct | Retr | Coding | Instr | Adv | Chains | TTFT | tok/s 1/4/8 | Failure modes | Card | Category |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| ZwZ2-4B | 320 t · 0.6.0 (current) | Oct 15 2026 | ZwZ2-4B-Q4_K_M.gguf (2.71 GB) | Q4_K_M | q8_0 | 32,768 | not recorded | 32,768 | 4 | **81.3%** | 89.5 | 60.0 | 100.0 | 80.0 | 61.1 | 70.0 | 100.0 | — | — | none | `../cards/card_zwz2-4b-q4km-kvq8.png` | on-GPU ≤12B |
 
 ## Classifier leaderboard (SEPARATE — never merged into generative %)
 
