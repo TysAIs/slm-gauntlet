@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="assets/hero.webp" alt="SLM Gauntlet — two robots brawl in a sand-floor arena while a rowdy crowd of other robots watches from the balcony tiers, waving blank score banners" width="100%">
+</p>
+
+<p align="center"><sub><b>320 tasks · 14 suites · 32 models ranked</b> — best 90.2% on 8 GB. The arena is illustration, not data; the board is <a href="SCOREBOARD.md">SCOREBOARD.md</a>.</sub></p>
+
 # SLM Gauntlet
 
 A benchmark for **small language models** (sub-12B class) that runs on whatever device you have — NVIDIA, AMD, or Apple Silicon. The card generator auto-detects your GPU and its memory, so every model card shows **your** hardware, not ours. It measures whether they can actually **do work as subagents** — call tools correctly, recover from errors, follow instructions precisely, and retrieve facts from long context — not just answer trivia.
