@@ -57,9 +57,9 @@ L1='ar'; L2='biter'
 # the docs legitimately quote) stay legal.
 M1='gr'; M2='unt-pve'
 N1='invi'; N2='ncible'
-# Private address space the earlier revision missed. Only 10.0.0. and 100.x were
-# screened before; RFC1918 class B/C and the CGNAT 100.64.0.0/10 range a tailnet
-# hands out were not, so a leaked tailnet address passed the gate.
+# Private address space the earlier revision missed. It screened only the first /24
+# of the 10/8 block and bare 100/8 prefixes; RFC1918 class B/C and the carrier-grade
+# NAT range a tailnet hands out were not screened, so a leaked tailnet address passed.
 O1='192'; O2='\.168\.'
 P1='172'; P2='\.(1[6-9]|2[0-9]|3[01])\.'
 Q1='100'; Q2='\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]'
