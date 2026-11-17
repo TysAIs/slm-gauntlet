@@ -6,7 +6,7 @@
 - next three: Bolt E4B 89.3, Qwen3.5-9B 84.5, Spark-X2.6-4B 84.4 — Bolt is inside one task's weight of the lead, so it is a tie, not a win;
 - newest entrant (measured 2026-11-16): **ZoomGain-4B** Q4_K_M, **82.9** seed-1 / **83.4** 3-run mean — a tie with Qwen3.5-4B (83.0) and Ornith-1.5-9B (83.1), 7.3 behind the lead;
 - at 102K context the hierarchy inverts: **MiniCPM5-2B** leads with 0.76, the 8 GB champion finishes last with 0.12;
-- 32 models ranked, 306 scored configurations, 209 extended-matrix cells; epoch 0.6.0 is not comparable with 0.5.0 or earlier.
+- 32 models ranked, 63 scored configurations in epoch 0.6.0 (306 cards in the corpus, 243 of them pre-0.6.0 and not comparable), 209 extended-matrix cells; epoch 0.6.0 is not comparable with 0.5.0 or earlier.
 - **2026-11-16 currency pass:** four entrants released in the previous two months were measured on this board (3 runs each, variance board below). Three more staged candidates could not be scored and are named with the reason in *Notes and exclusions* — none of them is silently missing.
 
 All results measured on one reference board: **NVIDIA GTX 1070 Ti 8GB**, llama.cpp serving, temperature-0 requests (the harness sets it per request), scores are the gauntlet weighted aggregate over the 320-task battery unless a board says otherwise. A cell that cannot be served in 8 GB is recorded as **does-not-fit** (serve_failed), never as zero.

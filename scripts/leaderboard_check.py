@@ -427,6 +427,39 @@ def pct(v, digits=1):
     return "—" if v is None else ("%." + str(digits) + "f%%") % v
 
 
+def blank_speed_cells(text: str) -> str:
+    """Blank the TTFT and tok/s cells of every speed table in a LEADERBOARD.md.
+
+    Used only to compare the committed detail table against a regeneration in a tree
+    without the per-run perf artifacts: those two columns are the only ones the cards
+    cannot supply, so they are the only ones that may differ for that reason.
+    """
+    out: list[str] = []
+    cols: list[int] = []
+    speed_headers = ("TTFT", "tok/s 1/4/8", "tok/s (1 stream)")
+    for ln in text.splitlines():
+        if not ln.startswith("|"):
+            cols = []
+            out.append(ln)
+            continue
+        cells = ln.split("|")
+        header = [c.strip() for c in cells]
+        if "TTFT" in header:
+            cols = [i for i, h in enumerate(header) if h in speed_headers]
+            out.append(ln)
+            continue
+        if cols and set("".join(header)) <= set("-: "):
+            out.append(ln)
+            continue
+        if cols and len(cells) > max(cols):
+            for i in cols:
+                cells[i] = " — "
+            out.append("|".join(cells))
+            continue
+        out.append(ln)
+    return "\n".join(out)
+
+
 def legacy_groups(legacy: list[dict]) -> list[dict]:
     """Collapse the non-comparable rows to one row per (model, epoch).
 
@@ -451,22 +484,59 @@ def legacy_groups(legacy: list[dict]) -> list[dict]:
     return out
 
 
-def render_block(data: dict) -> str:
+def logs_ship(data: dict, root) -> bool:
+    """True when every ranked row's source log is tracked by git.
+
+    The block's prose must state what a stranger can actually do. With the run logs in
+    the repository, `leaderboard_check.py` is a stranger-facing check; without them,
+    "recomputed from that run's log" advertises a step no clone can perform. Ask git,
+    not the working tree: a log that exists on the authoring machine ships nowhere.
+    """
+    srcs = [r.get("source_log") for r in data["rows"] + data["offload"]]
+    if not srcs or any(s is None for s in srcs):
+        return False
+    root_r = Path(root).resolve()
+    try:
+        out = subprocess.run(["git", "-C", str(root_r), "ls-files", "-z", "--", "results"],
+                             capture_output=True, text=True, check=False)
+    except OSError:
+        return False
+    if out.returncode != 0:
+        return False
+    tracked = {p for p in out.stdout.split("\0") if p}
+    for s in srcs:
+        if os.path.relpath(Path(s).resolve(), root_r) not in tracked:
+            return False
+    return True
+
+
+def render_block(data: dict, logs_shipped: bool = False) -> str:
     L = [BLOCK_BEGIN, ""]
     L.append("**Current leaderboard — %d tasks, scorer %s, NVIDIA GTX 1070 Ti 8 GB, all layers "
              "on-GPU, zero CPU offload, temp 0, seed 1.**" % (FULL_TASKS, CURRENT_EPOCH))
     L.append("")
+    if logs_shipped:
+        provenance = (
+            "Every score is the weighted aggregate defined in "
+            "`scripts/leaderboard_check.py`, recomputed from that run's own log, which ships with "
+            "the corpus (`results/<model>_<timestamp>.json`): `python3 "
+            "scripts/leaderboard_check.py` re-derives this table from a clone and exits non-zero "
+            "on any disagreement. The model's card (`results/cards/*.json`) carries the per-suite "
+            "result the score is computed from.")
+    else:
+        provenance = (
+            "Every score is the weighted aggregate defined in "
+            "`scripts/leaderboard_check.py`, recomputed from that run's log on the "
+            "authoring tree; the published instrument is the model's own card "
+            "(`results/cards/*.json`), which carries the per-suite result the score is computed "
+            "from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an "
+            "authoring-tree tool: in a public clone it reports every card as not reproducible.")
     L.append("One row per model: the **best-scoring configuration** of that model in the corpus "
-             "(%d scored configurations behind this table). Every score is the weighted aggregate "
-             "defined in `scripts/leaderboard_check.py`, recomputed from that run's log on the "
-             "authoring tree; the published instrument is the model's own card "
-             "(`results/cards/*.json`), which carries the per-suite result the score is computed "
-             "from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an "
-             "authoring-tree tool: in a public clone it reports every card as not reproducible. The "
+             "(%d scored configurations behind this table). %s The "
              "`Method` column carries the task count and scorer version for the row, so no row is "
              "ever compared across methodologies. Full per-configuration data: "
              "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)." % (
-                 sum(r["variants"] for r in data["rows"] + data["offload"])))
+                 sum(r["variants"] for r in data["rows"] + data["offload"]), provenance))
     L.append("")
     L.append(
         "| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | "
@@ -758,7 +828,8 @@ def main(argv=None) -> int:
         return 2
     logs = index_logs(root / "results")
     data = build_rows(cards, logs, verbose=a.verbose)
-    block = render_block(data)
+    shipped = logs_ship(data, root)
+    block = render_block(data, shipped)
     lj_text = publish_json(data)
 
     print("corpus: %d cards (%d rankable models after family collapse, %d offload, %d legacy)"
@@ -782,7 +853,7 @@ def main(argv=None) -> int:
                      c["suites_changed"], c["reason"]))
         cards = load_cards(cards_dir)
         data = build_rows(cards, logs, verbose=a.verbose)
-        block = render_block(data)
+        block = render_block(data, logs_ship(data, root))
         lj_text = publish_json(data)
         print("after repair: %d card repairs outstanding" % len(data["card_repairs"]))
 
@@ -806,20 +877,39 @@ def main(argv=None) -> int:
         return out
 
     def detail_problems() -> list[str]:
-        """results/_published/LEADERBOARD.md is generated from the same cards; catch staleness too."""
+        """results/_published/LEADERBOARD.md is generated from the same cards; catch staleness too.
+
+        Two of its columns -- TTFT and tok/s -- do not come from the cards at all: they come
+        from per-run `results/perf_*.json` speed artifacts, which are not part of the publish
+        surface. Without them the generator writes "—" in those cells, so a byte comparison
+        would report every published row as stale for a reason the reader cannot fix. Compare
+        the card-derived columns in full, and name the speed columns as not verifiable here,
+        the same way `scoreboard_check.py` names its own unshippable instruments.
+        """
         gen = root / "scripts" / "gen_leaderboard.py"
         committed = root / "results" / "_published" / "LEADERBOARD.md"
         if not gen.exists():
             return []
+        perf_present = any((root / "results").glob("perf_*.json"))
         with tempfile.TemporaryDirectory() as td:
             tmp = Path(td) / "LEADERBOARD.md"
             r = subprocess.run([sys.executable, str(gen), "--out", str(tmp)],
                                cwd=str(root), capture_output=True, text=True)
             if r.returncode != 0:
                 return ["scripts/gen_leaderboard.py failed: " + (r.stderr or r.stdout)[-300:]]
-            if not committed.exists() or committed.read_text() != tmp.read_text():
+            if not committed.exists():
+                return ["results/_published/LEADERBOARD.md is missing (run scripts/gen_leaderboard.py)"]
+            if perf_present:
+                same = committed.read_text() == tmp.read_text()
+            else:
+                same = (blank_speed_cells(committed.read_text())
+                        == blank_speed_cells(tmp.read_text()))
+            if not same:
                 return ["results/_published/LEADERBOARD.md is stale — run python3 scripts/gen_leaderboard.py "
                         "(the detail table is generated from the same cards)"]
+        if not perf_present:
+            print("not verifiable here: TTFT / tok-s columns of results/_published/LEADERBOARD.md "
+                  "(they come from per-run results/perf_*.json speed artifacts, which do not ship)")
         return []
 
     def verify_all() -> list[str]:

@@ -108,17 +108,22 @@ in [`docs/AUDIT-TASK-VALIDITY-v0.5.1.md`](docs/AUDIT-TASK-VALIDITY-v0.5.1.md).
 ## What is published, and what you can check
 
 Every score above is the weighted aggregate defined in `scripts/leaderboard_check.py`, the
-same figures `gauntlet run` prints. The published instrument is the model's **card**
-(`results/cards/*.json`): it carries the per-suite results the score is computed from, and
-[`SCOREBOARD.md`](SCOREBOARD.md) is re-derived from those cards by
-`scripts/scoreboard_check.py`, which exits non-zero on any disagreement — 88 cells in a
-public clone, 144 on the authoring tree, with the boards whose raw logs stay private named
-rather than skipped silently. The raw run logs behind the cards also stay on the authoring
-machine, so `scripts/leaderboard_check.py` cannot reproduce a card in a public clone — it is
-an authoring-tree tool, not a stranger-facing check. The table above is generated, never
-written: `python3 scripts/leaderboard_check.py` exits non-zero when this block,
-`results/_published/leaderboard.json` and the card corpus disagree, and `--write`
-regenerates them.
+same figures `gauntlet run` prints. The **card** (`results/cards/*.json`) carries the
+per-suite results the score is computed from, and [`SCOREBOARD.md`](SCOREBOARD.md) is
+re-derived from those cards by `scripts/scoreboard_check.py`, which exits non-zero on any
+disagreement — 92 cells verified in a clone, 144 on the authoring tree, with the boards whose
+raw logs stay private named rather than skipped silently.
+
+The run log of every ranked configuration ships with the corpus: 63 files under `results/`,
+one per scored configuration in epoch 0.6.0, each with its `endpoint` address replaced by
+`<lane-host>`. That is what makes the table above reproducible rather than merely reported —
+`python3 scripts/leaderboard_check.py` recomputes every row from those logs in a clone and
+exits non-zero when this block, `results/_published/leaderboard.json` and the card corpus
+disagree; `--write` regenerates them. Pre-0.6.0 logs stay private: those cards are the legacy
+provenance rows, and the checker names them as not reproducible instead of counting them. The
+TTFT and tok/s columns of `results/_published/LEADERBOARD.md` come from per-run speed
+artifacts that do not ship, so a clone cannot verify them and a regeneration there leaves them
+blank.
 
 ---
 
@@ -288,8 +293,11 @@ llama.cpp/        a submodule pointer without a published .gitmodules: an empty 
                   fresh clone, and nothing in the package needs it
 ```
 
-Raw run logs and per-run artifacts are gitignored (`results/*`); what ships is the card corpus,
-the published leaderboard and the receipts under `results/_preflight`.
+Run artifacts are gitignored (`results/*`) with one deliberate exception: the run log of every
+ranked configuration in the current epoch is tracked, because the published table has to be
+reproducible from a clone. Everything else under `results/` — repeat runs, perf artifacts,
+ad-hoc probes — stays on the authoring machine. What else ships is the card corpus, the
+published leaderboard and the receipts under `results/_preflight`.
 
 ## Repository hygiene
 
