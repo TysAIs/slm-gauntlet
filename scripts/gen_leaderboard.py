@@ -19,6 +19,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent / "results"
 CARDS = ROOT / "cards"
+# model id -> markdown link to that card's PNG, set while the corpus is loaded so a
+# superseded card links into archive/ instead of the current-epoch directory.
+CARD_LINK: dict[str, str] = {}
 
 FAM_ORDER = ["spark-x2.6-4b", "spark-x2.6-1.7b", "bolt-e4b", "lfm3-1.7b",
              "minicpm", "dory-4b", "dory-1.0-4b",
@@ -90,15 +93,39 @@ def method_label(card):
     return f"{n if n is not None else '?'} t · {ep} ({tag})"
 
 
+def card_ref(model) -> str:
+    """Markdown link for a card; defaults to the current-epoch directory."""
+    return CARD_LINK.get(model) or f"../cards/card_{model}.png"
+
+
+def card_json_files():
+    """The whole corpus: current epoch in cards/, superseded epochs in cards/archive/.
+
+    results/cards/ holds only the current epoch so a reader cannot open a superseded
+    card by mistake; the archived cards stay published because the legacy tables and
+    the reproducibility claim need them. This generator ranks and lists all of them.
+    """
+    return (sorted(glob.glob(str(CARDS / "card_*.json")))
+            + sorted(glob.glob(str(CARDS / "archive" / "card_*.json"))))
+
+
+def card_link(json_path) -> str:
+    """Relative markdown link to a card's PNG, honouring its subdirectory."""
+    p = Path(json_path)
+    sub = "archive/" if p.parent.name == "archive" else ""
+    return "../cards/{}{}".format(sub, p.with_suffix(".png").name)
+
+
 def main():
     cards = []
-    for jf in sorted(glob.glob(str(CARDS / "card_*.json"))):
+    for jf in card_json_files():
         data = json.load(open(jf))
         if not isinstance(data, list) or not data:
             continue
         m = data[0]
         if m["model"] == "announcement":
             continue
+        CARD_LINK[m["model"]] = card_link(jf)
         cards.append(m)
     # The document's header must describe the epoch it PRINTS, which is the newest one
     # that actually has rows — not whatever methodology the code currently ships. Bumping
@@ -190,7 +217,7 @@ def main():
                   else f"pre-{CURRENT_EPOCH} {best.get('n')}-task scorer {best_ep} (no current-epoch row yet)")
     lines.append(f"- **Best on-GPU overall: {best['display_name']} "
                  f"({best['details'].get('quant')}, KV {best['details'].get('kv_type')}) — "
-                 f"{best['overall_pct']:.1f}%** — measured {best_scope}; card `../cards/card_{best['model']}.png`. "
+                 f"{best['overall_pct']:.1f}%** — measured {best_scope}; card `{card_ref(best['model'])}`. "
                  f"Ties within one task are listed per family below; no single winner is declared "
                  f"from a one-task gap.")
     legacy_ongpu = [m for m in ongpu if epoch_of(m) != CURRENT_EPOCH]
@@ -200,7 +227,7 @@ def main():
                      f"{lb_best['display_name']} ({lb_best['details'].get('quant')}, KV "
                      f"{lb_best['details'].get('kv_type')}) — {lb_best['overall_pct']:.1f}%** at "
                      f"{lb_best.get('n')} tasks / scorer {epoch_of(lb_best)}; "
-                     f"card `../cards/card_{lb_best['model']}.png`.")
+                     f"card `{card_ref(lb_best['model'])}`.")
 
     lines.append("- **Best offload (generative): LFM2.5-24B-A2B UD-Q4_K_XL, 8K cap — 59.2%** "
                  "(retrieval 0% is an 8K-cap artifact, not a model score). Flint IQ2_XXS has no "
@@ -289,7 +316,7 @@ def main():
                 f"**{m['overall_pct']:.1f}%** | {pct(s.get('tooluse'))} | {pct(s.get('structured'))} | "
                 f"{pct(s.get('retrieval'))} | {pct(s.get('coding'))} | {pct(s.get('instruction'))} | "
                 f"{pct(s.get('adversarial'))} | {pct(s.get('agent_chains'))} | {ttft} | {tps} | "
-                f"{fm_s} | `../cards/card_{m['model']}.png` | {d.get('category') or '—'} |")
+                f"{fm_s} | `{card_ref(m['model'])}` | {d.get('category') or '—'} |")
 
     for fam in FAM_ORDER + sorted(set(groups) - set(FAM_ORDER)):
         ms = groups.get(fam)

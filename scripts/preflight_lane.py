@@ -81,7 +81,7 @@ from pathlib import Path
 DEFAULT_UNIT = "llama-worker@8891"
 DEFAULT_PORT = 8891
 DEFAULT_CT = "100"
-DEFAULT_SSH = os.environ.get("GRUNT_SSH", "pve")
+DEFAULT_SSH = os.environ.get("GRUNT_SSH", "lane-host")
 
 # Exit code per leg. Stable on purpose: a driver reports "REFUSED <code> <leg>" and a reader can
 # tell a card problem from a transport problem without parsing prose.

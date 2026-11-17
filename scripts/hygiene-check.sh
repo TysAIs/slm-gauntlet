@@ -57,7 +57,20 @@ L1='ar'; L2='biter'
 # the docs legitimately quote) stay legal.
 M1='gr'; M2='unt-pve'
 N1='invi'; N2='ncible'
-PATTERNS="${A1}${A2}|${B1}${B2}|${C1}${C2}|${D1}${D2}|10\\.0\\.0\\.|100\\.[0-9]+\\.|${E1}${E2}|@icloud\\.|${F1}${F2}|/home/[a-z]|${G1}${G2}|redacted|dgx|${H1}${H2}|${I1}${I2}|${J1}${J2}|${K1}${K2}|${L1}${L2}|${M1}${M2}|${N1}${N2}"
+# Private address space the earlier revision missed. Only 10.0.0. and 100.x were
+# screened before; RFC1918 class B/C and the CGNAT 100.64.0.0/10 range a tailnet
+# hands out were not, so a leaked tailnet address passed the gate.
+O1='192'; O2='\.168\.'
+P1='172'; P2='\.(1[6-9]|2[0-9]|3[01])\.'
+Q1='100'; Q2='\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]'
+# Literal lane identities: ssh alias values the sweep tooling used to default to,
+# and the private dotfiles path that used to carry the staging key.
+R1='p'; R2='ve-node'
+S1='p'; S2='ve-lab'
+T1='migration'; T2='-backup'
+U1='--ssh '; U2='pve'
+V1='ssh '; V2='pve'
+PATTERNS="${A1}${A2}|${B1}${B2}|${C1}${C2}|${D1}${D2}|10\\.0\\.0\\.|100\\.[0-9]+\\.|${E1}${E2}|@icloud\\.|${F1}${F2}|/home/[a-z]|${G1}${G2}|redacted|dgx|${H1}${H2}|${I1}${I2}|${J1}${J2}|${K1}${K2}|${L1}${L2}|${M1}${M2}|${N1}${N2}|${O1}${O2}|${P1}${P2}|${Q1}${Q2}|${R1}${R2}|${S1}${S2}|${T1}${T2}|${U1}${U2}|${V1}${V2}"
 
 FAIL=0
 STRICT_IDENT=0

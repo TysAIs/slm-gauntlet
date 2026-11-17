@@ -137,7 +137,10 @@ class Checker:
     # -- corpus -------------------------------------------------------------
     def _load_cards(self):
         by_cell: dict[tuple[str, str, str], dict] = {}
-        for p in sorted(CARDS.glob("card_*.json")):
+        # Current epoch in results/cards/, superseded epochs in results/cards/archive/.
+        # Both are the corpus; the split only stops a reader opening a stale card.
+        paths = sorted(CARDS.glob("card_*.json")) + sorted((CARDS / "archive").glob("card_*.json"))
+        for p in paths:
             try:
                 doc = json.loads(p.read_text())
             except Exception:

@@ -500,7 +500,7 @@ def main(argv=None) -> int:
     ap.add_argument("--port", type=int, default=8891)
     ap.add_argument("--dead-port", type=int, default=8899,
                     help="a port nothing listens on, for the endpoint and CPU-fallback seeds")
-    ap.add_argument("--ssh", default=os.environ.get("GRUNT_SSH", "pve"))
+    ap.add_argument("--ssh", default=os.environ.get("GRUNT_SSH", "lane-host"))
     ap.add_argument("--ssh-user", default="root")
     ap.add_argument("--ct", default="100")
     ap.add_argument("--unit", default="llama-worker@8891")

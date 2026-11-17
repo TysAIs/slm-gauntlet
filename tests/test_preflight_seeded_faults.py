@@ -53,7 +53,7 @@ def test_remote_commands_are_quoted_for_the_second_shell(monkeypatch):
         return Done()
 
     monkeypatch.setattr(prover, "sh", fake_sh)
-    lane = prover.Lane("pve", "100", "llama-worker@8891", 8891, "lane.example")
+    lane = prover.Lane("lane-host", "100", "llama-worker@8891", 8891, "lane.example")
     lane.run(["sh", "-c", "cd /opt && nohup ./llama-bench -m x > /tmp/y 2>&1 < /dev/null &"])
     remote = captured["argv"][-1]
     # One argument, fully quoted: the remote shell must hand `sh -c` the whole pipeline.
@@ -79,7 +79,7 @@ def test_burn_prefers_a_model_that_fits_beside_the_serving_engine(monkeypatch):
         stdout = "\n".join(rows)
         stderr = ""
 
-    lane = prover.Lane("pve", "100", "llama-worker@8891", 8891, "lane.example")
+    lane = prover.Lane("lane-host", "100", "llama-worker@8891", 8891, "lane.example")
     monkeypatch.setattr(lane, "run", lambda *a, **k: Done())
     assert lane.model_path().endswith("MiniCPM5-2B-Q4_K_M.gguf")
 
@@ -95,7 +95,7 @@ def test_burn_falls_back_to_the_smallest_gguf(monkeypatch):
         stdout = "\n".join(rows)
         stderr = ""
 
-    lane = prover.Lane("pve", "100", "llama-worker@8891", 8891, "lane.example")
+    lane = prover.Lane("lane-host", "100", "llama-worker@8891", 8891, "lane.example")
     monkeypatch.setattr(lane, "run", lambda *a, **k: Done())
     assert lane.model_path().endswith("small-600m-Q8_0.gguf")
 
@@ -103,7 +103,7 @@ def test_burn_falls_back_to_the_smallest_gguf(monkeypatch):
 def test_a_seed_expectation_cannot_contradict_the_table():
     """record() refuses to log a verdict whose expectation contradicts EXPECTED_EXIT."""
     class Args:
-        ssh = "pve"
+        ssh = "lane-host"
         ct = "100"
         unit = "llama-worker@8891"
         port = 8891

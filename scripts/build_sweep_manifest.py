@@ -15,7 +15,7 @@ B. NEMOTRON MATRIX — the intake the card asks for: every Bolt-E4B and Dory-1.0
 
 Inputs
   --inventory  lines of "<bytes>\\t<abs path>" for every .gguf on the box:
-               ssh pve 'pct exec 100 -- find /mnt/data/models -name "*.gguf" -printf "%s\\t%p\\n"'
+               ssh <test-box> 'pct exec <ctid> -- find <model-root> -name "*.gguf" -printf "%s\\t%p\\n"'
   --cards      results/cards (default; falls back to cards/manifest.json for headline rows)
   --published  results/_published/leaderboard.json (default; rankable rows only)
 

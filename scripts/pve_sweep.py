@@ -3,7 +3,7 @@
 
 WHY THIS EXISTS
 The gauntlet corpus was produced by per-model hand runs and a Mac-era night queue that
-spoke `ssh pve-lab` + port 18081. Neither matches the current test lane (`<test-box>`,
+spoke `ssh <lane-alias>` + port 18081. Neither matches the current test lane (`<test-box>`,
 `llama-worker@8891.service`, the box's tailnet address on port 8891), so a whole-suite
 re-run had no driver. This is that driver, and it is resume-safe because a full re-run
 spans hours.
@@ -731,7 +731,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", default=str(ROOT / "scripts" / "sweep_manifest_v050.tsv"))
     ap.add_argument("--state", default=str(ROOT / "results" / "_sweep_state.jsonl"))
-    ap.add_argument("--ssh", default=os.environ.get("GRUNT_SSH", "pve"))
+    ap.add_argument("--ssh", default=os.environ.get("GRUNT_SSH", "lane-host"))
     ap.add_argument("--ct", default="100")
     # No address literal in a public repo: the test box's tailnet/LAN address is the
     # operator's, so it arrives as --host or $GRUNT_HOST or the run refuses.

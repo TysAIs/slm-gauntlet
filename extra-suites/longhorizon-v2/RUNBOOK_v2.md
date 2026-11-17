@@ -5,10 +5,10 @@ Bench: `python3 lh-bench-v2r.py --endpoint http://127.0.0.1:8080/v1 --model <id>
   --doc longhorizon_doc_v2.txt --tasks longhorizon_tasks_v2r.json
   --out results_<id>-v2r.json`  (25 tasks, 9 families; per-family subscores in JSON)
 Tunnel: a systemd user service on the repo host `gauntlet-tunnel.service` (already active;
-endpoint is http://127.0.0.1:8080/v1 from the repo host, NEVER the PVE host's own :8080 —
-PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
+endpoint is http://127.0.0.1:8080/v1 from the repo host, NEVER the test box's own :8080 —
+the test box's firewall drops 8080; only its documented admin ports are open).
 
-## Serve (PVE, via ssh from the repo host with staging key ~/migration-backup/dotfiles/.ssh/id_ed25519)
+## Serve (<test-box>, via ssh from the repo host with the designated staging key)
 
 ```
 /opt/llama-new/llama-dory-merge/build/bin/llama-server -m <gguf> \
@@ -16,7 +16,7 @@ PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
   [--cache-type-k <kv> --cache-type-v <kv>]   # omit for FP16 (default f16)
 ```
 - KV values: f16 (FP16), q8_0, q4_0. NEVER label q8_0 as FP8 or q4_0 as FP4.
-- GGUF dirs on PVE (/mnt/data/models/): spark-x2.6-4b, spark-x2.6-4b-xhtoken,
+- GGUF dirs on <test-box> (/mnt/data/models/): spark-x2.6-4b, spark-x2.6-4b-xhtoken,
   spark-x2.6-4b-bartowski, spark-x2.6-1.7b, spark-x2.6-1.7b-xhtoken,
   minicpmv47-1b, lfm3-1.7b, qwen35-9b, lfm25-1.2b, lfm25-8b-a1b.
   (Bolt dir: see run log; Bolt is model-excluded anyway — do not serve it.)
@@ -39,7 +39,7 @@ PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
 - NOT-PROVEN variants (FIT_LIST.md) are NOT in this sweep. Do not add them
   without a separate fit-test step.
 - v2 scores go in their own leaderboard section. NEVER overwrite 32K scores.
-- No wipe, no deletions, no Sparks work, no push.
+- No wipe, no deletions, no work on the Spark family, no push.
 
 ## Health aborts (stop the run, record, do not retry blindly)
 
@@ -47,7 +47,7 @@ PVE firewall DROPs 8080; only 22/8006/9100 are allowed).
   decision (see criteria doc §8.1): sustained 100K prefills plateau at
   81-82C on this card, so a literal > 80C abort would kill every run.
   Record peak temp per run regardless.
-- PVE RAM available < 500 MB, swap use > 4 GB, VRAM headroom < 1 GiB at serve.
+- Test-box RAM available < 500 MB, swap use > 4 GB, VRAM headroom < 1 GiB at serve.
 - Server unhealthy, HTTP 400 on every task (context overflow), or slot stuck:
   record the mode, kill the server, verify GPU free, move to the next variant.
 

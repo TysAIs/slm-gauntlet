@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 
-_SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "pve-lab")
+_SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "lane-host")
 CT = ["ssh", "-o", "ConnectTimeout=15", _SSH_ALIAS, "pct", "exec", "100", "--"]
 PORT = "18081"
 

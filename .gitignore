@@ -11,6 +11,13 @@ models/
 # changed tasks); regenerating it from tasks/ is always cheaper than reviewing a diff.
 tasks_probe/
 results/*
+# Hard exclusion, stated separately from the blanket rule above because it encodes a
+# privacy decision rather than housekeeping: these are raw sweep console logs whose
+# first line reproduces the whole command, including the lane endpoint and local
+# paths. They are NEVER publishable and must never be force-added the way the epoch
+# run logs are. `tests/test_repo_privacy.py` fails if any file under this directory
+# ever becomes tracked.
+results/_sweep_logs/
 # EXCEPTION, deliberate: the run log of every ranked configuration in the current epoch is
 # tracked, because the published leaderboard has to be reproducible from a clone (63 files,
 # epoch 0.6.0, endpoint address scrubbed). They are force-added — `git add` obeys the rule

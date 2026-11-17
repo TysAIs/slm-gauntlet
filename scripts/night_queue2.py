@@ -4,7 +4,7 @@ import subprocess
 import sys
 import time
 
-_SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "pve-lab")
+_SSH_ALIAS = _os.environ.get("GAUNTLET_SSH_ALIAS", "lane-host")
 CT_HOST = _os.environ.get("GAUNTLET_CT_HOST", "localhost")
 EP = f"http://{CT_HOST}:18081/v1"
 CT = ["ssh", "-o", "ConnectTimeout=15", _SSH_ALIAS, "pct", "exec", "100", "--"]

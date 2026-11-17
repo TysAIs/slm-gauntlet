@@ -5,9 +5,9 @@
 # peaks are logged every 5s to /tmp/lh2_therm.log. 84C was the pre-ruling value.
 set -u
 SUITE="${SUITE:-$HOME/TysAIs/slm-gauntlet/extra-suites/longhorizon-v2}"
-KEY="${KEY:-$HOME/migration-backup/dotfiles/.ssh/id_ed25519}"
-PVE_HOST="${PVE_HOST:-pve-node}"
-PVE="ssh -o ConnectTimeout=10 -o BatchMode=yes -i $KEY root@$PVE_HOST"
+KEY="${KEY:-$HOME/.ssh/id_ed25519}"
+LANE_HOST="${LANE_HOST:-lane-host}"
+PVE="ssh -o ConnectTimeout=10 -o BatchMode=yes -i $KEY root@$LANE_HOST"
 BIN=/opt/llama-new/llama-dory-merge/build/bin/llama-server
 MANIFEST=$SUITE/sweep-manifest.tsv
 DLOG=$SUITE/sweep-driver.log

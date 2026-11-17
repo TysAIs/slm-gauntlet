@@ -176,7 +176,19 @@ def equal_suite_mean(suites: dict) -> float | None:
 # --- corpus + run logs -----------------------------------------------------
 
 def card_files(cards_dir: Path) -> list[Path]:
-    return sorted(p for p in cards_dir.glob("*.json") if p.name != "announcement.json")
+    """Every card in the corpus: the current epoch in cards_dir itself, superseded
+    epochs under cards_dir/archive/.
+
+    The split is deliberate. results/cards/ used to mix 306 cards across four epochs,
+    so a plain-named file such as card_gemma4-e4b-q4km was a v0.5.0 card reading 86.3
+    while the current top score was 90.2 under card_gemma4-e4b-q4km-kvq8 — a reader
+    could pick a superseded card by accident. Superseded cards stay published (the
+    legacy table and reproducibility need them); they are just not in the way.
+    """
+    files = [p for p in cards_dir.glob("*.json") if p.name != "announcement.json"]
+    files += [p for p in (cards_dir / "archive").glob("*.json")
+              if p.name != "announcement.json"]
+    return sorted(files)
 
 
 def load_cards(cards_dir: Path) -> list[dict]:
@@ -531,12 +543,23 @@ def render_block(data: dict, logs_shipped: bool = False) -> str:
             "(`results/cards/*.json`), which carries the per-suite result the score is computed "
             "from. The raw run logs are not published, so `scripts/leaderboard_check.py` is an "
             "authoring-tree tool: in a public clone it reports every card as not reproducible.")
-    L.append("One row per model: the **best-scoring configuration** of that model in the corpus "
-             "(%d scored configurations behind this table). %s The "
-             "`Method` column carries the task count and scorer version for the row, so no row is "
-             "ever compared across methodologies. Full per-configuration data: "
-             "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)." % (
-                 sum(r["variants"] for r in data["rows"] + data["offload"]), provenance))
+    ngpu = sum(r["variants"] for r in data["rows"])
+    noff = sum(r["variants"] for r in data["offload"])
+    L.append("One row per model: the **best-scoring configuration** of that model in the corpus. "
+             "Epoch %s holds %d scored configurations (%d on-GPU, %d offload, the offload ones "
+             "listed separately below); this table is one row each, taken from the best of them. "
+             "%s The `Method` column carries the task count and scorer version for the row, so no "
+             "row is ever compared across methodologies. Full per-configuration data: "
+             "[`results/_published/LEADERBOARD.md`](results/_published/LEADERBOARD.md)."
+             % (CURRENT_EPOCH, ngpu + noff, ngpu, noff, provenance))
+    L.append("")
+    L.append(
+        "**This table ranks \"best configuration of that model\", which is deliberately not the "
+        "same ranking as [`SCOREBOARD.md`](SCOREBOARD.md).** SCOREBOARD's T1 screen reads each "
+        "model's *canonical seed-1 run* instead — one fixed quant and KV type per model — so a "
+        "model whose best configuration is not its canonical one carries two different numbers "
+        "across the two boards. Both are current and both are correct under their own stated "
+        "rule; neither is an older score. Read whichever rule the question calls for.")
     L.append("")
     L.append(
         "| Rank | Model | Best configuration | Score | Tool | Adv | Chains | Struct | "

@@ -308,7 +308,7 @@ this sweep and must not be smuggled in.
   variants (fit-test first), offload/classifier/vision tracks (separate).
 - Health aborts: RAM available < 500 MB, swap > 4 GB, VRAM headroom < 1 GiB.
   Thermal: see open question 1 below.
-- No wipe, no deletions, no Sparks work, no push.
+- No wipe, no deletions, no work on the Spark family, no push.
 
 ## Open questions for the operator (nothing silently decided)
 
